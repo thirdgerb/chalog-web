@@ -1,14 +1,16 @@
+const path = require('path');
+
+function resolve (dir) {
+  return path.join(__dirname, dir)
+}
+
 module.exports = {
   "transpileDependencies": [
     "vuetify"
   ],
   chainWebpack: config => {
-    config
-      .plugin('html')
-      .tap(args => {
-        args[0].title = 'CommuneChatbot'
-        return args
-      })
+    // config.resolve.alias
+    //   .set("@", resolve("src"));
   }
 }
 

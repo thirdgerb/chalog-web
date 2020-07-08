@@ -1,60 +1,45 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
+    <!-- app bar -->
+    <AppBar/>
 
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
+    <!-- drawer -->
+    <Drawer/>
 
-      <v-spacer></v-spacer>
+    <!-- loading -->
+    <v-overlay :value="loading" opacity="0.1">
+      <v-progress-circular indeterminate size="64"></v-progress-circular>
+    </v-overlay>
 
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-    </v-app-bar>
-
-    <v-content>
-      <HelloWorld/>
-    </v-content>
+    <v-main>
+      <ShowChat></ShowChat>
+    </v-main>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
+import AppBar from './components/AppBar';
+import Drawer from './components/Drawer';
+import ShowChat from './components/ShowChat';
+
 
 export default {
   name: 'App',
 
   components: {
-    HelloWorld,
+      Drawer,
+      ShowChat,
+      AppBar,
   },
 
   data: () => ({
     //
   }),
+  computed:{
+
+      loading () {
+        return this.$store.state.layout.loading;
+      }
+  }
 };
 </script>
