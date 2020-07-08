@@ -3,9 +3,11 @@
         <v-list-item
         >
             <v-list-item-avatar>
+
                 <v-icon
                     class="blue white--text"
                 >{{item.icon}}</v-icon>
+
             </v-list-item-avatar>
 
             <v-list-item-content>
@@ -13,7 +15,8 @@
                 <v-list-item-subtitle >{{lastMessage}}</v-list-item-subtitle>
             </v-list-item-content>
             <v-list-item-action >
-                <v-badge color="pink" dot avatar>
+
+                <v-badge color="pink" v-show="item.hasNew" content="9" dot >
                     <v-list-item-action-text v-text="item.receivedAt"></v-list-item-action-text>
                 </v-badge>
             </v-list-item-action>

@@ -26,42 +26,48 @@
 //
 // const EVENT_ACK = 'system.ack';
 //
-// class IntercomMessage
-// {
-//   id = '';
-//   isInput = true;
-//   creator = '';
-//   creatorId = '';
-//   createdAt = 0;
-//   message;
-//
-//   constructor(
-//     id,
-//     message,
-//     isInput,
-//     creator,
-//     creatorId,
-//     createdAt
-//   )
-//   {
-//     this.id = id;
-//     this.message = message;
-//     this.isInput = isInput;
-//     this.creator = creator;
-//     this.createdAt = createdAt;
-//   }
-//
-// }
-//
-// const MESSAGE_TYPE_TEXT = 'text';
-// const MESSAGE_TYPE_VIDEIO = 'video';
-//
-// class Message
-// {
-//   type = ''; // text,
-//   data = {};
-//
-// }
+
+class Message
+{
+  // 消息唯一ID
+  id = '';
+  // 是否是输入消息
+  isInput = true;
+  // 创建者名称
+  creator = '';
+  // 会话ID
+  sessionId = '';
+  // 消息创建时间
+  createdAt = 0;
+  // 消息体.
+  message;
+
+  constructor(data)
+  {
+    this.id = data.id;
+    this.message = message;
+    this.isInput = data.isInput;
+    this.creator = data.creator;
+    this.createdAt = data.createdAt;
+    this.sessionId = data.sessionId;
+    this.message = new MessageData(data.message);
+  }
+
+}
+
+const MESSAGE_TYPE_TEXT = 'text';
+const MESSAGE_TYPE_VIDEIO = 'video';
+
+class MessageData
+{
+  type = ''; // text,
+  data = {};
+
+  constructor(message)
+  {
+    Object.assign(this, message);
+  }
+}
 
 
 export class Chat
@@ -82,8 +88,6 @@ export class Chat
   lastMessage = '';
   // 最后的响应时间.
   receivedAt = '';
-  // 图片
-  avatar = '';
 
   constructor(data)
   {
