@@ -1,3 +1,5 @@
 
 
 export const TOGGLE_DRAWER = 'TOGGLE_DRAWER'
+export const TOGGLE_VIDEO = 'TOGGLE_VIDEO'
+export const VIDEO_SETTER = 'VIDEO_SETTER';

@@ -10,13 +10,14 @@
     >
         <v-app-bar-nav-icon @click.stop="TOGGLE_DRAWER"></v-app-bar-nav-icon>
         <v-spacer></v-spacer>
-        <v-toolbar-title>CommuneChatbot</v-toolbar-title>
+        <v-btn text small @click.stop="TOGGLE_VIDEO">视频</v-btn>
+
     </v-app-bar>
 </template>
 
 <script>
     import { mapMutations } from 'vuex'
-    import { TOGGLE_DRAWER } from "../constants";
+    import { TOGGLE_DRAWER, TOGGLE_VIDEO } from "../constants";
 
     export default {
         name: "AppBar",
@@ -25,7 +26,8 @@
         },
         methods: {
             ...mapMutations([
-              TOGGLE_DRAWER
+              TOGGLE_DRAWER,
+              TOGGLE_VIDEO,
             ]),
         }
     }

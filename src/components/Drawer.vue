@@ -12,16 +12,29 @@
       Commune v0.2
     </v-toolbar>
     <v-divider></v-divider>
-    <v-list
-        dense
-        nav
-    >
-      <v-list-item-group>
-        <chat-item v-for="(item, index) in items"
-           :item="item"
-           :key="index" ></chat-item>
+    <!-- alive chat -->
+    <v-subheader>当前会话</v-subheader>
+    <!-- subscribe chats -->
+    <v-list dense nav>
+      <v-list-item-group >
+        <template v-for="(item, index) in items">
+            <chat-item
+               :item="item"
+               :key="item.sessionId" ></chat-item>
+            <v-divider :key="index"></v-divider>
+        </template>
       </v-list-item-group>
     </v-list>
+    <template v-if="hasIncomingChat">
+        <v-subheader>未连接</v-subheader>
+        <v-list dense nav>
+          <v-list-item-group >
+            <chat-item v-for="item in incoming"
+                       :item="item"
+                       :key="item.sessionId" ></chat-item>
+          </v-list-item-group>
+        </v-list>
+    </template>
   </v-navigation-drawer>
 
 
@@ -46,6 +59,13 @@
         },
         items () {
           return this.$store.state.chats;
+        },
+        hasIncomingChat() {
+          let keys = Object.keys(this.$store.state.incomingChats);
+          return keys.length > 0;
+        },
+        incoming() {
+          return this.$store.state.incomingChats;
         }
       }
   }

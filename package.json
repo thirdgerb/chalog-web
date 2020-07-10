@@ -12,6 +12,8 @@
     "js-cookie": "^2.2.1",
     "uuid": "^8.2.0",
     "vue": "^2.6.11",
+    "vue-qr": "^2.2.1",
+    "vue-router": "^3.3.4",
     "vue-socket.io": "^3.0.9",
     "vuetify": "^2.3.4",
     "vuetify-loader": "^1.5.0",
