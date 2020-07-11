@@ -34,7 +34,9 @@ export default new Vuex.Store({
     },
     video : {
       play : false,
-      url : '//player.bilibili.com/player.html?aid=243815965&bvid=BV1iv411i7tq&cid=210478701&page=1',
+      url :
+      "//player.bilibili.com/player.html?aid=838704523&bvid=BV1Bg4y1v79P&cid=207273372&page=1"
+        //'//player.bilibili.com/player.html?aid=243815965&bvid=BV1iv411i7tq&cid=210478701&page=1',
     },
     // 进行中的聊天.
     chats : chats,
@@ -46,7 +48,8 @@ export default new Vuex.Store({
         state.layout.drawer = !state.layout.drawer;
       },
       [TOGGLE_VIDEO] : state => {
-        state.video.play = !state.video.play;
+        state.video.play = true;
+        state.video.url = "//player.bilibili.com/player.html?aid=94527292&bvid=BV1nE411g7Lc&cid=161355478&page=1";
       },
       [VIDEO_SETTER] : (state, val) => {
         state.video.play = val;

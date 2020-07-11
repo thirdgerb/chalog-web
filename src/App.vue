@@ -11,25 +11,24 @@
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
 
-    <login v-if="false"></login>
-    <Bili></Bili>
-
     <v-main>
-      <div class="chat-container" id="scroll-target">
-        <chat-list
-            v-for="chat in chats"
-            :chat="chat"
-            :key="chat.sessionId"
-            v-show="chat.sessionId === alive"
-        ></chat-list>
-
-        <!--- input --->
-        <div class="chat-input">
-          <textarea placeholder="请输入..."
-                    rows="2"
-          ></textarea>
-        </div>
-      </div>
+        <v-container class="chat-container" fluid>
+            <div class="chat-wrap">
+                <chat-list
+                    v-for="chat in chats"
+                    :chat="chat"
+                    :key="chat.sessionId"
+                    v-show="chat.sessionId === alive"
+                ></chat-list>
+            </div>
+            <bili></bili>
+            <!--- input --->
+            <div class="chat-input">
+              <textarea placeholder="请输入..."
+                        rows="2"
+              ></textarea>
+            </div>
+        </v-container>
     </v-main>
   </v-app>
 </template>
@@ -37,20 +36,18 @@
 <script>
 import AppBar from './components/AppBar';
 import Drawer from './components/Drawer';
-import Login from  './components/Login';
 import ChatList from './components/ChatList';
-import Bili from './components/BiliBiliVideo';
+import Bili from './components/BiliVideo';
 
 
 export default {
   name: 'App',
 
   components: {
-    ChatList,
-    Login,
+      ChatList,
       Drawer,
       AppBar,
-      Bili,
+      Bili
   },
 
   data: () => ({

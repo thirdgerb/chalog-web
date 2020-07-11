@@ -1,21 +1,16 @@
 <template>
-    <v-dialog
-        v-model="play"
-        max-width="800px"
-    >
-
-        <v-sheet height="100%">
+    <v-dialog v-model="play" width="600">
+        <v-sheet  class="bili-video">
             <iframe
                 :src="src"
+                ref="bili"
                 scrolling="no"
                 border="0"
                 frameborder="no"
                 framespacing="0"
                 allowfullscreen="true"
-                style="width:100%;height: calc(100vw * 9 / 16);max-height:100%"
             ></iframe>
         </v-sheet>
-
     </v-dialog>
 </template>
 
@@ -23,13 +18,9 @@
   import {VIDEO_SETTER} from '../constants';
 
   export default {
-    name: "VideoDialog",
+    name: "biliVideo",
     data() {
       return {
-        video : {
-          url: '//player.bilibili.com/player.html?aid=243815965&bvid=BV1iv411i7tq&cid=210478701&page=1'
-        },
-
       }
     },
     computed : {
@@ -56,4 +47,18 @@
 
 <style scoped>
 
+.bili-video {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-top: 56.2%;
+}
+.bili-video iframe {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left:0;
+
+}
 </style>

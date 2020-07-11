@@ -1,5 +1,5 @@
 <template>
-    <div class="chat-wrap">
+    <div>
         <!-- 需要实现一个视频消息 -->
         <!-- 需要实现一个二维码消息 -->
 
@@ -31,6 +31,7 @@
                 <span class="chat-bubble">
                     <v-btn
                        class="mx-2" dark large color="purple"
+                       @click.stop="play"
                     >
                         <v-icon dark>mdi-play-box</v-icon>
                     </v-btn>
@@ -139,11 +140,17 @@
 </template>
 <script>
   import VueQr from 'vue-qr'
+  import {VIDEO_SETTER} from "../constants";
 
   export default {
     name: "ChatList",
     components: {
       VueQr
+    },
+    methods : {
+      play () {
+        this.$store.commit(VIDEO_SETTER, true);
+      }
     }
   }
 </script>

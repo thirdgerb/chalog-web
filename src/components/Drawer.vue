@@ -20,8 +20,7 @@
         <template v-for="(item, index) in items">
             <chat-item
                :item="item"
-               :key="item.sessionId" ></chat-item>
-            <v-divider :key="index"></v-divider>
+               :key="index" ></chat-item>
         </template>
       </v-list-item-group>
     </v-list>

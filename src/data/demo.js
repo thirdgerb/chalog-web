@@ -2,7 +2,7 @@ import {Chat} from './protocals';
 
 
 export let chat1 = new Chat({
-  sessionId : '1',
+  sessionId : 'a1',
   scene : '',
   title : '会话测试1',
   icon : 'mdi-robot',
@@ -13,7 +13,7 @@ export let chat1 = new Chat({
 });
 
 export let chat2 = new Chat({
-  sessionId : '2',
+  sessionId : 'a2',
   scene : '',
   title : '会话测试2',
   icon : 'mdi-robot',
@@ -24,7 +24,7 @@ export let chat2 = new Chat({
 });
 
 export let chat3 = new Chat({
-  sessionId : '3',
+  sessionId : 'a3',
   scene : '',
   title : '会话测试3',
   icon : 'mdi-robot',
@@ -35,7 +35,7 @@ export let chat3 = new Chat({
 });
 
 export let chat4 = new Chat({
-  sessionId : '4',
+  sessionId : 'a4',
   scene : '',
   title : '会话测试4',
   icon : 'mdi-robot',
@@ -52,7 +52,7 @@ chats[chat3.sessionId] = chat3;
 chats[chat4.sessionId] = chat4;
 for(let i=5; i< 7 ; i++) {
   let newChat = new Chat(chat3);
-  newChat.sessionId = i;
+  newChat.sessionId = 'a' + i;
   chats[i] = newChat;
 }
 
