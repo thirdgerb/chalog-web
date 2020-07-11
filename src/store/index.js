@@ -3,7 +3,8 @@ import Vuex from 'vuex'
 import {
   TOGGLE_DRAWER,
   TOGGLE_VIDEO,
-  VIDEO_SETTER
+  PLAY_VIDEO,
+  CHAT_TO_BOTTOM,
 } from '../constants';
 import Cookie from 'js-cookie';
 import {chats,chat4, chat1} from '../data/demo';
@@ -31,6 +32,7 @@ export default new Vuex.Store({
       drawer: true,
       loading: false,
       alive: chat1.id,
+      chatToBottom : false,
     },
     video : {
       play : false,
@@ -51,11 +53,35 @@ export default new Vuex.Store({
         state.video.play = true;
         state.video.url = "//player.bilibili.com/player.html?aid=94527292&bvid=BV1nE411g7Lc&cid=161355478&page=1";
       },
-      [VIDEO_SETTER] : (state, val) => {
-        state.video.play = val;
+
+
+    /**
+     * 播放电影.
+     * @param state
+     * @param  {Object} payload
+     */
+    [PLAY_VIDEO] : (state, payload) => {
+      console.log(
+        'receive',
+        payload,
+        state.video.url,
+        payload.url !== state.video.url
+      );
+
+        if (payload.url && payload.url !== state.video.url) {
+          state.video.url = payload.url;
+        }
+        state.video.play = payload.play ? payload.play : false;
+      },
+
+      [CHAT_TO_BOTTOM] : (state, payload) => {
+        if (Object.prototype.hasOwnProperty.call(payload, 'value')) {
+          state.layout.chatToBottom = payload.value;
+        }
       }
   },
   actions: {
+
   },
   modules: {
   }

@@ -1,23 +1,34 @@
 
-.chat-container {
-    width: 100%;
-    height: 100%;
-    margin: 0 auto;
-    overflow: hidden;
-    position: relative;
+#chat-container {
+    /*height: 100%;*/
+    /*left: 0;*/
+    /*right:0;*/
+    /*bottom:0;*/
+    /*top:0;*/
+    /*width: 100%;*/
+    /*height: 100%;*/
+    /*padding: 5px;*/
+    /*overflow: hidden;*/
+    background-color: #eeeeee;
+    /*-webkit-overflow-scrolling: touch;*/
+    /*-webkit-transform: translate3d(0, 0, 0);*/
 }
+#chat-bottom {height:0;clear:both;}
 .chat-wrap {
     position: absolute;
+    /*top: 0;*/
+    /*bottom: 0;*/
+
+    /*padding: 10px 15px 10px 10px;*/
+
     top: 0;
-    bottom: 0;
     left: 0;
+    bottom: 0;
     right: -17px;
-    padding: 10px calc(17px + 10px) 80px 10px;
-    overflow-y: scroll;
+}
+.chat {
+    padding: 10px 15px 60px 10px;
     word-break: break-all;
-    -webkit-overflow-scrolling: touch;
-    -webkit-transform: translate3d(0, 0, 0);
-    background-color: #eeeeee;
 }
 .chat-row {
     margin-bottom : 10px;
@@ -73,28 +84,23 @@
     color: grey;
 }
 
-.chat-container .chat-input {
+.chat-input {
     position: absolute;
     bottom: 0;
-    left: 0;
-    right: 0;
-    font-family: "Helvetica Neue", Helvetica, sans-serif;
+    right:15px;
+    left:15px;
     color: #2c2c2c;
 }
-.chat-container .chat-input textarea {
-    width: calc(100% - 20px);
+.chat-input textarea {
     font-family: "Helvetica Neue", Helvetica, sans-serif;
-    color: #2c2c2c;
-    background: rgba(250, 250, 250, 0.95);
+    margin-bottom: 0;
     font-size: 1em;
     letter-spacing: .5px;
     font-weight: 400;
-    margin: 10px;
-    border-radius: 15px;
-    border: none;
-    padding: 10px 15px;
-    outline: none;
-    box-shadow: 0 0 0 1px #d0d0d0 inset;
-    line-height: 1.25em;
+    /*border-radius: 15px;*/
+    /*border: none;*/
+    /*outline: none;*/
+    /*box-shadow: 0 0 0 1px #d0d0d0 inset;*/
+    /*line-height: 1.25em;*/
     resize:none;
 }

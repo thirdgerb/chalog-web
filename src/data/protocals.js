@@ -69,7 +69,113 @@
 //   }
 // }
 
+// /**
+//  * @property {string} sessionId
+//  */
+// export class ChatInfo {
+//
+//   /**
+//    * 对话场景
+//    * @type {string}
+//    */
+//   scene = '';
+//
+//   /**
+//    * sessionId 的设置值.
+//    * 如果没有需要自动生成一个.
+//    * @type {string}
+//    */
+//   sessionId = '';
+//
+//   /**
+//    * 分组的标题.
+//    * @type {string}
+//    */
+//   title ='';
+//
+//   /**
+//    * 分组的图标.
+//    * @type {string}
+//    */
+//   icon='';
+//
+//   /**
+//    * 是否有新消息.
+//    * @type {boolean}
+//    */
+//   hasNew = false;
+//
+//   /**
+//    * 消息体
+//    * @type {MessageBatch[]}
+//    */
+//   batches = [];
+//
+//   /**
+//    * 当前的建议
+//    * @type {string[]}
+//    */
+//   suggestions = [];
+//
+//   /**
+//    * 最后一条消息的简述.
+//    * @returns {string}
+//    */
+//   get lastMessage() {
+//     return ''
+//   }
+//
+//   constructor() {
+//   }
+//
+//   appendMessage(messages) {
+//
+//   }
+// }
+//
+// /**
+//  * 消息批次
+//  */
+// export class MessageBatch {
+//
+//   /**
+//    * 消息的批次 ID
+//    * @type {string}
+//    */
+//   batchId = '';
+//
+//   /**
+//    * 发送者Id.
+//    * @type {string}
+//    */
+//   creatorId = '';
+//
+//   /**
+//    * 发送者名称.
+//    * @type {string}
+//    */
+//   creatorName = '';
+//
+//   /**
+//    * 创建时间.
+//    * @type {string}
+//    */
+//   createdAt = '20:00:00';
+//
+//   /**
+//    *
+//    * @type {Message[]}
+//    */
+//   messages = [];
+// }
+//
+// export class Message {
+//
+// }
 
+/**
+ * 对话分组.
+ */
 export class Chat
 {
   // 对话的场景, 决定机器人响应的对象.

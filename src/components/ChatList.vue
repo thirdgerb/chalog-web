@@ -1,5 +1,6 @@
 <template>
-    <div>
+    <div >
+
         <!-- 需要实现一个视频消息 -->
         <!-- 需要实现一个二维码消息 -->
 
@@ -27,16 +28,8 @@
                 <span class="chat-author">测试用户</span>
                 <span class="chat-date">20:19:31</span>
             </div>
-            <div class="chat-content">
-                <span class="chat-bubble">
-                    <v-btn
-                       class="mx-2" dark large color="purple"
-                       @click.stop="play"
-                    >
-                        <v-icon dark>mdi-play-box</v-icon>
-                    </v-btn>
-                </span>
-            </div>
+
+            <message-bili></message-bili>
         </div>
 
         
@@ -45,9 +38,7 @@
                 <span class="chat-author">测试用户</span>
                 <span class="chat-date">20:19:31</span>
             </div>
-            <div class="chat-content">
-                <span class="chat-bubble">hello world</span>
-            </div>
+            <message-text></message-text>
         </div>
     
         <div class="chat-row chat-receive">
@@ -55,9 +46,7 @@
                 <span class="chat-author">测试用户</span>
                 <span class="chat-date">20:19:31</span>
             </div>
-            <div class="chat-content">
-                <span class="chat-bubble">hello world</span>
-            </div>
+            <message-text></message-text>
         </div>
     
         <div class="chat-row chat-receive">
@@ -65,9 +54,7 @@
                 <span class="chat-author">测试用户</span>
                 <span class="chat-date">20:19:31</span>
             </div>
-            <div class="chat-content">
-                <span class="chat-bubble">hello world</span>
-            </div>
+            <message-text></message-text>
         </div>
     
         <div class="chat-row chat-receive">
@@ -134,23 +121,22 @@
                 <span  class="chat-bubble">3. hello world</span>
             </div>
         </div>
-
     </div>
 
 </template>
 <script>
   import VueQr from 'vue-qr'
-  import {VIDEO_SETTER} from "../constants";
+  import MessageBili from "./MessageBili";
+  import MessageText from "./MessageText";
 
   export default {
     name: "ChatList",
     components: {
+      MessageBili,
+      MessageText,
       VueQr
     },
     methods : {
-      play () {
-        this.$store.commit(VIDEO_SETTER, true);
-      }
     }
   }
 </script>
