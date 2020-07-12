@@ -1,9 +1,5 @@
 <template>
     <div >
-
-        <!-- 需要实现一个视频消息 -->
-        <!-- 需要实现一个二维码消息 -->
-
         <div class="chat-row chat-receive">
             <div class="chat-title">
                 <span class="chat-author">测试用户</span>
@@ -107,20 +103,19 @@
             </div>
         </div>
 
+        <batch-item
+          v-for="batch in batches"
+          v-bind:key="batch.batchId"
+          v-bind:batch="batch"
+        ></batch-item>
     
         <div  class="chat-row chat-say">
             <div class="chat-content">
-                <span  class="chat-bubble chat-pick">hello world</span>
+                <span class="chat-bubble chat-pick">hello world</span>
             </div>
         </div>
     
-        <div  class="chat-row chat-say">
-            <div class="chat-content">
-                <span  class="chat-bubble">1. hello worldhello worldhello worldhello worldhello worldhello worldhello d</span>
-                <span  class="chat-bubble">2. hello world</span>
-                <span  class="chat-bubble">3. hello world</span>
-            </div>
-        </div>
+        <message-suggests></message-suggests>
     </div>
 
 </template>
@@ -128,13 +123,41 @@
   import VueQr from 'vue-qr'
   import MessageBili from "./MessageBili";
   import MessageText from "./MessageText";
+  import MessageSuggests from "./MessageSuggests";
+
+  import BatchItem from "./BatchItem";
+  import MessageBatch from "../protocals/MessageBatch";
+  import TextMessage from "../protocals/TextMessage";
+
+  let batch1 = MessageBatch.createByMessage(
+    TextMessage.create('nonononono'),
+    'test',
+    'test'
+  );
+  let batch2 = MessageBatch.createByMessage(
+    TextMessage.create('hahahahahhaj'),
+    'test',
+    'test',
+    false
+  );
 
   export default {
     name: "ChatList",
     components: {
       MessageBili,
       MessageText,
-      VueQr
+      VueQr,
+      MessageSuggests,
+      BatchItem,
+    },
+    data() {
+
+      return {
+        batches : [
+          batch1,
+          batch2
+        ],
+      }
     },
     methods : {
     }

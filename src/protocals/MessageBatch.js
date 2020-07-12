@@ -1,7 +1,9 @@
 
-// import uuidV4 from 'uuid';
+import Message from './Message';
+import TextMessage from "./TextMessage";
+import createMessage from "./CreateMessage";
 
-export class MessageBatch {
+export default class MessageBatch {
 
   /**
    * 是否是输入消息
@@ -29,15 +31,72 @@ export class MessageBatch {
   creatorName = '';
 
   /**
-   * 创建时间.
-   * @type {string}
-   */
-  createdAt = '20:00:00';
-
-  /**
    *
    * @type {Message[]}
    */
   messages = [];
 
+  constructor(data) {
+    if (!(data instanceof Object)) {
+      throw new Error('construct value is not object');
+    }
+
+    // 处理 batchId.
+    let batchId = data.batchId ? data.batchId : '';
+
+    // 处理 message.
+    let messages = data.message ? data.message : [];
+    if (!(messages instanceof Array)) {
+      throw new Error('messages must be array')
+    }
+
+    delete data.message;
+    for (let message of messages) {
+
+      let messageIns = createMessage(message);
+
+      console.log('message ins', messageIns);
+      this.append(messageIns);
+
+      batchId = batchId ? batchId : messageIns.id;
+    }
+
+    data.batchId = batchId;
+
+    Object.assign(this, data);
+  }
+
+  append(message) {
+    if (!(message instanceof Message)) {
+      return;
+    }
+    this.messages.push(message);
+  }
+
+  static createByMessage(message, creatorName, creatorId, isInput = true) {
+    if (!(message instanceof Message)) {
+      console.log(message);
+      throw new Error('message must be instanceof Message');
+    }
+
+    return new MessageBatch({
+      isInput : isInput,
+      creatorId : creatorId,
+      creatorName : creatorName,
+      batchId : message.id,
+      messages : [message]
+    });
+  }
+
+  static fake(isInput = false) {
+
+    return new MessageBatch({
+      isInput : isInput,
+      creatorId : 'test',
+      creatorName : 'test',
+      messages : [
+        TextMessage.fake()
+      ],
+    });
+  }
 }

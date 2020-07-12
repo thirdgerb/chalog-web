@@ -45,7 +45,7 @@ import Drawer from './components/Drawer';
 import ChatList from './components/ChatList';
 import Bili from './components/BiliVideo';
 import ChatInput from './components/ChatInput';
-import {CHAT_TO_BOTTOM} from "./constants";
+import {CHAT_BOTTOM, CHAT_TO_BOTTOM} from "./constants";
 
 
 export default {
@@ -87,7 +87,7 @@ export default {
   },
   methods : {
     toTheEnd() {
-      this.$vuetify.goTo('#chat-bottom');
+      this.$vuetify.goTo(CHAT_BOTTOM);
       this.$store.commit({
         type: CHAT_TO_BOTTOM,
         value: false

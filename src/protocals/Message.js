@@ -1,6 +1,6 @@
 import {v4 as uuidV4} from 'uuid';
 
-class Message {
+export default class Message {
 
   /**
    * 消息体的唯一 ID
@@ -14,12 +14,11 @@ class Message {
    */
   type = '';
 
-  constructor(data)
+  constructor(type, id = null)
   {
-    data.id = data.id ? data.id : uuidV4();
-    Object.assign(this, data);
+    this.id = id ? id : uuidV4();
+    this.type = type;
   }
 
 }
 
-export default Message;

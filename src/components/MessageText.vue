@@ -1,6 +1,6 @@
 <template>
-    <div class="chat-content">
-        <span class="chat-bubble">微信公众号请扫描二维码</span>
+    <div class="chat-content" :class="{'chat-pick': picked}">
+        <span class="chat-bubble">{{ message.text }}</span>
     </div>
 </template>
 
@@ -9,10 +9,17 @@
   export default {
     name: "MessageText",
     props : {
-      type : TextMessage,
-      default() {
-        return TextMessage.fake();
+      message : {
+        type : TextMessage,
+        default() {
+            return TextMessage.fake();
+        }
+      },
+      picked : {
+        type: Boolean,
+        default: false
       }
+
     }
   }
 </script>

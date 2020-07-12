@@ -10,8 +10,12 @@ export default class BiliMessage extends Message {
 
   constructor(data)
   {
-    data.type = MESSAGE_BILI;
-    super(data);
+    super(MESSAGE_BILI, data.id);
+    this.url = data.url;
+  }
+
+  static create(url) {
+    return new BiliMessage({url: url});
   }
 
   static fake() {

@@ -1,4 +1,4 @@
-
+import {v4 as uuid} from 'uuid';
 
 export class User {
 
@@ -16,6 +16,13 @@ export class User {
   /**
    * 服务端下发的 token
    */
-  token;
+  token = '';
+
+  constructor(data) {
+
+    data.id = data.id ? data.id : uuid();
+    data.name = data.name ? data.name : 'guest';
+    Object.assign(this, data);
+  }
 
 }

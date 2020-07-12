@@ -30,7 +30,6 @@
       play() {
         let $this = this;
 
-        console.log(this.message);
         let event = {
           type: PLAY_VIDEO,
           play : true,
