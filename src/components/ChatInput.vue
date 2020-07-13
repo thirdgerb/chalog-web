@@ -28,8 +28,9 @@
     TOGGLE_DRAWER,
     VIDEO_PLAY_SETTER,
     PLAY_VIDEO,
-    CHAT_COMMIT_MESSAGE,
+    ACTION_CHAT_DELIVER_MESSAGE,
   } from '../constants';
+  import TextMessage from '../protocals/TextMessage';
 
   const rules = {
     counter: value => (value && value.length <= 100) || '最多输入100字',
@@ -64,7 +65,6 @@
           error = rule(message);
           if (error !== true) {
             $this.error = error;
-            $this.clearMessage();
             return;
           }
         }
@@ -77,17 +77,19 @@
           return;
         }
 
-        // 设定输入忙.
-        // $this.busy = true;
+        $this.busy = true;
+        setTimeout(function() {
+          $this.busy = false;
+        }, 1000);
+
+        let text = TextMessage.create(message);
+
         // 先提交消息.
-        $this.$store.commit(
-          CHAT_COMMIT_MESSAGE,
-          {text: message}
+        $this.$store.dispatch(
+          ACTION_CHAT_DELIVER_MESSAGE,
+          text
         );
 
-        console.log($this.$store.state.alive);
-
-        // 提交消息...
         $this.clearMessage();
         $this.clearError();
       },
@@ -107,10 +109,6 @@
       loading() {
         return this.busy;
       },
-      width() {
-        let dom = document.getElementById('chat-container');
-        return dom ? dom.offsetHeight + 'px' : 200 + 'px';
-      }
     }
 
   }

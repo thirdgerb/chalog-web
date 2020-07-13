@@ -4,17 +4,42 @@ export default class NavItem {
   title;
   scene;
   icon;
-  session = '';
-  closable = true;
+  session;
+  closable;
+  hasNew = true;
 
-  constructor(data) {
-    Object.assign(this, data);
+  constructor({
+    scene,
+    title,
+    icon,
+    session,
+    closable
+  }) {
+    this.scene = scene;
+    this.title = title;
+    this.icon = icon ? icon : 'mdi-forum';
+    this.closable = !! closable;
+    this.session = session ? session : '';
   }
 
-  makeSession(userId) {
-    if (this.session) {
-      return this.session;
+  static from({
+      scene,
+      title,
+      icon,
+      session,
+      closable
+    },
+    userId
+  ) {
+    if (!session) {
+      session = md5('scene:' + scene + ':user:' + userId);
     }
-    return md5('title:' + this.title + ':user:' + userId);
+    return new NavItem({
+      scene,
+      title,
+      icon,
+      session,
+      closable
+    })
   }
 }

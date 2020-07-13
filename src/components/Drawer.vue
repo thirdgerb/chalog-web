@@ -13,38 +13,43 @@
     </v-toolbar>
     <v-divider></v-divider>
     <!-- alive chat -->
-    <v-subheader>当前会话</v-subheader>
+    <v-subheader>当前</v-subheader>
     <v-list dense nav>
       <v-list-item-group >
         <chat-item
           :item="alive"
-          :seletable="false"
+          :isAlive="true"
+          @close-chat="onDisconnect(alive)"
         ></chat-item>
       </v-list-item-group>
     </v-list>
     <v-divider></v-divider>
 
     <!-- subscribe chats -->
-    <v-subheader>Connected</v-subheader>
+    <v-subheader>已连接</v-subheader>
     <v-list dense nav>
       <v-list-item-group >
-        <template v-for="chat in chats">
-            <chat-item
-               :item="chat"
-               :key="chat.sessionId" ></chat-item>
-        </template>
+        <chat-item
+           v-for="item in connected"
+           :item="item"
+           :key="item.session"
+           v-on:close-chat="onDisconnect(item)"
+           v-on:select-chat="onSelect(item)"
+        ></chat-item>
       </v-list-item-group>
     </v-list>
-    <template v-if="incoming.length > 0">
-        <v-subheader>Incoming</v-subheader>
-        <v-list dense nav>
-          <v-list-item-group >
-            <chat-item v-for="item in incoming"
-               :item="item"
-               :key="item.sessionId" ></chat-item>
-          </v-list-item-group>
-        </v-list>
-    </template>
+    <v-divider></v-divider>
+    <v-subheader>未连接</v-subheader>
+    <v-list dense nav>
+      <v-list-item-group >
+        <chat-item v-for="item in list"
+           :item="item"
+           :key="item.session"
+           v-on:close-chat="onClose(item)"
+           v-on:select-chat="onConnect(item)"
+        ></chat-item>
+      </v-list-item-group>
+    </v-list>
   </v-navigation-drawer>
 
 
@@ -52,7 +57,13 @@
 
 <script>
   import ChatItem from './ChatItem';
-  import {DRAWER_SETTER} from "../constants";
+  import {
+    DRAWER_SETTER,
+    // ACTION_CHAT_CONNECT,
+    CHAT_ALIVE_SETTER,
+    CHAT_DELETE,
+    ACTION_CHAT_CONNECT,
+  } from "../constants";
 
   export default {
       name: "Drawer",
@@ -68,15 +79,49 @@
             this.$store.commit(DRAWER_SETTER, val);
           }
         },
-        chats () {
-          return this.$store.state.chats;
+        connected () {
+          return this.$store.state.menu.connected;
         },
         alive () {
-          return this.$store.state.alive;
+          return this.$store.state.menu.alive;
         },
-        incoming() {
-          return this.$store.state.incomingChats;
+        list () {
+          return this.$store.state.menu.list;
         }
+      },
+      methods : {
+        onSelect(item) {
+          this.$store.commit(
+            CHAT_ALIVE_SETTER,
+            item
+          );
+          this.$forceUpdate();
+        },
+        onConnect(item) {
+          this.$store.dispatch(
+            ACTION_CHAT_CONNECT,
+            item
+          );
+          this.$forceUpdate();
+        },
+        onClose(item) {
+          if (confirm('关闭当前对话?')) {
+            this.$store.commit(
+              CHAT_DELETE,
+              item
+            );
+            this.$forceUpdate();
+          }
+        },
+        onDisconnect(item) {
+          if (confirm('关闭当前对话?')) {
+            this.$store.commit(
+              CHAT_DELETE,
+              item
+            );
+            this.$forceUpdate();
+          }
+        },
       }
   }
 </script>

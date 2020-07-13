@@ -1,69 +1,62 @@
 <template>
-    <v-list-item
-        outlined
-        @click="select"
-    >
+    <v-list-item outlined @click.stop="$emit('select-chat', item)">
         <v-badge
             avatar
             dot
-            :value="item.hasNew"
+            :value="item.hasNew && !isAlive"
             color="error"
             offset-x="26"
             offset-y="20"
         >
-            <v-list-item-avatar>
-                <v-icon
-                    class="red lighten-1 white--text"
-                >{{item.icon}}</v-icon>
+            <v-list-item-avatar class="indigo lighten-3">
+                <v-icon dark>{{item.icon}}</v-icon>
             </v-list-item-avatar>
         </v-badge>
         <v-list-item-content>
             <v-list-item-title>{{item.title}}</v-list-item-title>
-            <v-list-item-subtitle >{{item.lastMessage}}</v-list-item-subtitle>
+            <v-list-item-subtitle style="color:grey">{{lastMessage}}</v-list-item-subtitle>
         </v-list-item-content>
         <v-list-item-action>
             <v-btn
                 v-if="item.closable"
-                @click.stop="close"
                 icon
-                color="#bbb" >X</v-btn>
+                color="#bbb"
+                @click.stop="close"
+            >X</v-btn>
         </v-list-item-action>
     </v-list-item>
 </template>
 
 <script>
-  import ChatInfo from '../protocals/ChatInfo';
-  import {
-    ACTION_CHAT_SELECT,
-    ACTION_CHAT_CLOSE,
-  } from '../constants';
+  import NavItem from '../protocals/NavItem';
+
+  // import {
+  //   ACTION_CHAT_CONNECT,
+  //   ACTION_CHAT_CLOSE,
+  // } from '../constants';
 
   export default {
     name: "ChatItem",
     props : {
-      item: {
-        type : ChatInfo
-      },
-      selectable : {
+      item: NavItem,
+      isAlive : {
         type : Boolean,
-        default : true,
+        default : false,
+      }
+    },
+    computed: {
+      lastMessage () {
+        let $this = this;
+        let chats = $this.$store.state.chats;
+        let session = $this.item.session;
+
+        let chat = chats[session];
+        return chat ? chat.lastMessage : '';
       }
     },
     methods : {
-      select () {
-        if (!this.selectable) {
-            return;
-        }
-        this.$store.dispatch(
-          ACTION_CHAT_SELECT,
-          this.item
-        );
-      },
       close() {
-        this.$store.dispatch(
-          ACTION_CHAT_CLOSE,
-          {sessionId: this.item.sessionId}
-        )
+        this.$emit('close-chat')
       }
     }
   }

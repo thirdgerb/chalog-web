@@ -1,6 +1,6 @@
 import {v4 as uuid} from 'uuid';
 
-export class User {
+export default class User {
 
   /**
    * 用户的 uuid
@@ -18,11 +18,11 @@ export class User {
    */
   token = '';
 
-  constructor(data) {
+  constructor({id, name, token}) {
 
-    data.id = data.id ? data.id : uuid();
-    data.name = data.name ? data.name : 'guest';
-    Object.assign(this, data);
+    this.id = id ? id : uuid();
+    this.name = name ? name : 'guest';
+    this.token = token ? token : '';
   }
 
 }

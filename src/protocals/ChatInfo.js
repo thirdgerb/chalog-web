@@ -11,25 +11,13 @@ export default class ChatInfo {
    * sessionId 的设置值.
    * @type {string}
    */
-  sessionId = '';
+  session;
 
   /**
    * 对话场景
    * @type {string}
    */
-  scene = '';
-
-  /**
-   * 分组的标题.
-   * @type {string}
-   */
-  title ='';
-
-  /**
-   * 分组的图标.
-   * @type {string}
-   */
-  icon='';
+  scene;
 
   /**
    * 是否有新消息.
@@ -37,6 +25,10 @@ export default class ChatInfo {
    */
   hasNew = false;
 
+  /**
+   * 当前的消息
+   * @type {MessageBatch[]}
+   */
   batches = [];
 
   /**
@@ -45,39 +37,27 @@ export default class ChatInfo {
    */
   suggestions = [];
 
-  closable = true;
-
-  constructor(
-    title,
-    sessionId,
-    scene = '',
-    icon = '',
-    closable = true
-  ) {
-    this.sessionId = sessionId;
-    this.title = title;
-    this.scene = scene;
-    this.icon = icon;
-    this.closable = closable
-  }
+  /**
+   * @type {boolean}
+   */
+  isSaid = false;
 
   /**
-   *
-   * @param {NavItem} nav
-   * @param {string} userId
-   * @returns {ChatInfo}
+   * Chat 自身是否在等待回复.
+   * @type {boolean}
    */
-  static fromNavItem(nav, userId)
-  {
-    let session = nav.makeSession(userId);
-    return new ChatInfo(
-      nav.title,
-      session,
-      nav.scene,
-      nav.icon,
-      nav.closable
-    )
+  loading = false;
+
+  constructor(
+    {
+      scene,
+      session
+    }
+  ) {
+    this.session = session;
+    this.scene = scene;
   }
+
 
   /**
    * 最后一条消息的简述.
@@ -98,15 +78,13 @@ export default class ChatInfo {
     return null;
   }
 
-  get hasSuggesions() {
-    return this.suggestions.length > 0;
-  }
-
   appendBatch(batch) {
     if (batch instanceof MessageBatch) {
       this.batches.push(batch);
+      this.hasNew = !batch.isInput;
+
     } else {
-      console.log('invalid batch info ', batch);
+      throw new Error('invalid batch info ' + batch);
     }
   }
 }

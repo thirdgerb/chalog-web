@@ -28,15 +28,21 @@
 .chat {
     padding: 10px 15px 60px 10px;
     word-break: break-all;
+    font-size: 14px;
 }
 .chat-row {
     margin-bottom : 10px;
 }
+.chat-row.selected {
+    display:none;
+}
+
 .chat-row.chat-receive {
     padding-right: 30%;
 }
 .chat-row.chat-say {
     padding-left: 30%;
+
 }
 .chat-content {
     overflow: hidden;
@@ -56,16 +62,18 @@
     float: right;
     border-radius:  12px 12px 0 12px;
     color:white;
+    background: rgba(44, 44, 44, 1);
+}
+
+.chat-say.chat-suggestion .chat-bubble {
     background-color: rgba(44, 44, 44, 0.67);
 }
 
-.chat-say .chat-bubble:hover,
-.chat-say .chat-pick{
+.chat-say.chat-suggestion .chat-bubble:hover{
     background: rgba(44, 44, 44, 1);
-    transform: scale(1) translate3d(0px, 0px, 0px);
-    padding: 8px 16px;
-    height: auto;
 }
+
+
 
 .chat-title {
     padding: 5px 10px;
