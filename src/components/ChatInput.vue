@@ -17,17 +17,31 @@
       background-color="white"
       @click:append="sendMessage"
       @click:clear="clearMessage"
-      v-on:keyup.enter="sendMessage"
+      v-on:keyup.enter.prevent.stop="sendMessage"
       v-on:blur="clearError"
       ></v-textarea>
     </div>
 </template>
 
 <script>
-const rules = {
-  counter: value => (value && value.length <= 100) || '最多输入100字',
-  require: value => (value && value.length > 0) || '消息不能为空',
-};
+  import {
+    TOGGLE_DRAWER,
+    VIDEO_PLAY_SETTER,
+    PLAY_VIDEO,
+    CHAT_COMMIT_MESSAGE,
+  } from '../constants';
+
+  const rules = {
+    counter: value => (value && value.length <= 100) || '最多输入100字',
+    require: value => (value && value.length > 0) || '消息不能为空',
+  };
+
+  const commands = [
+    VIDEO_PLAY_SETTER,
+    TOGGLE_DRAWER,
+    PLAY_VIDEO,
+  ];
+
   export default {
     name: "ChatInput",
     data() {
@@ -50,23 +64,36 @@ const rules = {
           error = rule(message);
           if (error !== true) {
             $this.error = error;
+            $this.clearMessage();
             return;
           }
         }
 
-        // 设定输入忙.
-        $this.busy = true;
-        setTimeout(function() {
-            $this.busy = false;
-        }, 500);
-        console.log('send');
+        // 检查命令, 执行命令.
+        let i = commands.indexOf(message);
+        if (i >=0 ) {
+          $this.$store.commit(message);
+          $this.clearMessage();
+          return;
+        }
 
-        // $this.clearMessage();
+        // 设定输入忙.
+        // $this.busy = true;
+        // 先提交消息.
+        $this.$store.commit(
+          CHAT_COMMIT_MESSAGE,
+          {text: message}
+        );
+
+        console.log($this.$store.state.alive);
+
+        // 提交消息...
+        $this.clearMessage();
+        $this.clearError();
       },
       clearMessage() {
         let $this = this;
         $this.message = '';
-        $this.error = '';
       },
       clearError() {
         this.error = '';

@@ -2,8 +2,8 @@
     <div class="chat-content">
         <span class="chat-bubble">
             <v-btn
-                    class="mx-2" dark large color="purple"
-                    @click.stop="play"
+                class="mx-2 red lighten-1" dark large
+                @click.stop="play"
             >
                 <v-icon dark>mdi-play-box</v-icon>
             </v-btn>
@@ -29,15 +29,7 @@
     methods : {
       play() {
         let $this = this;
-
-        let event = {
-          type: PLAY_VIDEO,
-          play : true,
-          url: $this.message.url
-        };
-
-        console.log('event', event);
-        $this.$store.commit(event);
+        $this.$store.commit(PLAY_VIDEO, $this.message.url);
       }
     }
   }

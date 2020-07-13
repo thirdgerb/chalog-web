@@ -24,4 +24,8 @@ export default class BiliMessage extends Message {
     })
   }
 
+
+  lastInfo () {
+    return '视频';
+  }
 }

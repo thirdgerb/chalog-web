@@ -14,23 +14,34 @@
     <v-divider></v-divider>
     <!-- alive chat -->
     <v-subheader>当前会话</v-subheader>
-    <!-- subscribe chats -->
     <v-list dense nav>
       <v-list-item-group >
-        <template v-for="(item, index) in items">
+        <chat-item
+          :item="alive"
+          :seletable="false"
+        ></chat-item>
+      </v-list-item-group>
+    </v-list>
+    <v-divider></v-divider>
+
+    <!-- subscribe chats -->
+    <v-subheader>Connected</v-subheader>
+    <v-list dense nav>
+      <v-list-item-group >
+        <template v-for="chat in chats">
             <chat-item
-               :item="item"
-               :key="index" ></chat-item>
+               :item="chat"
+               :key="chat.sessionId" ></chat-item>
         </template>
       </v-list-item-group>
     </v-list>
-    <template v-if="hasIncomingChat">
-        <v-subheader>未连接</v-subheader>
+    <template v-if="incoming.length > 0">
+        <v-subheader>Incoming</v-subheader>
         <v-list dense nav>
           <v-list-item-group >
             <chat-item v-for="item in incoming"
-                       :item="item"
-                       :key="item.sessionId" ></chat-item>
+               :item="item"
+               :key="item.sessionId" ></chat-item>
           </v-list-item-group>
         </v-list>
     </template>
@@ -41,6 +52,7 @@
 
 <script>
   import ChatItem from './ChatItem';
+  import {DRAWER_SETTER} from "../constants";
 
   export default {
       name: "Drawer",
@@ -53,15 +65,14 @@
             return this.$store.state.layout.drawer;
           },
           set (val) {
-            this.$store.state.layout.drawer = val;
+            this.$store.commit(DRAWER_SETTER, val);
           }
         },
-        items () {
+        chats () {
           return this.$store.state.chats;
         },
-        hasIncomingChat() {
-          let keys = Object.keys(this.$store.state.incomingChats);
-          return keys.length > 0;
+        alive () {
+          return this.$store.state.alive;
         },
         incoming() {
           return this.$store.state.incomingChats;

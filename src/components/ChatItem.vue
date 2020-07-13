@@ -1,6 +1,8 @@
 <template>
-    <v-list-item outlined>
-
+    <v-list-item
+        outlined
+        @click="select"
+    >
         <v-badge
             avatar
             dot
@@ -11,34 +13,57 @@
         >
             <v-list-item-avatar>
                 <v-icon
-                    class="blue white--text"
+                    class="red lighten-1 white--text"
                 >{{item.icon}}</v-icon>
             </v-list-item-avatar>
         </v-badge>
-
-
         <v-list-item-content>
             <v-list-item-title>{{item.title}}</v-list-item-title>
-            <v-list-item-subtitle >{{lastMessage}}</v-list-item-subtitle>
+            <v-list-item-subtitle >{{item.lastMessage}}</v-list-item-subtitle>
         </v-list-item-content>
         <v-list-item-action>
-            <v-btn icon color="#bbb" >X</v-btn>
+            <v-btn
+                v-if="item.closable"
+                @click.stop="close"
+                icon
+                color="#bbb" >X</v-btn>
         </v-list-item-action>
     </v-list-item>
 </template>
 
 <script>
-  import {Chat} from '../data/protocals';
+  import ChatInfo from '../protocals/ChatInfo';
+  import {
+    ACTION_CHAT_SELECT,
+    ACTION_CHAT_CLOSE,
+  } from '../constants';
 
   export default {
     name: "ChatItem",
     props : {
-      item: Chat
+      item: {
+        type : ChatInfo
+      },
+      selectable : {
+        type : Boolean,
+        default : true,
+      }
     },
-    computed : {
-      lastMessage () {
-        let item =this.item;
-        return item.lastMessage.slice(0, 8);
+    methods : {
+      select () {
+        if (!this.selectable) {
+            return;
+        }
+        this.$store.dispatch(
+          ACTION_CHAT_SELECT,
+          this.item
+        );
+      },
+      close() {
+        this.$store.dispatch(
+          ACTION_CHAT_CLOSE,
+          {sessionId: this.item.sessionId}
+        )
       }
     }
   }

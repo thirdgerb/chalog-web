@@ -1,7 +1,7 @@
 
 import Message from './Message';
 import TextMessage from "./TextMessage";
-import createMessage from "./CreateMessage";
+import createMessage from './CreateMessage';
 
 export default class MessageBatch {
 
@@ -14,15 +14,13 @@ export default class MessageBatch {
   /**
    * 消息的批次 ID
    * @type {string}
-   * @private
    */
   batchId = '';
 
   /**
-   * 发送者Id.
-   * @type {string}
+   * @type {boolean}
    */
-  creatorId = '';
+  loading = false;
 
   /**
    * 发送者名称.
@@ -30,10 +28,6 @@ export default class MessageBatch {
    */
   creatorName = '';
 
-  /**
-   *
-   * @type {Message[]}
-   */
   messages = [];
 
   constructor(data) {
@@ -41,36 +35,22 @@ export default class MessageBatch {
       throw new Error('construct value is not object');
     }
 
-    // 处理 batchId.
-    let batchId = data.batchId ? data.batchId : '';
-
-    // 处理 message.
-    let messages = data.message ? data.message : [];
-    if (!(messages instanceof Array)) {
-      throw new Error('messages must be array')
-    }
 
     delete data.message;
-    for (let message of messages) {
-
-      let messageIns = createMessage(message);
-
-      console.log('message ins', messageIns);
-      this.append(messageIns);
-
-      batchId = batchId ? batchId : messageIns.id;
-    }
-
-    data.batchId = batchId;
-
     Object.assign(this, data);
   }
 
-  append(message) {
+  /**
+   *
+   * @param message
+   * @returns {*}
+   */
+  appendMessage(message) {
     if (!(message instanceof Message)) {
       return;
     }
     this.messages.push(message);
+    return this;
   }
 
   static createByMessage(message, creatorName, creatorId, isInput = true) {
@@ -79,24 +59,34 @@ export default class MessageBatch {
       throw new Error('message must be instanceof Message');
     }
 
-    return new MessageBatch({
+    let batch = new MessageBatch({
       isInput : isInput,
       creatorId : creatorId,
       creatorName : creatorName,
       batchId : message.id,
-      messages : [message]
     });
+
+    batch.appendMessage(createMessage(message));
+    return batch;
   }
 
   static fake(isInput = false) {
 
-    return new MessageBatch({
+    let batch =  new MessageBatch({
       isInput : isInput,
       creatorId : 'test',
       creatorName : 'test',
-      messages : [
-        TextMessage.fake()
-      ],
+
     });
+
+    batch.appendMessage(TextMessage.fake());
+    return batch;
+  }
+
+  get lastMessage() {
+    let last = this.messages.length - 1;
+    let message = this.messages[last];
+
+    return message ? message.lastInfo() : '';
   }
 }

@@ -12,16 +12,11 @@
     </v-overlay>
     <bili></bili>
 
-    <v-main app>
-        <v-container id="chat-container" ref="chatContainer">
+    <v-main app  class="indigo lighten-5">
+        <v-container id="chat-container" fluid>
             <!--<div class="chat-wrap">-->
             <div class="chat" id="chat">
-                <chat-list
-                    v-for="chat in chats"
-                    :chat="chat"
-                    :key="chat.sessionId"
-                    v-show="chat.sessionId === alive"
-                ></chat-list>
+                <chat-list :chat="alive"></chat-list>
                 <div id="chat-bottom"></div>
             </div>
             <!--- input --->
@@ -67,11 +62,8 @@ export default {
       loading () {
         return this.$store.state.layout.loading;
       },
-      chats () {
-        return this.$store.state.chats;
-      },
       alive() {
-        return this.$store.state.layout.alive;
+        return this.$store.state.alive;
       },
       toBottom() {
         return this.$store.state.layout.chatToBottom;
@@ -101,7 +93,4 @@ export default {
 <style>
 @import "./assets/chat.css";
 
-body {
-  background-color: #eee;
-}
 </style>

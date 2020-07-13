@@ -15,7 +15,7 @@
 </template>
 
 <script>
-  import {PLAY_VIDEO} from '../constants';
+  import {VIDEO_PLAY_SETTER} from '../constants';
 
   export default {
     name: "biliVideo",
@@ -29,7 +29,7 @@
           return this.$store.state.video.play;
         },
         set(val) {
-          this.$store.commit(PLAY_VIDEO, val);
+          this.$store.commit(VIDEO_PLAY_SETTER, val);
         }
       } ,
       src()  {

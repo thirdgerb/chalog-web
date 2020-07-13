@@ -33,4 +33,9 @@ export default class TextMessage extends Message{
       text: '在公众号对话框中输入以下内容, 可在公众号对话中操作本网页',
     })
   }
+
+
+  lastInfo () {
+    return this.text;
+  }
 }

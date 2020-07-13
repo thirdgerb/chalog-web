@@ -21,6 +21,7 @@
     import {
       TOGGLE_DRAWER,
       PLAY_VIDEO,
+      CHAT_BOTTOM,
     } from "../constants";
 
     export default {
@@ -35,14 +36,13 @@
               TOGGLE_DRAWER,
             ]),
             scroll() {
-              this.$vuetify.goTo('#chat-bottom');
+              this.$vuetify.goTo(CHAT_BOTTOM);
             },
           play() {
-              this.$store.commit({
-                type : PLAY_VIDEO,
-                play: true,
-                url : "//player.bilibili.com/player.html?aid=838871423&bvid=BV1w54y1S7Cs&cid=210198185&page=1"
-              })
+              this.$store.commit(
+                PLAY_VIDEO,
+                 "//player.bilibili.com/player.html?aid=838871423&bvid=BV1w54y1S7Cs&cid=210198185&page=1"
+              );
 
           }
 

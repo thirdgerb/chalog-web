@@ -20,5 +20,8 @@ export default class Message {
     this.type = type;
   }
 
+  lastInfo () {
+    return this.id;
+  }
 }
 
