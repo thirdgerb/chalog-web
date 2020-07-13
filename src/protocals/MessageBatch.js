@@ -28,16 +28,36 @@ export default class MessageBatch {
    */
   creatorName = '';
 
+  /**
+   * 发送者 id
+   * @type {string}
+   */
+  creatorId = '';
+
+  /**
+   * 消息
+   * @type {Message[]}
+   */
   messages = [];
 
-  constructor(data) {
-    if (!(data instanceof Object)) {
-      throw new Error('construct value is not object');
-    }
+  /**
+   * 时间表示.
+   */
+  date;
 
+  constructor({
+    isInput,
+    creatorId,
+    creatorName,
+    batchId,
+  }) {
+    this.isInput = isInput;
+    this.creatorId = creatorId;
+    this.creatorName = creatorName;
+    this.batchId = batchId;
 
-    delete data.message;
-    Object.assign(this, data);
+    let date = new Date();
+    this.date = date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
   }
 
   /**

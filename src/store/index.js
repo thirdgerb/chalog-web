@@ -29,6 +29,7 @@ import MessageBatch from "../protocals/MessageBatch";
 import User from '../protocals/User';
 import NavItem from '../protocals/NavItem';
 import TextMessage from "../protocals/TextMessage";
+import BiliMessage from "../protocals/BiliMessage";
 
 Vue.use(Vuex);
 
@@ -259,6 +260,7 @@ export default new Vuex.Store({
         let connected = Object.keys(state.menu.connected)[0];
 
         state.menu.alive = state.menu.connected[connected];
+        state.layout.chatToBottom = true;
         delete state.menu.connected[connected];
         return;
       }
@@ -340,6 +342,7 @@ export default new Vuex.Store({
           'test',
           false
         );
+        newBatch.appendMessage(BiliMessage.fake());
         let suggestions = ['张三', '李四', '王五'];
         try {
           commit(CHAT_COMMIT_MESSAGE, {chat, batch:newBatch, suggestions });
@@ -347,7 +350,7 @@ export default new Vuex.Store({
           chat.loading = false;
         }
 
-      }, 1500);
+      }, 1000);
 
     },
 

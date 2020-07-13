@@ -4,7 +4,7 @@
     >
         <div class="chat-title" v-if="!batch.isInput">
             <span class="chat-author">{{ batch.creatorName }}</span>
-            <span class="chat-date"> --:--:-- </span>
+            <span class="chat-date"> {{batch.date}} </span>
         </div>
         <template v-for="message of batch.messages">
             <message-bili
@@ -41,9 +41,6 @@
             return MessageBatch.fake(true);
           }
       }
-    },
-    mounted() {
-      console.log('hello', this.batch)
     },
     methods : {
       isText : (type) => type === MESSAGE_TEXT,
