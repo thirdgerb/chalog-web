@@ -12,9 +12,9 @@ export const LOADING_SETTER = 'LOADING_SETTER';
 // chat 相关.
 export const CHAT_BOTTOM = '#chat-bottom';
 export const CHAT_ALIVE_SETTER = 'CHAT_ALIVE_SETTER';
-export const CHAT_INSERT = 'CHAT_INSERT';
 export const CHAT_DELETE = 'CHAT_DELETE';
 export const CHAT_COMMIT_MESSAGE = 'CHAT_COMMIT_MESSAGE';
+export const CHAT_LIST_PUSH = 'CHAT_LIST_PUSH';
 
 export const ACTION_CHAT_CONNECT = 'ACTION_CHAT_CONNECT';
 export const ACTION_CHAT_CLOSE = 'ACTION_CHAT_CLOSE';

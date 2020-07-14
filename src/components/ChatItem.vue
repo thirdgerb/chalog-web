@@ -3,7 +3,7 @@
         <v-badge
             avatar
             dot
-            :value="item.hasNew && !isAlive"
+            :value="hasNew"
             color="error"
             offset-x="26"
             offset-y="20"
@@ -42,7 +42,7 @@
       isAlive : {
         type : Boolean,
         default : false,
-      }
+      },
     },
     computed: {
       lastMessage () {
@@ -52,13 +52,18 @@
 
         let chat = chats[session];
         return chat ? chat.lastMessage : '';
+      },
+      hasNew() {
+        let $this = this;
+        let chat = $this.$store.state.chats[$this.item.session];
+        return (!!chat && chat.hasNew);
       }
     },
     methods : {
       close() {
         this.$emit('close-chat')
-      }
-    }
+      },
+    },
   }
 </script>
 

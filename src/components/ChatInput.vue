@@ -1,25 +1,28 @@
 <template>
     <div class="chat-input" >
-      <v-textarea placeholder="请输入..."
+      <v-text-field ref="inputbox" placeholder="请输入..."
       v-model="message"
       rows="1"
       outlined
       :loading="loading"
-      :disabled="loading"
       :error="hasError"
       :error-messages="error"
+      :success="success"
+      :autofocus="focus"
       light
       flat
+      single-line
       append-icon="mdi-send"
       clearable
       dense
       filled
+      no-resize
       background-color="white"
       @click:append="sendMessage"
       @click:clear="clearMessage"
       v-on:keyup.enter.prevent.stop="sendMessage"
       v-on:blur="clearError"
-      ></v-textarea>
+      ></v-text-field>
     </div>
 </template>
 
@@ -33,8 +36,8 @@
   import TextMessage from '../protocals/TextMessage';
 
   const rules = {
-    counter: value => (value && value.length <= 100) || '最多输入100字',
-    require: value => (value && value.length > 0) || '消息不能为空',
+    require: value => (value.length > 0) || '消息不能为空',
+    counter: value => (value.length <= 100) || '最多输入100字',
   };
 
   const commands = [
@@ -50,13 +53,15 @@
         message: '',
         busy: false,
         error: '',
-        rules: rules
+        rules: rules,
+        success: false,
+        focus: true,
       }
     },
     methods : {
-      sendMessage() {
+      deliver() {
         let $this = this;
-        let message = $this.message.trim();
+        let message = $this.message;
         let error;
         let rulesArr = Object.values(rules);
 
@@ -92,6 +97,14 @@
 
         $this.clearMessage();
         $this.clearError();
+      },
+      sendMessage() {
+        let $this = this;
+        $this.message = $this.message.trim();
+        if ($this.loading) {
+          return;
+        }
+        $this.deliver();
       },
       clearMessage() {
         let $this = this;

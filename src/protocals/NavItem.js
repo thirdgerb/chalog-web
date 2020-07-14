@@ -6,7 +6,6 @@ export default class NavItem {
   icon;
   session;
   closable;
-  hasNew = true;
 
   constructor({
     scene,
@@ -16,8 +15,8 @@ export default class NavItem {
     closable
   }) {
     this.scene = scene;
-    this.title = title;
-    this.icon = icon ? icon : 'mdi-forum';
+    this.title = title || scene;
+    this.icon = icon || 'mdi-forum';
     this.closable = !! closable;
     this.session = session ? session : '';
   }
@@ -34,6 +33,7 @@ export default class NavItem {
     if (!session) {
       session = md5('scene:' + scene + ':user:' + userId);
     }
+    title = title || scene;
     return new NavItem({
       scene,
       title,

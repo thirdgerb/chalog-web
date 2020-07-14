@@ -9,13 +9,13 @@
      flat
      dense
     >
-      Commune v0.2
+        Demo
     </v-toolbar>
     <v-divider></v-divider>
     <!-- alive chat -->
     <v-subheader>当前</v-subheader>
     <v-list dense nav>
-      <v-list-item-group >
+      <v-list-item-group transition="scroll-y-transition">
         <chat-item
           :item="alive"
           :isAlive="true"
@@ -28,7 +28,7 @@
     <!-- subscribe chats -->
     <v-subheader>已连接</v-subheader>
     <v-list dense nav>
-      <v-list-item-group >
+      <v-list-item-group transition="scroll-y-transition">
         <chat-item
            v-for="item in connected"
            :item="item"
@@ -41,12 +41,12 @@
     <v-divider></v-divider>
     <v-subheader>未连接</v-subheader>
     <v-list dense nav>
-      <v-list-item-group >
+      <v-list-item-group transition="scroll-y-transition">
         <chat-item v-for="item in list"
            :item="item"
            :key="item.session"
            v-on:close-chat="onClose(item)"
-           v-on:select-chat="onConnect(item)"
+           v-on:select-chat="onSelect(item)"
         ></chat-item>
       </v-list-item-group>
     </v-list>
@@ -59,10 +59,7 @@
   import ChatItem from './ChatItem';
   import {
     DRAWER_SETTER,
-    // ACTION_CHAT_CONNECT,
-    CHAT_ALIVE_SETTER,
     CHAT_DELETE,
-    ACTION_CHAT_CONNECT,
   } from "../constants";
 
   export default {
@@ -91,18 +88,15 @@
       },
       methods : {
         onSelect(item) {
-          this.$store.commit(
-            CHAT_ALIVE_SETTER,
-            item
-          );
-          this.$forceUpdate();
-        },
-        onConnect(item) {
-          this.$store.dispatch(
-            ACTION_CHAT_CONNECT,
-            item
-          );
-          this.$forceUpdate();
+          let scene = item.scene;
+          let session = item.session;
+          this.$router.push({
+            name: 'chat',
+            params: {
+              scene,
+              session
+            }
+          })
         },
         onClose(item) {
           if (confirm('关闭当前对话?')) {
@@ -122,7 +116,9 @@
             this.$forceUpdate();
           }
         },
-      }
+
+      },
+
   }
 </script>
 

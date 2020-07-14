@@ -1,5 +1,5 @@
 <template>
-    <div >
+    <div>
         <div class="chat-row chat-receive">
             <div class="chat-title">
                 <span class="chat-author">{{ chat.session}}</span>
@@ -51,7 +51,10 @@
 
   import BatchItem from "./BatchItem";
   import ChatInfo from "../protocals/ChatInfo";
-  import {ACTION_CHAT_DELIVER_MESSAGE} from "../constants";
+  import {
+    ACTION_CHAT_DELIVER_MESSAGE,
+    CHAT_TO_BOTTOM,
+  } from "../constants";
   import TextMessage from "../protocals/TextMessage";
 
   export default {
@@ -63,6 +66,13 @@
       VueQr,
       BatchItem,
     },
+
+    mounted() {
+      this.$store.commit({
+        type: CHAT_TO_BOTTOM,
+        value: true
+      });
+    },
     methods : {
       sendMessage(suggestion) {
         let text = TextMessage.create(suggestion);
@@ -70,7 +80,8 @@
           ACTION_CHAT_DELIVER_MESSAGE,
           text
         );
-      }
+      },
+
     },
     computed : {
       isSuggestionSelected() {

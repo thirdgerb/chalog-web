@@ -1,5 +1,7 @@
 <template>
-    <h1>404</h1>
+    <v-main app>
+        <h1>404</h1>
+    </v-main>
 </template>
 
 <script>

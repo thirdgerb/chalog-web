@@ -13,6 +13,7 @@ import {
   CHAT_ALIVE_SETTER,
   CHAT_DELETE,
   CHAT_COMMIT_MESSAGE,
+  CHAT_LIST_PUSH,
 
   ACTION_CHAT_CONNECT,
   ACTION_CHAT_SUBSCRIBE,
@@ -75,16 +76,26 @@ let to_author = NavItem.from({
 
 /*--------- 定义方法 ----------*/
 
-function insertChat(chats, chat) {
-  let chatArr = Object.values(chats);
-  chatArr.unshift(chat);
+function insertMenu(menu, ...items) {
+  let chatArr = Object.values(menu);
 
+  chatArr.unshift(...items);
   let newChats = {};
-  for (let item of chatArr) {
-    newChats[item.session] = item;
+  for (let i of chatArr) {
+    newChats[i.session] = i;
   }
 
   return newChats;
+}
+
+
+function createMenu(...items) {
+  let menu = {};
+  let item;
+  for (item of items) {
+    menu[item.session] = item;
+  }
+  return menu;
 }
 
 /*--------- 初始化会话 ----------*/
@@ -97,25 +108,17 @@ let commune_chat = new ChatInfo(to_commune);
 chats[group_chat.session] = group_chat;
 chats[commune_chat.session] = commune_chat;
 
-function createMenu(...items) {
-  let menu = {};
-  let item;
-  for (item of items) {
-    menu[item.session] = item;
-  }
-  return menu;
-}
-
 
 
 
 export default new Vuex.Store({
+  // 属性
   state: {
     // 用户的信息
-    user : user,
+    user : null,
     // 页面呈现
     layout : {
-      drawer: null,
+      drawer: false,
       loading: false,
       chatToBottom : false,
     },
@@ -133,6 +136,13 @@ export default new Vuex.Store({
     // 进行中的聊天.
     chats : chats,
   },
+  // getters
+  getters : {
+    isLogin: state =>   state.user !== null,
+
+  },
+
+  //
   mutations: {
     /**
      * 开关抽屉.
@@ -209,7 +219,7 @@ export default new Vuex.Store({
       alive.hasNew = false;
 
       state.menu.alive = chat;
-      state.menu.connected = insertChat(state.menu.connected, alive);
+      state.menu.connected = insertMenu(state.menu.connected, alive);
 
 
       // 看看是否关闭 drawer
@@ -217,6 +227,19 @@ export default new Vuex.Store({
       // 滚动屏幕.
       state.layout.chatToBottom = true;
     },
+
+    /**
+     * 添加新的未连接菜单.
+     * @param state
+     * @param {NavItem[]} navItems
+     */
+    [CHAT_LIST_PUSH] :(state, ...navItems) => {
+      let menu = state.menu.list;
+
+      let newMenu = insertMenu(menu, ...navItems);
+      state.menu.list = newMenu;
+    },
+
 
     /**
      * 用户提交消息
