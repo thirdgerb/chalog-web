@@ -81,7 +81,6 @@ export default class ChatInfo {
   appendBatch(batch) {
     if (batch instanceof MessageBatch) {
       this.batches.push(batch);
-      this.hasNew = !batch.isInput;
 
     } else {
       throw new Error('invalid batch info ' + batch);

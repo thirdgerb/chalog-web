@@ -1,83 +1,46 @@
 <template>
-    <v-col
-        cols="10"
-        sm="8"
-        md="6"
-        lg="6"
-        xl="6"
-    >
-        <v-tabs
-        v-model="tab"
-
-        >
-            <v-tab v-for="(t, index) in tabs" :key="index">{{ t }}</v-tab>
+    <v-card tile transition="slide-x-transition" class="chat-login">
+        <v-tabs v-model="tab">
+            <v-tab v-for="item in tabItems" :key="item.id">{{ item.name }}</v-tab>
         </v-tabs>
-        <v-card tile v-if="tab === 0" transition="fade-transition">
-            <v-card-text>
+        <v-tabs-items v-model="tab">
+            <v-tab-item key="guest">
                 <v-form
-                ref="guest"
-                v-model="guest.valid"
+                    ref="guest"
+                    v-model="guest.valid"
+                    @submit.prevent="createGuest"
+                    dense
                 >
-                    <v-text-field
-                    v-model="guest.name"
-                    :counter="10"
-                    :rules="nameRules"
-                    label="请输入昵称"
-                    required
-                    ></v-text-field>
-                </v-form>
-            </v-card-text>
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text >提交</v-btn>
-            </v-card-actions>
-        </v-card>
-        <v-card tile v-if="tab === 1" transition="fade-transition">
-            <v-card-text>
-                <v-form
-                    ref="login"
-                    v-model="login.valid"
-                >
-                    <v-text-field
-                        v-model="login.name"
+                    <v-card-text>
+                        <v-text-field
+                        v-model="guest.name"
                         :counter="10"
                         :rules="nameRules"
                         label="请输入昵称"
                         required
-                    ></v-text-field>
-                    <v-text-field
-                        v-model="login.password"
-                        :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
-                        :rules="[rules.required, rules.min, rules.max]"
-                        :type="showPass ? 'text' : 'password'"
-                        label="请输入密码"
-                        hint="最少 8 个字符"
-                        counter
-                        @click:append="showPass = !showPass"
-                    ></v-text-field>
+                        ></v-text-field>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="success" type="submit">进入对话</v-btn>
+                    </v-card-actions>
                 </v-form>
-            </v-card-text>
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text >提交</v-btn>
-            </v-card-actions>
-        </v-card>
-
-        <v-card tile v-if="tab === 2" transition="fade-transition">
-            <v-card-text>
+            </v-tab-item>
+            <v-tab-item key="login">
                 <v-form
-                ref="register"
-                v-model="register.valid"
+                    ref="login"
+                    v-model="login.valid"
                 >
-                    <v-text-field
-                            v-model="register.name"
+                    <v-card-text>
+                        <v-text-field
+                            v-model="login.name"
                             :counter="10"
                             :rules="nameRules"
                             label="请输入昵称"
                             required
-                    ></v-text-field>
-                    <v-text-field
-                            v-model="register.password"
+                        ></v-text-field>
+                        <v-text-field
+                            v-model="login.password"
                             :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
                             :rules="[rules.required, rules.min, rules.max]"
                             :type="showPass ? 'text' : 'password'"
@@ -85,31 +48,74 @@
                             hint="最少 8 个字符"
                             counter
                             @click:append="showPass = !showPass"
-                    ></v-text-field>
-                    <v-text-field
-                            v-model="register.confirm"
-                            :rules="[rules.required, rules.min, rules.max]"
-                            type="password"
-                            label="确认密码"
-                            hint="最少 8 个字符"
-                            counter
-                    ></v-text-field>
+                        ></v-text-field>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="blue darken-1" text type="submit" >提交</v-btn>
+                    </v-card-actions>
                 </v-form>
-            </v-card-text>
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text >提交</v-btn>
-            </v-card-actions>
-        </v-card>
-    </v-col>
+            </v-tab-item>
+            <v-tab-item key="register">
+                <v-form
+                    ref="register"
+                    v-model="register.valid"
+                >
+                    <v-card-text>
+
+                        <v-text-field
+                                v-model="register.name"
+                                :counter="10"
+                                :rules="nameRules"
+                                label="请输入昵称"
+                                required
+                        ></v-text-field>
+                        <v-text-field
+                                v-model="register.password"
+                                :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
+                                :rules="[rules.required, rules.min, rules.max]"
+                                :type="showPass ? 'text' : 'password'"
+                                label="请输入密码"
+                                hint="最少 8 个字符"
+                                counter
+                                @click:append="showPass = !showPass"
+                        ></v-text-field>
+                        <v-text-field
+                                v-model="register.confirm"
+                                :rules="[rules.required, rules.min, rules.max]"
+                                type="password"
+                                label="确认密码"
+                                hint="最少 8 个字符"
+                                counter
+                        ></v-text-field>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="blue darken-1"  >提交</v-btn>
+                    </v-card-actions>
+                </v-form>
+            </v-tab-item>
+        </v-tabs-items>
+    </v-card>
 </template>
 
 <script>
+  import {v4} from 'uuid';
+  import User from "../protocals/User";
+  import {USER_SETTER} from "../constants";
+
   export default {
     name: "Login",
+    props: {
+      show : Boolean,
+    },
     data: () => ({
-      tab: 0,
-      tabs : ['访客', '登录', '注册'],
+      tab : null,
+      tabItems : [
+        {name: '访客', id : 'guest'},
+        {name: '登录', id : 'login'},
+        {name: '注册', id : 'register'},
+      ],
       showPass : false,
       nameRules: [
         v => !!v || '昵称不能为空',
@@ -139,9 +145,33 @@
 
       },
     }),
+    methods : {
+      createGuest() {
+        let $this = this;
+
+        $this.$refs.guest.validate();
+
+        if (!$this.guest.valid) {
+          return;
+        }
+
+        let id = v4();
+        let name = '访客-' + this.guest.name;
+
+        let user = new User({
+          id ,
+          name
+        });
+
+        $this.$store.commit(USER_SETTER, user);
+        $this.$router.push($this.$store.state.next);
+      }
+    },
   }
 </script>
 
 <style scoped>
-
+.chat-login {
+    min-height:200px;
+}
 </style>

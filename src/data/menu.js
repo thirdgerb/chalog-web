@@ -1,9 +1,29 @@
 
-import Nav from '../protocals/NavItem';
+export default {
+  alive : {
+    title: 'Commune助手',
+    scene: 'commune',
+    icon: 'mdi-robot',
+    closable: false
+  },
 
-export default [
+  connected : [
+    {
+      title: '交流群',
+      scene: 'commune-chat',
+      icon: 'mdi-forum',
+      session: 'commune-chat',
+      closable: false
+    },
+  ],
 
-  new Nav({title: 'Commune助手', scene:'', icon:'mdi-robot', session: '', closable: false}),
+  list : [
+    {
+      title: '联系作者',
+      scene: 'thirdgerb',
+      icon: 'mdi-account-question',
+      closable: true
+    }
+  ],
 
-  new Nav({title: 'Commune交流群', scene:'', icon:'mdi-forum', session: 'commune-chat', closable: true}),
-];
+};

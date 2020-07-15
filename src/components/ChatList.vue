@@ -9,9 +9,6 @@
                 <span class="chat-bubble">微信公众号请扫描二维码</span>
             </div>
             <div class="chat-content">
-                    <span class="chat-bubble"><vue-qr text="xxx" :size="150"></vue-qr></span>
-            </div>
-            <div class="chat-content">
                 <span class="chat-bubble">在公众号对话框中输入以下内容, 可在公众号对话中操作本网页</span>
             </div>
             <div class="chat-content" >
@@ -47,13 +44,13 @@
 
 </template>
 <script>
-  import VueQr from 'vue-qr'
+  // import VueQr from 'vue-qr'
 
   import BatchItem from "./BatchItem";
   import ChatInfo from "../protocals/ChatInfo";
   import {
     ACTION_CHAT_DELIVER_MESSAGE,
-    CHAT_TO_BOTTOM,
+    // CHAT_TO_BOTTOM,
   } from "../constants";
   import TextMessage from "../protocals/TextMessage";
 
@@ -63,15 +60,7 @@
       chat : ChatInfo,
     },
     components: {
-      VueQr,
       BatchItem,
-    },
-
-    mounted() {
-      this.$store.commit({
-        type: CHAT_TO_BOTTOM,
-        value: true
-      });
     },
     methods : {
       sendMessage(suggestion) {

@@ -20,9 +20,9 @@ export default class User {
 
   constructor({id, name, token}) {
 
-    this.id = id ? id : uuid();
-    this.name = name ? name : 'guest';
-    this.token = token ? token : '';
+    this.id = id || uuid();
+    this.name = name || 'guest';
+    this.token = token || '';
   }
 
 }

@@ -28,7 +28,6 @@
         >
             <chat-input></chat-input>
         </v-footer>
-        <div id="chat-bottom"></div>
     </v-main>
 </template>
 
@@ -41,15 +40,11 @@
 
   import {
     CHAT_TO_BOTTOM,
-    CHAT_BOTTOM,
     ACTION_CHAT_CONNECT,
     CHAT_ALIVE_SETTER,
-    CHAT_LIST_PUSH,
+    CHAT_MENU_PUSH,
   } from "../constants";
 
-  import {
-    DRAWER_SETTER,
-  } from "../constants";
 
   export default {
     name: "ChatPage",
@@ -59,6 +54,9 @@
       ChatInput,
       Drawer,
     },
+    data: () => ({
+      scrolling : false
+    }),
     created () {
       let $this =this;
 
@@ -68,37 +66,6 @@
         let session = $route.params.session;
         $this.onRoute(scene, session);
       }
-
-      // 慢慢地才打开抽屉.
-      setTimeout(function() {
-        $this.$store.commit(DRAWER_SETTER, null);
-      }, 1000);
-
-    },
-    beforeRouteUpdate(to) {
-      let name = to.name;
-      if (name !== 'chat') {
-        return;
-      }
-
-      if (!this.$store.getters.isLogin) {
-        this.$router.push({name:'login'});
-      }
-
-      let session = to.params.session;
-      let scene = to.params.scene;
-      this.onRoute(scene, session);
-    },
-    mounted() {
-      let $this =this;
-
-      // 检查是否已登录.
-      if (!$this.$store.getters.isLogin) {
-        $this.$router.push({name:'login'});
-      }
-
-      // 开始连接.
-
     },
     computed : {
       alive() {
@@ -113,25 +80,45 @@
       isLogin() {
         return this.$store.getters.isLogin;
       }
-
     },
 
     watch : {
       toBottom(newVal) {
         //todo 要考虑品是否在底部.
-        if (newVal === true) {
+        if (newVal > 0) {
           this.toTheEnd();
         }
+      },
+      $route (to) {
+        let name = to.name;
+
+        if (name !== 'chat') {
+          return;
+        }
+
+        if (!this.$store.getters.isLogin) {
+          this.$router.push({name:'login'});
+        }
+
+        let session = to.params.session;
+        let scene = to.params.scene;
+        this.onRoute(scene, session);
       },
 
     },
     methods : {
       toTheEnd() {
-        this.$vuetify.goTo(CHAT_BOTTOM);
-        this.$store.commit({
-          type: CHAT_TO_BOTTOM,
-          value: false
-        })
+        let $this = this;
+        $this.$store.commit(CHAT_TO_BOTTOM, 0);
+        if ($this.scrolling) {
+          return;
+        }
+
+        $this.scrolling = true;
+        setTimeout(function(){
+          $this.$vuetify.goTo(document.body.offsetHeight);
+          $this.scrolling = false;
+        }, 200);
       },
 
       onRoute(scene, session) {
@@ -166,7 +153,7 @@
           $this.$store.state.user.id
         );
 
-        $this.$store.commit(CHAT_LIST_PUSH, navItem);
+        $this.$store.commit(CHAT_MENU_PUSH, { list:[navItem]});
         $this.$store.dispatch(ACTION_CHAT_CONNECT, navItem);
       },
     },

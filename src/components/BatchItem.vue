@@ -26,7 +26,10 @@
   import MessageBatch from '../protocals/MessageBatch';
   import MessageBili from "./MessageBili";
   import MessageText from "./MessageText";
-  import {MESSAGE_TEXT, MESSAGE_BILI} from "../constants";
+  import {
+    MESSAGE_TEXT,
+    MESSAGE_BILI,
+  } from "../constants";
 
   export default {
     name: "BatchItem",

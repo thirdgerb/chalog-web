@@ -8,7 +8,6 @@
       :error="hasError"
       :error-messages="error"
       :success="success"
-      :autofocus="focus"
       light
       flat
       single-line
@@ -55,8 +54,11 @@
         error: '',
         rules: rules,
         success: false,
-        focus: true,
+        focus: false,
       }
+    },
+    created() {
+      this.focus = true;
     },
     methods : {
       deliver() {

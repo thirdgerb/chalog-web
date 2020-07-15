@@ -9,70 +9,34 @@ import {
   VIDEO_PLAY_SETTER,
   PLAY_VIDEO,
 
+  USER_SETTER,
+
   CHAT_TO_BOTTOM,
   CHAT_ALIVE_SETTER,
   CHAT_DELETE,
   CHAT_COMMIT_MESSAGE,
-  CHAT_LIST_PUSH,
+  CHAT_MENU_PUSH,
 
   ACTION_CHAT_CONNECT,
   ACTION_CHAT_SUBSCRIBE,
   ACTION_CHAT_CLOSE,
   ACTION_CHAT_DISCONNECT,
-  ACTION_CHAT_DELIVER_MESSAGE,
+  ACTION_CHAT_DELIVER_MESSAGE, ACTION_LOGIN_USER,
 } from '../constants';
 
-// import Cookie from 'js-cookie';
+import Cookies from 'js-cookie';
 
 import ChatInfo from '../protocals/ChatInfo';
 import MessageBatch from "../protocals/MessageBatch";
 
-import User from '../protocals/User';
 import NavItem from '../protocals/NavItem';
 import TextMessage from "../protocals/TextMessage";
 import BiliMessage from "../protocals/BiliMessage";
 
+import menu from "../data/menu";
+
 Vue.use(Vuex);
 
-// 初始化用户.
-let user = new User({});
-let userId = user.id;
-
-
-
-/*------ 初始化菜单. ------*/
-
-// alive
-let to_commune = NavItem.from({
-    title: 'Commune助手',
-    scene: 'commune',
-    icon: 'mdi-robot',
-    closable: false
-  },
-  userId
-);
-
-// 交流群
-let to_group = NavItem.from({
-    title: '交流群',
-    scene: 'commune-chat',
-    icon: 'mdi-forum',
-    session: 'commune-chat',
-    closable: false
-  },
-  userId
-);
-
-
-// 与作者私聊.
-let to_author = NavItem.from({
-    title: '联系作者',
-    scene: 'thirdgerb',
-    icon: 'mdi-account-question',
-    closable: true
-  },
-  userId
-);
 
 /*--------- 定义方法 ----------*/
 
@@ -89,25 +53,19 @@ function insertMenu(menu, ...items) {
 }
 
 
-function createMenu(...items) {
+/**
+ * @param {string} userId
+ * @param {Object} items
+ */
+function createMenu(userId, ...items) {
   let menu = {};
   let item;
   for (item of items) {
-    menu[item.session] = item;
+    let nav = NavItem.from(item, userId);
+    menu[nav.session] = nav;
   }
   return menu;
 }
-
-/*--------- 初始化会话 ----------*/
-
-let chats = {};
-let group_chat = new ChatInfo(to_group);
-group_chat.suggestions = ['张三', '李四', '王五'];
-let commune_chat = new ChatInfo(to_commune);
-
-chats[group_chat.session] = group_chat;
-chats[commune_chat.session] = commune_chat;
-
 
 
 
@@ -118,10 +76,12 @@ export default new Vuex.Store({
     user : null,
     // 页面呈现
     layout : {
-      drawer: false,
+      drawer: null,
       loading: false,
-      chatToBottom : false,
+      chatToBottom : 0,
     },
+    // next
+    next : {name:'alive'},
     // 视频模块
     video : {
       play : false,
@@ -129,12 +89,12 @@ export default new Vuex.Store({
     },
     // 当前的会话
     menu : {
-      alive : to_commune,
-      connected : createMenu(to_group),
-      list: createMenu(to_author),
+      alive : {},
+      connected : [],
+      list: [],
     },
     // 进行中的聊天.
-    chats : chats,
+    chats : {},
   },
   // getters
   getters : {
@@ -193,10 +153,10 @@ export default new Vuex.Store({
     /**
      * 滚动到底部
      * @param state
-     * @param {bool} payload
+     * @param {int} payload
      */
     [CHAT_TO_BOTTOM] : (state, payload) => {
-        state.layout.chatToBottom = payload;
+        state.layout.chatToBottom += payload;
     },
 
     /**
@@ -225,19 +185,25 @@ export default new Vuex.Store({
       // 看看是否关闭 drawer
       state.layout.drawer = null;
       // 滚动屏幕.
-      state.layout.chatToBottom = true;
+      state.layout.chatToBottom += 1;
     },
 
     /**
      * 添加新的未连接菜单.
+     *
      * @param state
-     * @param {NavItem[]} navItems
+     * @param {NavItem[]} connected
+     * @param {NavItem[]} list
      */
-    [CHAT_LIST_PUSH] :(state, ...navItems) => {
-      let menu = state.menu.list;
+    [CHAT_MENU_PUSH] :(state, {connected, list}) => {
+      if (list) {
+        let menu = state.menu.list;
+        state.menu.list = insertMenu(menu, ...list);
+      }
 
-      let newMenu = insertMenu(menu, ...navItems);
-      state.menu.list = newMenu;
+      if (connected) {
+        state.menu.connected = insertMenu(state.menu.connected, ...connected);
+      }
     },
 
 
@@ -254,6 +220,8 @@ export default new Vuex.Store({
 
       // 插入新的消息.
       chat.appendBatch(batch);
+      chat.hasNew = !batch.isInput
+        && (state.menu.alive.session !== chat.session);
 
       // 如果有提议
       if (suggestions) {
@@ -264,7 +232,7 @@ export default new Vuex.Store({
       // 如果是当前会话, 则滑动到底部.
       let aliveSession = state.menu.alive.session;
       if (aliveSession === chat.session) {
-        state.layout.chatToBottom = true;
+        state.layout.chatToBottom += 1;
       }
     },
 
@@ -283,13 +251,27 @@ export default new Vuex.Store({
         let connected = Object.keys(state.menu.connected)[0];
 
         state.menu.alive = state.menu.connected[connected];
-        state.layout.chatToBottom = true;
+        state.layout.chatToBottom += 1;
         delete state.menu.connected[connected];
         return;
       }
 
       delete state.menu.connected[session];
       delete state.menu.list[session];
+    },
+
+
+    /**
+     * @param state
+     * @param {User} user
+     */
+    [USER_SETTER] (state, user) {
+      let option = {expires :7};
+      Cookies.set('userid', user.id, option);
+      Cookies.set('username', user.name, option);
+      Cookies.set('token', user.token || '', option);
+
+      state.user = user;
     }
 
 
@@ -417,7 +399,40 @@ export default new Vuex.Store({
      */
     [ACTION_CHAT_DISCONNECT] (store, {sessionId}) {
       console.log(ACTION_CHAT_DISCONNECT, {sessionId});
+    },
+
+    /**
+     * 登录用户, 并且创建菜单, 连接会话.
+     * @param store
+     * @param user
+     */
+    [ACTION_LOGIN_USER] (store, user) {
+
+      // disconnect 断开连接.
+
+      // 初始化菜单.
+      let id = user.id;
+
+      store.state.menu.alive = NavItem.from(menu.alive, id);
+      store.state.menu.connected = createMenu(id, ...menu.connected);
+      store.state.menu.list = createMenu(id, ...menu.list);
+
+      // 初始化 Chat.
+      let chats = {};
+      let chatArr = [];
+      chatArr.unshift(store.state.menu.alive, ...Object.values(store.state.menu.connected));
+      for (let i of chatArr){
+        chats[i.session] = new ChatInfo(i);
+      }
+      store.state.chats = chats;
+
+      // 正式创建用户.
+      store.commit(USER_SETTER, user);
+
+      // 连接会话.
+
     }
+
   },
   modules: {
   }
