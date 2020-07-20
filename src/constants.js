@@ -35,7 +35,7 @@ export const MESSAGE_EVENT = 'event';
 
 // user
 export const USER_SETTER = 'USER_SETTER';
-// export const ACTION_LOGIN_USER = 'ACTION_LOGIN_USER';
+export const ACTION_USER_LOGOUT = 'ACTION_USER_LOGOUT';
 
 // socket
 

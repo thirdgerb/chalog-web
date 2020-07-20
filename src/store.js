@@ -26,7 +26,8 @@ import {
   SET_ERROR,
   INIT_MENU,
 
-  ACTION_LOGIN_USER
+  ACTION_LOGIN_USER,
+  ACTION_USER_LOGOUT,
 
   /* socket */
   // SOCKET_ACTION_MESSAGE
@@ -250,10 +251,17 @@ export default new Vuex.Store({
      * @param {User} user
      */
     [USER_SETTER] (state, user) {
-      let option = {expires :7};
-      Cookies.set('userid', user.id, option);
-      Cookies.set('username', user.name, option);
-      Cookies.set('token', user.token || '', option);
+
+      if (user) {
+        let option = {expires :7};
+        Cookies.set('userid', user.id, option);
+        Cookies.set('username', user.name, option);
+        Cookies.set('token', user.token || '', option);
+      } else {
+        Cookies.remove('userid');
+        Cookies.remove('username');
+        Cookies.remove('token');
+      }
 
       state.user = user;
     }
@@ -389,6 +397,13 @@ export default new Vuex.Store({
 
       store.commit(USER_SETTER, user);
       store.commit(INIT_MENU, menu);
+    },
+
+    [ACTION_USER_LOGOUT] (store) {
+
+      store.state.menu = {alive: null, connected:{}, list:{}};
+      store.chats = {};
+      store.commit(USER_SETTER, null);
     },
 
     /*---------- socket.io ----------*/

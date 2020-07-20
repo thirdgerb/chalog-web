@@ -15,10 +15,12 @@
 <script>
 
 import AppBar from './components/AppBar';
-// import {SOCKET_ACTION_MESSAGE} from "./constants";
+import {ACTION_USER_LOGOUT} from "./constants";
 import Cookies from 'js-cookie';
 import User from './protocals/User';
 import {ACTION_LOGIN_USER} from "./constants";
+import {getResponse} from "./utils";
+import ErrorInfo from './socketio/ErrorInfo';
 
 
 export default {
@@ -37,8 +39,7 @@ export default {
 
     if (id && name && token) {
       let user = new User({id, name, token});
-      this.$store.commit(ACTION_LOGIN_USER, user);
-      this.$socket.emit('SIGN', new Sign({name:user.name, token: user.token}));
+      this.$store.dispatch(ACTION_LOGIN_USER, user);
     }
   },
   mounted() {
@@ -63,9 +64,21 @@ export default {
     error() {
       console.log('error');
     },
-    broadcasting(data) {
-      console.log(data);
-    }
+    ERROR_INFO (res) {
+      getResponse(res, function(proto) {
+        let error = new ErrorInfo(proto);
+
+        switch (error.errcode) {
+
+          case 401 :
+            this.$store.commit(ACTION_USER_LOGOUT);
+            break;
+          default :
+            console.log(error);
+        }
+
+      });
+    },
   },
   computed:{
     loading () {

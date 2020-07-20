@@ -180,7 +180,7 @@
 
         // 提交.
         $this.$socket.emit(
-          'sign',
+          'SIGN',
           new Request({
             proto: new Sign({name: name})
           })

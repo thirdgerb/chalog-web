@@ -3,12 +3,10 @@
 export default class Sign {
   name;
   password;
-  token;
 
-  constructor({name, password, token})
+  constructor({name, password})
   {
     this.name = name;
     this.password = password;
-    this.token = token;
   }
 }
