@@ -14,7 +14,7 @@
     <v-divider></v-divider>
     <!-- alive chat -->
     <v-subheader>当前</v-subheader>
-    <v-list dense nav>
+    <v-list dense nav v-if="alive">
       <v-list-item-group transition="scroll-y-transition">
         <chat-item
           :item="alive"

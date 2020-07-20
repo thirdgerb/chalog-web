@@ -1,5 +1,11 @@
 
+// 全局
 
+export const SET_ERROR = 'SET_ERROR';
+export const INIT_MENU = 'INIT_MENU';
+
+
+// store 常量
 export const TOGGLE_DRAWER = 'TOGGLE_DRAWER';
 export const VIDEO_PLAY_SETTER = 'VIDEO_PLAY_SETTER';
 export const PLAY_VIDEO = 'PLAY_VIDEO';
@@ -14,8 +20,8 @@ export const LOADING_SETTER = 'LOADING_SETTER';
 export const CHAT_ALIVE_SETTER = 'CHAT_ALIVE_SETTER';
 export const CHAT_DELETE = 'CHAT_DELETE';
 export const CHAT_COMMIT_MESSAGE = 'CHAT_COMMIT_MESSAGE';
-export const CHAT_MENU_PUSH = 'CHAT_MENU_PUSH';
 
+export const ACTION_LOGIN_USER = 'ACTION_LOGIN_USER';
 export const ACTION_CHAT_CONNECT = 'ACTION_CHAT_CONNECT';
 export const ACTION_CHAT_CLOSE = 'ACTION_CHAT_CLOSE';
 export const ACTION_CHAT_SUBSCRIBE = 'ACTION_CHAT_SUBSCRIBE';
@@ -29,5 +35,8 @@ export const MESSAGE_EVENT = 'event';
 
 // user
 export const USER_SETTER = 'USER_SETTER';
+// export const ACTION_LOGIN_USER = 'ACTION_LOGIN_USER';
 
-export const ACTION_LOGIN_USER = 'ACTION_LOGIN_USER';
+// socket
+
+export const SOCKET_ACTION_MESSAGE = 'SOCKET_ACTION_MESSAGE';

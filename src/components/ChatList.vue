@@ -53,6 +53,10 @@
     // CHAT_TO_BOTTOM,
   } from "../constants";
   import TextMessage from "../protocals/TextMessage";
+  import Request from "../socketio/Request";
+  import Join from "../socketio/Join";
+  import Leave from "../socketio/Leave";
+  import {getResponse} from "../utils";
 
   export default {
     name: "ChatList",
@@ -62,6 +66,36 @@
     components: {
       BatchItem,
     },
+    created() {
+      let $this = this;
+      let req = new Request({
+        token: $this.$store.state.user.token,
+        proto: new Join({session: $this.chat.session})
+      });
+
+      // 监听频道.
+      this.$socket.emit('join', req);
+    },
+    destroyed() {
+
+      let $this = this;
+      let req = new Request({
+        token: $this.$store.state.user.token,
+        proto: new Leave({session: $this.chat.session})
+      });
+
+      // 监听频道.
+      this.$socket.emit('join', req);
+
+    },
+    sockets : {
+      message(res) {
+        let $this = this;
+        getResponse($this.$store, res, function(store, proto) {
+          console.log(proto);
+        });
+      }
+    },
     methods : {
       sendMessage(suggestion) {
         let text = TextMessage.create(suggestion);
@@ -70,7 +104,6 @@
           text
         );
       },
-
     },
     computed : {
       isSuggestionSelected() {

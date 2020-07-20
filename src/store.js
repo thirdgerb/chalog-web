@@ -15,58 +15,36 @@ import {
   CHAT_ALIVE_SETTER,
   CHAT_DELETE,
   CHAT_COMMIT_MESSAGE,
-  CHAT_MENU_PUSH,
 
   ACTION_CHAT_CONNECT,
   ACTION_CHAT_SUBSCRIBE,
   ACTION_CHAT_CLOSE,
   ACTION_CHAT_DISCONNECT,
-  ACTION_CHAT_DELIVER_MESSAGE, ACTION_LOGIN_USER,
-} from '../constants';
+  ACTION_CHAT_DELIVER_MESSAGE,
+
+
+  SET_ERROR,
+  INIT_MENU,
+
+  ACTION_LOGIN_USER
+
+  /* socket */
+  // SOCKET_ACTION_MESSAGE
+} from './constants';
 
 import Cookies from 'js-cookie';
 
-import ChatInfo from '../protocals/ChatInfo';
-import MessageBatch from "../protocals/MessageBatch";
+import ChatInfo from './protocals/ChatInfo';
+import MessageBatch from "./protocals/MessageBatch";
 
-import NavItem from '../protocals/NavItem';
-import TextMessage from "../protocals/TextMessage";
-import BiliMessage from "../protocals/BiliMessage";
-
-import menu from "../data/menu";
+import NavItem from './protocals/NavItem';
+// import TextMessage from "./protocals/TextMessage";
+// import BiliMessage from "./protocals/BiliMessage";
+import User from "./protocals/User";
+import menu from "./data/menu";
+import {insertChats, insertMenu, getResponse, createMenu} from "./utils";
 
 Vue.use(Vuex);
-
-
-/*--------- 定义方法 ----------*/
-
-function insertMenu(menu, ...items) {
-  let chatArr = Object.values(menu);
-
-  chatArr.unshift(...items);
-  let newChats = {};
-  for (let i of chatArr) {
-    newChats[i.session] = i;
-  }
-
-  return newChats;
-}
-
-
-/**
- * @param {string} userId
- * @param {Object} items
- */
-function createMenu(userId, ...items) {
-  let menu = {};
-  let item;
-  for (item of items) {
-    let nav = NavItem.from(item, userId);
-    menu[nav.session] = nav;
-  }
-  return menu;
-}
-
 
 
 export default new Vuex.Store({
@@ -89,7 +67,7 @@ export default new Vuex.Store({
     },
     // 当前的会话
     menu : {
-      alive : {},
+      alive : null,
       connected : [],
       list: [],
     },
@@ -98,8 +76,7 @@ export default new Vuex.Store({
   },
   // getters
   getters : {
-    isLogin: state =>   state.user !== null,
-
+    isLogin: state => !! state.user
   },
 
   //
@@ -121,6 +98,31 @@ export default new Vuex.Store({
     [DRAWER_SETTER] : (state, val) => {
       state.layout.drawer = val;
     },
+
+    /*------- error -------*/
+
+    [SET_ERROR] : (state, {code, msg}) => {
+      console.log('error code:' + code + '; msg:' + msg);
+    },
+
+
+    [INIT_MENU] : (state, {alive, connected, list}) => {
+      let id = state.user.id;
+      if (alive) {
+        let aliveNav = NavItem.from(alive, id);
+        state.menu.alive = aliveNav;
+        insertChats(state.chats, aliveNav);
+      }
+
+      if (connected) {
+        state.menu.connected = createMenu(id, ...connected);
+        insertChats(state.chats, state.menu.connected);
+      }
+      if (list) {
+        state.menu.list = createMenu(id, ...list);
+      }
+    },
+
 
     /*------- loading -------*/
     [LOADING_SETTER] : (state, loading) => {
@@ -186,24 +188,6 @@ export default new Vuex.Store({
       state.layout.drawer = null;
       // 滚动屏幕.
       state.layout.chatToBottom += 1;
-    },
-
-    /**
-     * 添加新的未连接菜单.
-     *
-     * @param state
-     * @param {NavItem[]} connected
-     * @param {NavItem[]} list
-     */
-    [CHAT_MENU_PUSH] :(state, {connected, list}) => {
-      if (list) {
-        let menu = state.menu.list;
-        state.menu.list = insertMenu(menu, ...list);
-      }
-
-      if (connected) {
-        state.menu.connected = insertMenu(state.menu.connected, ...connected);
-      }
     },
 
 
@@ -324,7 +308,6 @@ export default new Vuex.Store({
       let batch = MessageBatch.createByMessage(
         message,
         state.user.name,
-        state.user.id,
         true
       );
 
@@ -335,26 +318,21 @@ export default new Vuex.Store({
       batch.loading = true;
       commit(CHAT_COMMIT_MESSAGE, {chat, batch});
 
-      // 发送消息到服务端的逻辑.
-      // 模拟一个回复逻辑
+      // 模型响应中动作.
       chat.loading = true;
-
       setTimeout(function() {
-
-        let newBatch = MessageBatch.createByMessage(
-          TextMessage.create('hello world!'),
-          'test',
-          'test',
-          false
-        );
-        newBatch.appendMessage(BiliMessage.fake());
-        let suggestions = ['张三', '李四', '王五'];
-        try {
-          commit(CHAT_COMMIT_MESSAGE, {chat, batch:newBatch, suggestions });
-        }finally {
-          chat.loading = false;
-        }
-
+        chat.loading = false;
+        // let newBatch = MessageBatch.createByMessage(
+        //   TextMessage.create('hello world!'),
+        //   'test',
+        //   false
+        // );
+        // newBatch.appendMessage(BiliMessage.fake());
+        // let suggestions = ['张三', '李四', '王五'];
+        // try {
+        //   commit(CHAT_COMMIT_MESSAGE, {chat, batch:newBatch, suggestions });
+        // }finally {
+        // }
       }, 1000);
 
     },
@@ -401,37 +379,30 @@ export default new Vuex.Store({
       console.log(ACTION_CHAT_DISCONNECT, {sessionId});
     },
 
+    [ACTION_LOGIN_USER] (store, user) {
+      let option = {expires: 7};
+
+      // 保存 cookie
+      Cookies.set('userid', user.id, option);
+      Cookies.set('username', user.name, option);
+      Cookies.set('token', user.token, option);
+
+      store.commit(USER_SETTER, user);
+      store.commit(INIT_MENU, menu);
+    },
+
+    /*---------- socket.io ----------*/
+
     /**
      * 登录用户, 并且创建菜单, 连接会话.
-     * @param store
-     * @param user
      */
-    [ACTION_LOGIN_USER] (store, user) {
+    SOCKET_ACTION_LOGIN ({dispatch}, res) {
+      getResponse(res, function(proto) {
+        let user = new User(proto);
+        dispatch(ACTION_LOGIN_USER, user);
+      });
+    },
 
-      // disconnect 断开连接.
-
-      // 初始化菜单.
-      let id = user.id;
-
-      store.state.menu.alive = NavItem.from(menu.alive, id);
-      store.state.menu.connected = createMenu(id, ...menu.connected);
-      store.state.menu.list = createMenu(id, ...menu.list);
-
-      // 初始化 Chat.
-      let chats = {};
-      let chatArr = [];
-      chatArr.unshift(store.state.menu.alive, ...Object.values(store.state.menu.connected));
-      for (let i of chatArr){
-        chats[i.session] = new ChatInfo(i);
-      }
-      store.state.chats = chats;
-
-      // 正式创建用户.
-      store.commit(USER_SETTER, user);
-
-      // 连接会话.
-
-    }
 
   },
   modules: {

@@ -13,11 +13,6 @@ export default class User {
    */
   name;
 
-  /**
-   * 服务端下发的 token
-   */
-  token = '';
-
   constructor({id, name, token}) {
 
     this.id = id || uuid();

@@ -97,6 +97,9 @@
           text
         );
 
+        // 测试.
+        $this.$socket.emit('message', text);
+
         $this.clearMessage();
         $this.clearError();
       },

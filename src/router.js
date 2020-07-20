@@ -16,24 +16,10 @@ const router = new VueRouter({
       name: 'index',
       component: Index,
     },
-    // 登录页.
     {
-      path: '/login',
-      name: 'login',
-      component: Index,
-      props : {login:true}
-    },
-    {
-      path: '/alive',
-      name: 'alive',
-      component: ChatPage,
-    },
-    // 会话页, 如果会话不存在, 可以主动生成一个会话.
-    // 这个可以作为链接分享出去.
-    {
-      path: '/chat/:scene/id/:session',
+      path: '/chat',
       name: 'chat',
-      component: ChatPage
+      component: ChatPage,
     },
     // 404 未找到.
     {path: '*', component: NotFound}

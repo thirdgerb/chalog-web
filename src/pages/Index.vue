@@ -44,39 +44,24 @@
 
   export default {
     name: "Index",
-    props : {
-      login : {
-        type : Boolean,
-        default : false,
-      },
+    data: () => ({
+      login: false,
+    }),
+    mounted() {
+      let $this = this;
+      // 稍微延迟一下再打开.
+      setTimeout(function() {
+        if ($this.$store.getters.isLogin) {
+          $this.$router.push({name:'chat'});
+        } else {
+          $this.login = true;
+        }
+      }, 1000);
     },
     components: {
       Login
     },
-    mounted () {
-      let $this = this;
-      let name = $this.$route.name;
-      // 作为首页, 判断要打开登录还是跳转到 chat
-      if (name === 'index') {
-        // 让屏幕先炫一下下.
-        setTimeout(function() {
-          $this.goAlive();
-        }, 1000);
-      }
-    },
     methods : {
-      goAlive() {
-        let $this = this;
-        let name = $this.$route.name;
-
-        // 如果已经登录了.
-        if ($this.$store.getters.isLogin) {
-          $this.$router.push($this.$store.state.next)
-        // 否则要求登录.
-        } else if (name !== 'login') {
-          $this.$router.replace({name:'login'})
-        }
-      },
     },
   }
 </script>

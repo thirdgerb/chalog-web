@@ -32,12 +32,6 @@ export default class ChatInfo {
   batches = [];
 
   /**
-   * 当前的建议
-   * @type {string[]}
-   */
-  suggestions = [];
-
-  /**
    * @type {boolean}
    */
   isSaid = false;
@@ -48,16 +42,43 @@ export default class ChatInfo {
    */
   loading = false;
 
+  bot=true;
+
+  /**
+   * @type {Context}
+   */
+  context;
+
   constructor(
     {
       scene,
-      session
+      session,
+      bot
     }
   ) {
     this.session = session;
     this.scene = scene;
+    this.bot = !!bot;
   }
 
+
+  appendBatch(batch) {
+    if (batch instanceof MessageBatch) {
+      this.batches.push(batch);
+
+    } else {
+      throw new Error('invalid batch info ' + batch);
+    }
+  }
+
+  setContext() {
+
+  }
+
+
+  get suggestions() {
+    return [];
+  }
 
   /**
    * 最后一条消息的简述.
@@ -76,14 +97,5 @@ export default class ChatInfo {
       return this.batches[this.batches.length - 1];
     }
     return null;
-  }
-
-  appendBatch(batch) {
-    if (batch instanceof MessageBatch) {
-      this.batches.push(batch);
-
-    } else {
-      throw new Error('invalid batch info ' + batch);
-    }
   }
 }

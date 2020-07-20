@@ -36,13 +36,9 @@
   import Bili from '../components/BiliVideo';
   import ChatInput from '../components/ChatInput';
   import Drawer from '../components/Drawer';
-  import NavItem from '../protocals/NavItem';
 
   import {
     CHAT_TO_BOTTOM,
-    ACTION_CHAT_CONNECT,
-    CHAT_ALIVE_SETTER,
-    CHAT_MENU_PUSH,
   } from "../constants";
 
 
@@ -55,16 +51,13 @@
       Drawer,
     },
     data: () => ({
+      // 滚动中禁止循环滚动
       scrolling : false
     }),
-    created () {
+    mounted () {
       let $this =this;
-
-      let $route = $this.$route;
-      if ($route.name === 'chat') {
-        let scene = $route.params.scene;
-        let session = $route.params.session;
-        $this.onRoute(scene, session);
+      if (!$this.$store.getters.isLogin) {
+        $this.$router.replace({name:'index'});
       }
     },
     computed : {
@@ -89,22 +82,6 @@
           this.toTheEnd();
         }
       },
-      $route (to) {
-        let name = to.name;
-
-        if (name !== 'chat') {
-          return;
-        }
-
-        if (!this.$store.getters.isLogin) {
-          this.$router.push({name:'login'});
-        }
-
-        let session = to.params.session;
-        let scene = to.params.scene;
-        this.onRoute(scene, session);
-      },
-
     },
     methods : {
       toTheEnd() {
@@ -119,42 +96,6 @@
           $this.$vuetify.goTo(document.body.offsetHeight);
           $this.scrolling = false;
         }, 200);
-      },
-
-      onRoute(scene, session) {
-        let $this = this;
-        let menu = $this.$store.state.menu;
-
-        // 如果正是当前节点.
-        if (session === menu.alive.session) {
-          return;
-        }
-
-        // 如果是未连接.
-        let chat = menu.list[session];
-        if (chat) {
-          $this.$store.dispatch(ACTION_CHAT_CONNECT, chat);
-          return;
-        }
-
-        // 如果是已连接, 切换.
-        chat = menu.connected[session];
-        if (chat) {
-          $this.$store.commit(CHAT_ALIVE_SETTER, chat);
-          return;
-        }
-
-        // 都没有, 尝试创建会话.
-        let navItem = NavItem.from({
-            scene,
-            session,
-            closable: true
-          },
-          $this.$store.state.user.id
-        );
-
-        $this.$store.commit(CHAT_MENU_PUSH, { list:[navItem]});
-        $this.$store.dispatch(ACTION_CHAT_CONNECT, navItem);
       },
     },
   }

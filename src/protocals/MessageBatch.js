@@ -29,12 +29,6 @@ export default class MessageBatch {
   creatorName = '';
 
   /**
-   * 发送者 id
-   * @type {string}
-   */
-  creatorId = '';
-
-  /**
    * 消息
    * @type {Message[]}
    */
@@ -47,12 +41,10 @@ export default class MessageBatch {
 
   constructor({
     isInput,
-    creatorId,
     creatorName,
     batchId,
   }) {
     this.isInput = isInput;
-    this.creatorId = creatorId;
     this.creatorName = creatorName;
     this.batchId = batchId;
 
@@ -73,7 +65,7 @@ export default class MessageBatch {
     return this;
   }
 
-  static createByMessage(message, creatorName, creatorId, isInput = true) {
+  static createByMessage(message, creatorName, isInput = true) {
     if (!(message instanceof Message)) {
       console.log(message);
       throw new Error('message must be instanceof Message');
@@ -81,7 +73,6 @@ export default class MessageBatch {
 
     let batch = new MessageBatch({
       isInput : isInput,
-      creatorId : creatorId,
       creatorName : creatorName,
       batchId : message.id,
     });

@@ -100,12 +100,18 @@
 </template>
 
 <script>
-  import {v4} from 'uuid';
-  import User from "../protocals/User";
-  import {USER_SETTER} from "../constants";
+  // import {v4} from 'uuid';
+  // import User from "../protocals/User";
+  import {
+    // ACTION_LOGIN_USER,
+    LOADING_SETTER,
+    // USER_SETTER
+  } from "../constants";
+  import Request from "../socketio/Request";
+  import Sign from "../socketio/Sign";
 
   export default {
-    name: "Login",
+    name: "Sign",
     props: {
       show : Boolean,
     },
@@ -145,26 +151,48 @@
 
       },
     }),
+    computed : {
+      isLogin() {
+        return this.$store.getters.isLogin;
+      }
+    },
+    watch: {
+      isLogin() {
+        this.$router.push({name: 'chat'})
+      }
+    },
     methods : {
       createGuest() {
         let $this = this;
-
         $this.$refs.guest.validate();
 
         if (!$this.guest.valid) {
           return;
         }
 
-        let id = v4();
         let name = '访客-' + this.guest.name;
 
-        let user = new User({
-          id ,
-          name
-        });
+        // 打开 loading
+        $this.$store.commit(
+          LOADING_SETTER,
+          true
+        );
 
-        $this.$store.commit(USER_SETTER, user);
-        $this.$router.push($this.$store.state.next);
+        // 提交.
+        $this.$socket.emit(
+          'sign',
+          new Request({
+            proto: new Sign({name: name})
+          })
+        );
+
+        // 延时关闭 loading.
+        setTimeout(function() {
+          $this.$store.commit(
+            LOADING_SETTER,
+            false
+          );
+        }, 1500);
       }
     },
   }
