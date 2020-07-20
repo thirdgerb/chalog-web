@@ -1,5 +1,5 @@
 
-import MessageBatch from "./MessageBatch";
+import {MessageBatch} from "./MessageBatch";
 
 /**
  * @property {MessageBatch} lastBatch
@@ -49,6 +49,8 @@ export default class ChatInfo {
    */
   context;
 
+  suggestions;
+
   constructor(
     {
       scene,
@@ -61,7 +63,6 @@ export default class ChatInfo {
     this.bot = !!bot;
   }
 
-
   appendBatch(batch) {
     if (batch instanceof MessageBatch) {
       this.batches.push(batch);
@@ -69,15 +70,6 @@ export default class ChatInfo {
     } else {
       throw new Error('invalid batch info ' + batch);
     }
-  }
-
-  setContext() {
-
-  }
-
-
-  get suggestions() {
-    return [];
   }
 
   /**

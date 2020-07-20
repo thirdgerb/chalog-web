@@ -7,11 +7,12 @@ export default class TextMessage extends Message{
 
   /**
    *
-   * @param data
+   * @param text
+   * @param id
    */
-  constructor(data) {
-    super(MESSAGE_TEXT, data.id);
-    this.text = data.text;
+  constructor({text, id}) {
+    super(MESSAGE_TEXT, id);
+    this.text = text;
   }
 
   /**
@@ -20,7 +21,7 @@ export default class TextMessage extends Message{
    */
   static create(text) {
     return new TextMessage({
-      text: text
+      text
     });
   }
 
@@ -35,7 +36,7 @@ export default class TextMessage extends Message{
   }
 
 
-  lastInfo () {
+  brief () {
     return this.text;
   }
 }

@@ -10,9 +10,10 @@
             <div class="chat" id="chat" >
                 <chat-list
                     v-for="chat in chats"
-                    v-show="chat.session === alive"
+                    v-show="chat.session === aliveSession"
                     :key="chat.session"
                     :chat="chat"
+                    v-on:deliver-message="deliverMessage"
                 >
                 </chat-list>
             </div>
@@ -26,7 +27,9 @@
             padless
             inset
         >
-            <chat-input></chat-input>
+            <chat-input
+                v-on:deliver-message="deliverMessage"
+            ></chat-input>
         </v-footer>
     </v-main>
 </template>
@@ -38,8 +41,13 @@
   import Drawer from '../components/Drawer';
 
   import {
+    CHAT_COMMIT_MESSAGE,
     CHAT_TO_BOTTOM,
   } from "../constants";
+  import Message from "../protocals/Message";
+  import Input from "../socketio/Input";
+  import Request from "../socketio/Request";
+  import {MessageBatch} from "../protocals/MessageBatch";
 
 
   export default {
@@ -61,7 +69,7 @@
       }
     },
     computed : {
-      alive() {
+      aliveSession() {
         return this.$store.state.menu.alive.session;
       },
       chats() {
@@ -82,8 +90,42 @@
           this.toTheEnd();
         }
       },
+      isLogin(newVal) {
+        if (!newVal) {
+          this.$router.push({name:'index'});
+        }
+      }
     },
     methods : {
+      deliverMessage(message) {
+        let $this = this;
+
+        if (!(message instanceof Message)) {
+          throw new Error('message should be instance of Message');
+        }
+
+
+        // 准备需要发送的消息.
+        let alive = $this.$store.state.menu.alive;
+        let input = new Input(
+          {session: alive.session, bot : alive.bot, scene: alive.scene},
+          message
+        );
+
+        let request = new Request({
+          token: $this.$store.getters.token,
+          proto: input
+        });
+        // 向服务端投递消息.
+        $this.$socket.emit('INPUT', request);
+
+        // 提交消息到当前列表.
+        let batch = MessageBatch.createByMessage(message, $this.$store.state.user);
+        $this.$store.commit(
+          CHAT_COMMIT_MESSAGE,
+          {session:alive.session, batch}
+        );
+      },
       toTheEnd() {
         let $this = this;
         $this.$store.commit(CHAT_TO_BOTTOM, 0);

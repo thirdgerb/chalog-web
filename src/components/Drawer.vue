@@ -16,11 +16,11 @@
     <v-subheader>当前</v-subheader>
     <v-list dense nav v-if="alive">
       <v-list-item-group transition="scroll-y-transition">
-        <chat-item
+        <menu-item
           :item="alive"
           :isAlive="true"
           @close-chat="onDisconnect(alive)"
-        ></chat-item>
+        ></menu-item>
       </v-list-item-group>
     </v-list>
     <v-divider></v-divider>
@@ -29,25 +29,25 @@
     <v-subheader>已连接</v-subheader>
     <v-list dense nav>
       <v-list-item-group transition="scroll-y-transition">
-        <chat-item
+        <menu-item
            v-for="item in connected"
            :item="item"
            :key="item.session"
            v-on:close-chat="onDisconnect(item)"
            v-on:select-chat="onSelect(item)"
-        ></chat-item>
+        ></menu-item>
       </v-list-item-group>
     </v-list>
     <v-divider></v-divider>
     <v-subheader>未连接</v-subheader>
     <v-list dense nav>
       <v-list-item-group transition="scroll-y-transition">
-        <chat-item v-for="item in list"
+        <menu-item v-for="item in list"
            :item="item"
            :key="item.session"
            v-on:close-chat="onClose(item)"
            v-on:select-chat="onSelect(item)"
-        ></chat-item>
+        ></menu-item>
       </v-list-item-group>
     </v-list>
   </v-navigation-drawer>
@@ -56,16 +56,19 @@
 </template>
 
 <script>
-  import ChatItem from './ChatItem';
+  import MenuItem from './MenuItem';
   import {
     DRAWER_SETTER,
     CHAT_DELETE,
+    CHAT_ALIVE_SETTER,
   } from "../constants";
+  import Request from "../socketio/Request";
+  import Room from '../socketio/Room';
 
   export default {
       name: "Drawer",
       components : {
-        ChatItem
+        MenuItem: MenuItem
       },
       computed : {
         drawer : {
@@ -88,33 +91,59 @@
       },
       methods : {
         onSelect(item) {
-          let scene = item.scene;
-          let session = item.session;
-          this.$router.push({
-            name: 'chat',
-            params: {
-              scene,
-              session
-            }
-          })
+
+          this.$store.commit(
+            CHAT_ALIVE_SETTER,
+            item
+          );
         },
+        /**
+         * 删除会话.
+         * @param {NavItem} item
+         */
         onClose(item) {
           if (confirm('关闭当前对话?')) {
             this.$store.commit(
               CHAT_DELETE,
               item
             );
-            this.$forceUpdate();
           }
         },
+        /**
+         * 退出房间, 删除会话.
+         * @param {NavItem} item
+         */
         onDisconnect(item) {
-          if (confirm('关闭当前对话?')) {
-            this.$store.commit(
-              CHAT_DELETE,
-              item
-            );
-            this.$forceUpdate();
-          }
+          let $this = this;
+          let proto = new Room({
+            session: item.session,
+            scene: item.scene,
+          });
+
+          // 退出房价.
+          $this.$socket.emit('LEAVE', new Request({
+            token: $this.$store.getters.token,
+            proto,
+          }));
+
+          // 删除会话.
+          $this.onClose(item);
+        },
+        onConnect(item) {
+          let $this = this;
+          let proto = new Room({
+            session: item.session,
+            scene: item.scene,
+          });
+
+          $this.onSelect(item);
+
+          // 退出房价.
+          $this.$socket.emit('JOIN', new Request({
+            token: $this.$store.getters.token,
+            proto,
+          }));
+
         },
 
       },

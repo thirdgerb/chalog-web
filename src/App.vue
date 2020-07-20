@@ -6,6 +6,19 @@
     <v-overlay :value="loading" opacity="0.1">
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
+    <v-snackbar v-model="isError">
+      {{ error }}
+      <template v-slot:action="{ attrs }">
+        <v-btn
+            color="pink"
+            text
+            v-bind="attrs"
+            @click="error = ''"
+        >
+          关闭
+        </v-btn>
+      </template>
+    </v-snackbar>
     <transition name="slide-fade">
           <router-view></router-view>
     </transition>
@@ -15,12 +28,16 @@
 <script>
 
 import AppBar from './components/AppBar';
-import {ACTION_USER_LOGOUT} from "./constants";
+import {
+  ACTION_USER_LOGOUT,
+  ACTION_LOGIN_USER
+} from "./constants";
 import Cookies from 'js-cookie';
 import User from './protocals/User';
-import {ACTION_LOGIN_USER} from "./constants";
 import {getResponse} from "./utils";
 import ErrorInfo from './socketio/ErrorInfo';
+import Request from "./socketio/Request";
+import Sign from "./socketio/Sign";
 
 
 export default {
@@ -30,7 +47,7 @@ export default {
     AppBar
   },
   data : () => ({
-
+    error : '',
   }),
   created() {
     let id = Cookies.get('userid');
@@ -40,16 +57,9 @@ export default {
     if (id && name && token) {
       let user = new User({id, name, token});
       this.$store.dispatch(ACTION_LOGIN_USER, user);
+      let proto = new Sign({name: user.name});
+      this.$socket.emit('SIGN', new Request({token, proto}));
     }
-  },
-  mounted() {
-    // let $this = this;
-    // $this.$socket.emit('connect', 1);
-    // setInterval(function() {
-    //   $this.$socket.emit('test', {test:'test'});
-    //   console.log('send');
-    // }, 2000);
-    console.log('mounted');
   },
   sockets : {
     connect() {
@@ -65,6 +75,7 @@ export default {
       console.log('error');
     },
     ERROR_INFO (res) {
+      let $this = this;
       getResponse(res, function(proto) {
         let error = new ErrorInfo(proto);
 
@@ -76,13 +87,26 @@ export default {
           default :
             console.log(error);
         }
-
+        $this.error = 'error:' + error.errcode + '; msg:' + error.errmsg;
+        console.log($this.error);
+        setTimeout(function() {
+          $this.error = '';
+        }, 10000);
       });
     },
   },
   computed:{
     loading () {
       return this.$store.state.layout.loading;
+    },
+    isError: {
+      get() {
+        return !! this.error;
+      },
+      set(val) {
+        this.error = val || '';
+      }
+
     },
   },
 

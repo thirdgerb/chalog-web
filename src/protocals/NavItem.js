@@ -14,14 +14,14 @@ export default class NavItem {
     icon,
     session,
     closable,
-    bot
+    bot = true
   }) {
     this.scene = scene;
     this.title = title || scene;
     this.icon = icon || 'mdi-forum';
     this.closable = !! closable;
     this.session = session ? session : '';
-    this.bot = !! bot;
+    this.bot = bot;
   }
 
   static from({
@@ -29,7 +29,8 @@ export default class NavItem {
       title,
       icon,
       session,
-      closable
+      closable,
+      bot = true
     },
     userId
   ) {
@@ -42,7 +43,8 @@ export default class NavItem {
       title,
       icon,
       session,
-      closable
+      closable,
+      bot
     })
   }
 }

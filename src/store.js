@@ -20,8 +20,6 @@ import {
   ACTION_CHAT_SUBSCRIBE,
   ACTION_CHAT_CLOSE,
   ACTION_CHAT_DISCONNECT,
-  ACTION_CHAT_DELIVER_MESSAGE,
-
 
   SET_ERROR,
   INIT_MENU,
@@ -36,11 +34,10 @@ import {
 import Cookies from 'js-cookie';
 
 import ChatInfo from './protocals/ChatInfo';
-import MessageBatch from "./protocals/MessageBatch";
-
 import NavItem from './protocals/NavItem';
 // import TextMessage from "./protocals/TextMessage";
 // import BiliMessage from "./protocals/BiliMessage";
+// import ErrorInfo from "./socketio/ErrorInfo";
 import User from "./protocals/User";
 import menu from "./data/menu";
 import {insertChats, insertMenu, getResponse, createMenu} from "./utils";
@@ -77,7 +74,8 @@ export default new Vuex.Store({
   },
   // getters
   getters : {
-    isLogin: state => !! state.user
+    isLogin: state => !! state.user,
+    token: state => state.user.token,
   },
 
   //
@@ -107,20 +105,21 @@ export default new Vuex.Store({
     },
 
 
-    [INIT_MENU] : (state, {alive, connected, list}) => {
-      let id = state.user.id;
-      if (alive) {
-        let aliveNav = NavItem.from(alive, id);
+    [INIT_MENU] : (state, {menu, user}) => {
+      let id = user.id;
+      if (menu.alive) {
+        let aliveNav = NavItem.from(menu.alive, id);
         state.menu.alive = aliveNav;
         insertChats(state.chats, aliveNav);
       }
 
-      if (connected) {
-        state.menu.connected = createMenu(id, ...connected);
-        insertChats(state.chats, state.menu.connected);
+      if (menu.connected) {
+        state.menu.connected = createMenu(id, ...menu.connected);
+        insertChats(state.chats, ...Object.values(state.menu.connected));
       }
-      if (list) {
-        state.menu.list = createMenu(id, ...list);
+
+      if (menu.list) {
+        state.menu.list = createMenu(id, ...menu.list);
       }
     },
 
@@ -164,24 +163,30 @@ export default new Vuex.Store({
 
     /**
      * @param state
-     * @param {NavItem} chat
+     * @param {NavItem} nav
      */
-    [CHAT_ALIVE_SETTER] : (state, chat) => {
+    [CHAT_ALIVE_SETTER] : (state, nav) => {
 
       let alive = state.menu.alive;
 
-      if (chat.session === alive.session) {
+      if (nav.session === alive.session) {
         return;
       }
 
-      // 删除未连接中的选项.
-      delete state.menu.connected[chat.session];
-      delete state.menu.list[chat.session];
+      // 初始化 Chats
+      let chat = state.chats[nav.session];
+      if (!chat) {
+        insertChats(state.chats, nav);
+      }
 
-      chat.hasNew = false;
+      // 删除未连接中的选项.
+      delete state.menu.connected[nav.session];
+      delete state.menu.list[nav.session];
+
+      nav.hasNew = false;
       alive.hasNew = false;
 
-      state.menu.alive = chat;
+      state.menu.alive = nav;
       state.menu.connected = insertMenu(state.menu.connected, alive);
 
 
@@ -193,26 +198,29 @@ export default new Vuex.Store({
 
 
     /**
-     * 用户提交消息
-     *
+     * 向 Chat 提交消息
      * @param state
-     * @param {MessageBatch} batch
+     * @param {MessageBatch}batch
      */
-    [CHAT_COMMIT_MESSAGE] : (state, {chat, batch, suggestions}) => {
+    [CHAT_COMMIT_MESSAGE] : (state, {session, batch}) => {
       if (!batch) {
         throw new Error('batch should not be empty');
       }
+      let chat = state.chats[session];
 
       // 插入新的消息.
       chat.appendBatch(batch);
-      chat.hasNew = !batch.isInput
+      chat.hasNew = !batch.mode
         && (state.menu.alive.session !== chat.session);
 
       // 如果有提议
+      let suggestions = batch.suggestions;
       if (suggestions) {
         chat.suggestions = suggestions;
         chat.isSaid = false;
       }
+
+      state.chats[chat.session] = chat;
 
       // 如果是当前会话, 则滑动到底部.
       let aliveSession = state.menu.alive.session;
@@ -264,7 +272,9 @@ export default new Vuex.Store({
       }
 
       state.user = user;
-    }
+    },
+
+    /*------- socket -------*/
 
 
   },
@@ -298,51 +308,6 @@ export default new Vuex.Store({
 
       // 监听并且接受消息.
       commit(CHAT_ALIVE_SETTER, nav);
-    },
-
-    /**
-     * 主动发送消息.
-     *
-     */
-    [ACTION_CHAT_DELIVER_MESSAGE] ({commit, state}, message) {
-
-      let session = state.menu.alive.session;
-      let chat = state.chats[session];
-      if (!chat) {
-        throw new Error('chat not exists');
-      }
-
-      // 先提交消息, 然后再发送消息.
-      let batch = MessageBatch.createByMessage(
-        message,
-        state.user.name,
-        true
-      );
-
-      // 标记 chat 已经输入
-      chat.isSaid = true;
-
-      // 插入一个 loading 的消息.
-      batch.loading = true;
-      commit(CHAT_COMMIT_MESSAGE, {chat, batch});
-
-      // 模型响应中动作.
-      chat.loading = true;
-      setTimeout(function() {
-        chat.loading = false;
-        // let newBatch = MessageBatch.createByMessage(
-        //   TextMessage.create('hello world!'),
-        //   'test',
-        //   false
-        // );
-        // newBatch.appendMessage(BiliMessage.fake());
-        // let suggestions = ['张三', '李四', '王五'];
-        // try {
-        //   commit(CHAT_COMMIT_MESSAGE, {chat, batch:newBatch, suggestions });
-        // }finally {
-        // }
-      }, 1000);
-
     },
 
     /**
@@ -396,7 +361,7 @@ export default new Vuex.Store({
       Cookies.set('token', user.token, option);
 
       store.commit(USER_SETTER, user);
-      store.commit(INIT_MENU, menu);
+      store.commit(INIT_MENU, {menu, user});
     },
 
     [ACTION_USER_LOGOUT] (store) {

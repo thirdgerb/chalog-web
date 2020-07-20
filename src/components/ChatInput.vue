@@ -30,9 +30,10 @@
     TOGGLE_DRAWER,
     VIDEO_PLAY_SETTER,
     PLAY_VIDEO,
-    ACTION_CHAT_DELIVER_MESSAGE,
+    // ACTION_INPUT_MESSAGE,
   } from '../constants';
   import TextMessage from '../protocals/TextMessage';
+  // import Input from "../socketio/Input";
 
   const rules = {
     require: value => (value.length > 0) || '消息不能为空',
@@ -61,11 +62,15 @@
       this.focus = true;
     },
     methods : {
-      deliver() {
+      sendMessage() {
         let $this = this;
-        let message = $this.message;
+        if ($this.loading) {
+          return;
+        }
+
         let error;
         let rulesArr = Object.values(rules);
+        let message = $this.message;
 
         // 参数校验
         for (let rule of rulesArr) {
@@ -76,6 +81,7 @@
           }
         }
 
+        message = message.trim();
         // 检查命令, 执行命令.
         let i = commands.indexOf(message);
         if (i >=0 ) {
@@ -84,33 +90,20 @@
           return;
         }
 
+
         $this.busy = true;
         setTimeout(function() {
           $this.busy = false;
         }, 1000);
 
         let text = TextMessage.create(message);
+        $this.$emit('deliver-message', text);
 
-        // 先提交消息.
-        $this.$store.dispatch(
-          ACTION_CHAT_DELIVER_MESSAGE,
-          text
-        );
-
-        // 测试.
-        $this.$socket.emit('message', text);
-
+        // 清空输入框.
         $this.clearMessage();
         $this.clearError();
       },
-      sendMessage() {
-        let $this = this;
-        $this.message = $this.message.trim();
-        if ($this.loading) {
-          return;
-        }
-        $this.deliver();
-      },
+
       clearMessage() {
         let $this = this;
         $this.message = '';

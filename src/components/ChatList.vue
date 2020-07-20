@@ -1,26 +1,12 @@
 <template>
     <div>
-        <!--<div class="chat-row chat-receive">-->
-            <!--<div class="chat-title">-->
-                <!--<span class="chat-author">{{ chat.session}}</span>-->
-                <!--<span class="chat-date">20:19:31</span>-->
-            <!--</div>-->
-            <!--<div class="chat-content">-->
-                <!--<span class="chat-bubble">微信公众号请扫描二维码</span>-->
-            <!--</div>-->
-            <!--<div class="chat-content">-->
-                <!--<span class="chat-bubble">在公众号对话框中输入以下内容, 可在公众号对话中操作本网页</span>-->
-            <!--</div>-->
-            <!--<div class="chat-content" >-->
-                <!--<span class="chat-bubble">.join 1234</span>-->
-            <!--</div>-->
-        <!--</div>-->
-
         <batch-item
-          v-for="batch in chat.batches"
+          v-for="batch in batches"
           v-bind:key="batch.batchId"
           v-bind:batch="batch"
         ></batch-item>
+
+        <!-- loading -->
         <div class="chat-row chat-receive" v-show="chat.loading">
             <div class="chat-content">
             <span class="chat-bubble">
@@ -30,13 +16,15 @@
             </span>
             </div>
         </div>
+
+        <!-- suggestion -->
         <div class="chat-row chat-say chat-suggestion"
              :class="{'selected':isSuggestionSelected}">
             <div class="chat-content">
                 <v-btn class="chat-bubble" text
                   v-for="(suggestion, index) in chat.suggestions"
                   :key="index"
-                  @click="sendMessage(suggestion)"
+                  @click="selectSuggestion(suggestion)"
                 >{{ suggestion }}</v-btn>
             </div>
         </div>
@@ -44,18 +32,11 @@
 
 </template>
 <script>
-  // import VueQr from 'vue-qr'
-
   import BatchItem from "./BatchItem";
   import ChatInfo from "../protocals/ChatInfo";
-  import {
-    ACTION_CHAT_DELIVER_MESSAGE,
-    // CHAT_TO_BOTTOM,
-  } from "../constants";
   import TextMessage from "../protocals/TextMessage";
   import Request from "../socketio/Request";
-  import Join from "../socketio/Join";
-  import Leave from "../socketio/Leave";
+  import Room from "../socketio/Room";
   import {getResponse} from "../utils";
 
   export default {
@@ -70,22 +51,25 @@
       let $this = this;
       let req = new Request({
         token: $this.$store.state.user.token,
-        proto: new Join({session: $this.chat.session})
+        proto: new Room({
+          session: $this.chat.session,
+          scene: $this.chat.scene,
+        })
       });
 
       // 监听频道.
-      this.$socket.emit('join', req);
+      this.$socket.emit('JOIN', req);
     },
     destroyed() {
 
       let $this = this;
       let req = new Request({
         token: $this.$store.state.user.token,
-        proto: new Leave({session: $this.chat.session})
+        proto: new Room({session: $this.chat.session})
       });
 
       // 监听频道.
-      this.$socket.emit('join', req);
+      this.$socket.emit('LEAVE', req);
 
     },
     sockets : {
@@ -97,21 +81,23 @@
       }
     },
     methods : {
-      sendMessage(suggestion) {
+      selectSuggestion(suggestion) {
         let text = TextMessage.create(suggestion);
-        this.$store.dispatch(
-          ACTION_CHAT_DELIVER_MESSAGE,
-          text
-        );
+        this.$emit('deliver-message', text);
       },
     },
     computed : {
+      batches() {
+        return this.chat.batches;
+      },
       isSuggestionSelected() {
         /**
          * @type {ChatInfo} chat
          */
         let chat = this.chat;
-        return chat.isSaid || chat.suggestions.length <= 0
+        let suggestions = chat.suggestions;
+        let hasSuggestion = suggestions && suggestions.length > 0;
+        return chat.isSaid || hasSuggestion;
       }
     }
   }

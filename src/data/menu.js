@@ -4,7 +4,7 @@ export default {
     title: 'Commune助手',
     scene: 'commune',
     icon: 'mdi-robot',
-    closable: false
+    closable: false,
   },
 
   connected : [
@@ -13,7 +13,8 @@ export default {
       scene: 'commune-chat',
       icon: 'mdi-forum',
       session: 'commune-chat',
-      closable: false
+      closable: false,
+      bot: false,
     },
   ],
 
@@ -22,7 +23,8 @@ export default {
       title: '联系作者',
       scene: 'thirdgerb',
       icon: 'mdi-account-question',
-      closable: true
+      closable: true,
+      bot: false
     }
   ],
 

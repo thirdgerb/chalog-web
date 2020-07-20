@@ -1,32 +1,34 @@
 
 import Message from './Message';
-import TextMessage from "./TextMessage";
 import createMessage from './CreateMessage';
+import User from './User';
 
-export default class MessageBatch {
+
+export const MODE_SELF = 0;
+export const MODE_BOT = 1;
+export const MODE_USER = 2;
+export const MODE_SYSTEM = 3;
+
+export class MessageBatch {
 
   /**
    * 是否是输入消息
    * @type {boolean}
    */
-  isInput = false;
+  mode;
 
   /**
    * 消息的批次 ID
    * @type {string}
    */
-  batchId = '';
+  batchId;
 
-  /**
-   * @type {boolean}
-   */
-  loading = false;
-
+  creatorId;
   /**
    * 发送者名称.
    * @type {string}
    */
-  creatorName = '';
+  creatorName;
 
   /**
    * 消息
@@ -39,14 +41,20 @@ export default class MessageBatch {
    */
   date;
 
+  suggestions;
+
   constructor({
-    isInput,
+    mode,
+    creatorId,
     creatorName,
     batchId,
+    messages,
   }) {
-    this.isInput = isInput;
+    this.mode = mode;
+    this.creatorId = creatorId;
     this.creatorName = creatorName;
     this.batchId = batchId;
+    this.messages = messages || [];
 
     let date = new Date();
     this.date = date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
@@ -65,15 +73,27 @@ export default class MessageBatch {
     return this;
   }
 
-  static createByMessage(message, creatorName, isInput = true) {
+  /**
+   *
+   * @param {Message} message
+   * @param {User} user
+   * @param {int}mode
+   * @returns {MessageBatch}
+   */
+  static createByMessage(message, user, mode = MODE_SELF) {
     if (!(message instanceof Message)) {
-      console.log(message);
       throw new Error('message must be instanceof Message');
     }
 
+    if (!(user instanceof User)) {
+      throw new Error('user must be instanceof User');
+    }
+
+
     let batch = new MessageBatch({
-      isInput : isInput,
-      creatorName : creatorName,
+      mode,
+      creatorId: user.id,
+      creatorName: user.name,
       batchId : message.id,
     });
 
@@ -81,23 +101,10 @@ export default class MessageBatch {
     return batch;
   }
 
-  static fake(isInput = false) {
-
-    let batch =  new MessageBatch({
-      isInput : isInput,
-      creatorId : 'test',
-      creatorName : 'test',
-
-    });
-
-    batch.appendMessage(TextMessage.fake());
-    return batch;
-  }
-
   get lastMessage() {
     let last = this.messages.length - 1;
     let message = this.messages[last];
 
-    return message ? message.lastInfo() : '';
+    return message ? message.brief() : '';
   }
 }

@@ -5,7 +5,7 @@ export const SET_ERROR = 'SET_ERROR';
 export const INIT_MENU = 'INIT_MENU';
 
 
-// store 常量
+// layout
 export const TOGGLE_DRAWER = 'TOGGLE_DRAWER';
 export const VIDEO_PLAY_SETTER = 'VIDEO_PLAY_SETTER';
 export const PLAY_VIDEO = 'PLAY_VIDEO';
@@ -26,7 +26,6 @@ export const ACTION_CHAT_CONNECT = 'ACTION_CHAT_CONNECT';
 export const ACTION_CHAT_CLOSE = 'ACTION_CHAT_CLOSE';
 export const ACTION_CHAT_SUBSCRIBE = 'ACTION_CHAT_SUBSCRIBE';
 export const ACTION_CHAT_DISCONNECT = 'ACTION_CHAT_DISCONNECT';
-export const ACTION_CHAT_DELIVER_MESSAGE = 'ACTION_CHAT_DELIVER_MESSAGE';
 
 // messages
 export const MESSAGE_TEXT = 'text';
