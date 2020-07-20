@@ -66,8 +66,8 @@ export default new Vuex.Store({
     // 当前的会话
     menu : {
       alive : null,
-      connected : [],
-      list: [],
+      connected : {},
+      list: {},
     },
     // 进行中的聊天.
     chats : {},
@@ -107,20 +107,25 @@ export default new Vuex.Store({
 
     [INIT_MENU] : (state, {menu, user}) => {
       let id = user.id;
+      let newMenu = {};
+      let newChats = {};
       if (menu.alive) {
         let aliveNav = NavItem.from(menu.alive, id);
-        state.menu.alive = aliveNav;
-        insertChats(state.chats, aliveNav);
+        newMenu.alive = aliveNav;
+        insertChats(newChats, aliveNav);
       }
 
       if (menu.connected) {
-        state.menu.connected = createMenu(id, ...menu.connected);
-        insertChats(state.chats, ...Object.values(state.menu.connected));
+        newMenu.connected = createMenu(id, ...menu.connected);
+        insertChats(newChats, ...Object.values(newMenu.connected));
       }
 
       if (menu.list) {
-        state.menu.list = createMenu(id, ...menu.list);
+        newMenu.list = createMenu(id, ...menu.list);
       }
+
+      state.menu = newMenu;
+      state.chats = newChats;
     },
 
 
@@ -200,17 +205,19 @@ export default new Vuex.Store({
     /**
      * 向 Chat 提交消息
      * @param state
+     * @param {string} session
      * @param {MessageBatch}batch
      */
     [CHAT_COMMIT_MESSAGE] : (state, {session, batch}) => {
       if (!batch) {
         throw new Error('batch should not be empty');
       }
-      let chat = state.chats[session];
+      let chats = state.chats;
+      let chat = chats[session];
 
       // 插入新的消息.
-      chat.appendBatch(batch);
-      chat.hasNew = !batch.mode
+      chat.batches[batch.batchId] = batch;
+      chat.hasNew = batch.mode
         && (state.menu.alive.session !== chat.session);
 
       // 如果有提议
@@ -220,7 +227,8 @@ export default new Vuex.Store({
         chat.isSaid = false;
       }
 
-      state.chats[chat.session] = chat;
+      chats[chat.session] = chat;
+      state.chats = chats;
 
       // 如果是当前会话, 则滑动到底部.
       let aliveSession = state.menu.alive.session;
@@ -265,13 +273,14 @@ export default new Vuex.Store({
         Cookies.set('userid', user.id, option);
         Cookies.set('username', user.name, option);
         Cookies.set('token', user.token || '', option);
+        state.user = user;
       } else {
         Cookies.remove('userid');
         Cookies.remove('username');
         Cookies.remove('token');
+        state.user = null;
       }
 
-      state.user = user;
     },
 
     /*------- socket -------*/

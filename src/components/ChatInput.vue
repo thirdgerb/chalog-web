@@ -30,9 +30,11 @@
     TOGGLE_DRAWER,
     VIDEO_PLAY_SETTER,
     PLAY_VIDEO,
+    // CHAT_COMMIT_MESSAGE,
     // ACTION_INPUT_MESSAGE,
   } from '../constants';
   import TextMessage from '../protocals/TextMessage';
+  // import {MessageBatch} from "../protocals/MessageBatch";
   // import Input from "../socketio/Input";
 
   const rules = {

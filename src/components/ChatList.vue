@@ -1,10 +1,17 @@
 <template>
     <div>
-        <batch-item
-          v-for="batch in batches"
-          v-bind:key="batch.batchId"
+        <div class="chat-row chat-receive">
+            <div class="chat-content">
+                <span class="chat-bubble">
+                    <span>hello world</span>
+                </span>
+            </div>
+        </div>
+        <div
+          v-for="(batch, batchId) in batches"
+          v-bind:key="batchId"
           v-bind:batch="batch"
-        ></batch-item>
+        >{{ batchId }}</div>
 
         <!-- loading -->
         <div class="chat-row chat-receive" v-show="chat.loading">
@@ -32,7 +39,7 @@
 
 </template>
 <script>
-  import BatchItem from "./BatchItem";
+  // import BatchItem from "./BatchItem";
   import ChatInfo from "../protocals/ChatInfo";
   import TextMessage from "../protocals/TextMessage";
   import Request from "../socketio/Request";
@@ -42,23 +49,27 @@
   export default {
     name: "ChatList",
     props : {
-      chat : ChatInfo,
+      chat: ChatInfo
     },
     components: {
-      BatchItem,
+      // BatchItem,
     },
     created() {
       let $this = this;
+      let chat = $this.chat;
       let req = new Request({
-        token: $this.$store.state.user.token,
+        token: $this.$store.getters.token,
         proto: new Room({
-          session: $this.chat.session,
-          scene: $this.chat.scene,
+          session: chat.session,
+          scene: chat.scene,
         })
       });
 
       // 监听频道.
       this.$socket.emit('JOIN', req);
+    },
+    mounted() {
+      console.log('chatlist mounted');
     },
     destroyed() {
 
@@ -98,7 +109,7 @@
         let suggestions = chat.suggestions;
         let hasSuggestion = suggestions && suggestions.length > 0;
         return chat.isSaid || hasSuggestion;
-      }
+      },
     }
   }
 </script>

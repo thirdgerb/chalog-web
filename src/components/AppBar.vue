@@ -17,6 +17,7 @@
         <v-spacer></v-spacer>
         <v-btn text>v0.1</v-btn>
         <v-btn icon><v-icon >mdi-github</v-icon></v-btn>
+        <v-btn text @click.stop="submit">提交</v-btn>
 
     </v-app-bar>
 </template>
@@ -25,8 +26,10 @@
     import { mapMutations } from 'vuex'
     import {
       TOGGLE_DRAWER,
-      PLAY_VIDEO,
+      PLAY_VIDEO, CHAT_COMMIT_MESSAGE,
     } from "../constants";
+    import TextMessage from "../protocals/TextMessage";
+    import {MessageBatch} from "../protocals/MessageBatch";
 
     export default {
       name: "AppBar",
@@ -53,6 +56,17 @@
             if ($this.$router.currentRoute.name !== 'index') {
               this.$router.push({name:'index'})
             }
+
+          },
+
+          submit() {
+            let text = TextMessage.create('hello');
+            let batch = MessageBatch.createByMessage(text, this.$store.state.user);
+
+            this.$store.commit(
+              CHAT_COMMIT_MESSAGE,
+              {session:this.$store.state.menu.alive.session, batch}
+            )
           }
 
         }

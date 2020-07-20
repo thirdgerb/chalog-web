@@ -5,13 +5,12 @@
         <Drawer v-if="isLogin"/>
 
         <bili></bili>
-        <v-container id="chat-container" fluid v-if="isLogin">
+        <v-container id="chat-container" fluid>
             <!--<div class="chat-wrap">-->
             <div class="chat" id="chat" >
                 <chat-list
-                    v-for="chat in chats"
-                    v-show="chat.session === aliveSession"
-                    :key="chat.session"
+                    v-for="(chat,session) in chats"
+                    :key="session"
                     :chat="chat"
                     v-on:deliver-message="deliverMessage"
                 >
@@ -63,10 +62,11 @@
       scrolling : false
     }),
     mounted () {
-      let $this =this;
-      if (!$this.$store.getters.isLogin) {
-        $this.$router.replace({name:'index'});
-      }
+      // let $this =this;
+      // if (!$this.$store.getters.isLogin) {
+      //   $this.$router.replace({name:'index'});
+      // }
+      console.log('chat page mounted');
     },
     computed : {
       aliveSession() {
@@ -80,9 +80,8 @@
       },
       isLogin() {
         return this.$store.getters.isLogin;
-      }
+      },
     },
-
     watch : {
       toBottom(newVal) {
         //todo 要考虑品是否在底部.
@@ -94,6 +93,9 @@
         if (!newVal) {
           this.$router.push({name:'index'});
         }
+      },
+      chats(val) {
+        console.log(val);
       }
     },
     methods : {
@@ -103,7 +105,6 @@
         if (!(message instanceof Message)) {
           throw new Error('message should be instance of Message');
         }
-
 
         // 准备需要发送的消息.
         let alive = $this.$store.state.menu.alive;
@@ -116,11 +117,13 @@
           token: $this.$store.getters.token,
           proto: input
         });
+        console.log(request);
         // 向服务端投递消息.
-        $this.$socket.emit('INPUT', request);
+        // $this.$socket.emit('INPUT', request);
 
         // 提交消息到当前列表.
         let batch = MessageBatch.createByMessage(message, $this.$store.state.user);
+
         $this.$store.commit(
           CHAT_COMMIT_MESSAGE,
           {session:alive.session, batch}

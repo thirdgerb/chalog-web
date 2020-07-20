@@ -1,6 +1,4 @@
 
-import {MessageBatch} from "./MessageBatch";
-
 /**
  * @property {MessageBatch} lastBatch
  * @property {string} lastMessage
@@ -27,9 +25,9 @@ export default class ChatInfo {
 
   /**
    * 当前的消息
-   * @type {MessageBatch[]}
+   * @type {Object}
    */
-  batches = [];
+  batches = {};
 
   /**
    * @type {boolean}
@@ -49,7 +47,7 @@ export default class ChatInfo {
    */
   context;
 
-  suggestions;
+  suggestions = {};
 
   constructor(
     {
@@ -61,15 +59,6 @@ export default class ChatInfo {
     this.session = session;
     this.scene = scene;
     this.bot = !!bot;
-  }
-
-  appendBatch(batch) {
-    if (batch instanceof MessageBatch) {
-      this.batches.push(batch);
-
-    } else {
-      throw new Error('invalid batch info ' + batch);
-    }
   }
 
   /**

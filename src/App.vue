@@ -20,7 +20,9 @@
       </template>
     </v-snackbar>
     <transition name="slide-fade">
+      <keep-alive>
           <router-view></router-view>
+      </keep-alive>
     </transition>
   </v-app>
 </template>
