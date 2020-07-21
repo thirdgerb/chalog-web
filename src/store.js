@@ -65,7 +65,7 @@ export default new Vuex.Store({
     },
     // 当前的会话
     menu : {
-      alive : null,
+      alive: null,
       connected : {},
       list: {},
     },
@@ -170,28 +170,31 @@ export default new Vuex.Store({
      * @param state
      * @param {NavItem} nav
      */
-    [CHAT_ALIVE_SETTER] : (state, nav) => {
+    [CHAT_ALIVE_SETTER] : (state, selected) => {
 
       let alive = state.menu.alive;
 
-      if (nav.session === alive.session) {
+      if (selected.session === alive.session) {
         return;
       }
 
       // 初始化 Chats
-      let chat = state.chats[nav.session];
-      if (!chat) {
-        insertChats(state.chats, nav);
+      let chats = state.chats;
+      let selectedChat = chats[selected.session];
+      if (!selectedChat) {
+        insertChats(chats, selected);
+        selectedChat = chats[selected.session];
+        state.chats = chats;
       }
 
       // 删除未连接中的选项.
-      delete state.menu.connected[nav.session];
-      delete state.menu.list[nav.session];
+      delete state.menu.connected[selected.session];
+      delete state.menu.list[selected.session];
 
-      nav.hasNew = false;
-      alive.hasNew = false;
+      selectedChat.hasNew = false;
+      state.chats[alive.session].hasNew = false;
 
-      state.menu.alive = nav;
+      state.menu.alive = selected;
       state.menu.connected = insertMenu(state.menu.connected, alive);
 
 
@@ -205,20 +208,26 @@ export default new Vuex.Store({
     /**
      * 向 Chat 提交消息
      * @param state
-     * @param {string} session
      * @param {MessageBatch}batch
      */
-    [CHAT_COMMIT_MESSAGE] : (state, {session, batch}) => {
+    [CHAT_COMMIT_MESSAGE] : (state, batch) => {
       if (!batch) {
         throw new Error('batch should not be empty');
       }
       let chats = state.chats;
+      let session = batch.session;
       let chat = chats[session];
 
+      if (!chat) {
+        console.log(session + ' not exists');
+        return;
+      }
+      console.log(chat);
+
       // 插入新的消息.
-      chat.batches[batch.batchId] = batch;
-      chat.hasNew = batch.mode
-        && (state.menu.alive.session !== chat.session);
+      chat.appendBatch(batch);
+      chat.hasNew = batch.isNew()
+        && (state.menu.alive.session !== session);
 
       // 如果有提议
       let suggestions = batch.suggestions;

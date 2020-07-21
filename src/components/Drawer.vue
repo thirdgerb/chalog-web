@@ -46,7 +46,7 @@
            :item="item"
            :key="item.session"
            v-on:close-chat="onClose(item)"
-           v-on:select-chat="onSelect(item)"
+           v-on:select-chat="onConnect(item)"
         ></menu-item>
       </v-list-item-group>
     </v-list>
@@ -70,6 +70,9 @@
       components : {
         MenuItem: MenuItem
       },
+        mounted() {
+            console.log('drawer mounted');
+        },
       computed : {
         drawer : {
           get () {
@@ -138,7 +141,7 @@
 
           $this.onSelect(item);
 
-          // 退出房价.
+          // 进入房间.
           $this.$socket.emit('JOIN', new Request({
             token: $this.$store.getters.token,
             proto,

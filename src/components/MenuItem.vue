@@ -1,5 +1,9 @@
 <template>
-    <v-list-item outlined @click.stop="$emit('select-chat', item)">
+    <v-list-item
+        outlined
+        @click.stop="$emit('select-chat', item)"
+        :disabled="isAlive"
+    >
         <v-badge
             avatar
             dot
@@ -8,7 +12,7 @@
             offset-x="26"
             offset-y="20"
         >
-            <v-list-item-avatar class="indigo lighten-3">
+            <v-list-item-avatar class="purple lighten-1">
                 <v-icon dark>{{item.icon}}</v-icon>
             </v-list-item-avatar>
         </v-badge>

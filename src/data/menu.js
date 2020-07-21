@@ -6,8 +6,8 @@ export default {
     icon: 'mdi-robot',
     closable: false,
   },
-
   connected : [
+
     {
       title: '交流群',
       scene: 'commune-chat',

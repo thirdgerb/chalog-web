@@ -6,7 +6,7 @@
             <span class="chat-author">{{ batch.creatorName }}</span>
             <span class="chat-date"> {{batch.date}} </span>
         </div>
-        <div v-if="isSystem">{{ batch.lastMessage() }}</div>
+        <div v-if="isSystem">{{ batch.lastMessage }}</div>
         <div v-if="!isSystem">
             <template v-for="message of batch.messages">
                 <message-bili
@@ -47,12 +47,7 @@
       MessageBili
     },
     props: {
-      batch: {
-          type: MessageBatch,
-          default() {
-            return MessageBatch.fake(true);
-          }
-      }
+      batch:  MessageBatch,
     },
     methods : {
       isText : (type) => type === MESSAGE_TEXT,

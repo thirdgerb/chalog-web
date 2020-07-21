@@ -13,9 +13,11 @@ export class MessageBatch {
 
   /**
    * 是否是输入消息
-   * @type {boolean}
+   * @type {int}
    */
   mode;
+
+  session;
 
   /**
    * 消息的批次 ID
@@ -45,16 +47,22 @@ export class MessageBatch {
 
   constructor({
     mode,
+    session,
+    batchId,
     creatorId,
     creatorName,
-    batchId,
     messages,
   }) {
     this.mode = mode;
     this.creatorId = creatorId;
     this.creatorName = creatorName;
+    this.session = session;
     this.batchId = batchId;
-    this.messages = messages || [];
+
+    for(let i in messages) {
+      let message = createMessage(messages[i]);
+      this.appendMessage(message);
+    }
 
     let date = new Date();
     this.date = date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
@@ -62,7 +70,7 @@ export class MessageBatch {
 
   /**
    *
-   * @param message
+   * @param {Message} message
    * @returns {*}
    */
   appendMessage(message) {
@@ -73,14 +81,19 @@ export class MessageBatch {
     return this;
   }
 
+  isNew() {
+    return this.mode === MODE_USER || this.mode === MODE_BOT;
+  }
+
   /**
    *
+   * @param {string} session
    * @param {Message} message
    * @param {User} user
    * @param {int}mode
    * @returns {MessageBatch}
    */
-  static createByMessage(message, user, mode = MODE_SELF) {
+  static createByMessage(session, message, user, mode = MODE_SELF) {
     if (!(message instanceof Message)) {
       throw new Error('message must be instanceof Message');
     }
@@ -92,9 +105,10 @@ export class MessageBatch {
 
     let batch = new MessageBatch({
       mode,
+      session,
+      batchId : message.id,
       creatorId: user.id,
       creatorName: user.name,
-      batchId : message.id,
     });
 
     batch.appendMessage(createMessage(message));
@@ -105,6 +119,15 @@ export class MessageBatch {
     let last = this.messages.length - 1;
     let message = this.messages[last];
 
-    return message ? message.brief() : '';
+    let brief =  message ? message.brief() : '';
+    if (!brief) {
+      return '';
+    }
+
+    let mode = this.mode;
+    if (mode !== MODE_SELF && mode !== MODE_SYSTEM) {
+      return this.creatorName + ':' + brief;
+    }
+    return brief;
   }
 }

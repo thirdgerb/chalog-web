@@ -7,11 +7,11 @@
                 </span>
             </div>
         </div>
-        <div
-          v-for="(batch, batchId) in batches"
-          v-bind:key="batchId"
+        <batch-item
+          v-for="batch in batches"
+          v-bind:key="batch.batchId"
           v-bind:batch="batch"
-        >{{ batchId }}</div>
+        ></batch-item>
 
         <!-- loading -->
         <div class="chat-row chat-receive" v-show="chat.loading">
@@ -45,6 +45,7 @@
   import Request from "../socketio/Request";
   import Room from "../socketio/Room";
   import {getResponse} from "../utils";
+  import BatchItem from "./BatchItem";
 
   export default {
     name: "ChatList",
@@ -52,7 +53,7 @@
       chat: ChatInfo
     },
     components: {
-      // BatchItem,
+      BatchItem,
     },
     created() {
       let $this = this;
