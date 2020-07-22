@@ -28,18 +28,15 @@
 <script>
   import {
     MessageBatch,
-    MODE_BOT,
-    MODE_SELF,
-    MODE_SYSTEM,
-    MODE_USER,
-  } from '../protocals/MessageBatch';
+    BATCH_MODE_BOT,
+    BATCH_MODE_SELF,
+    BATCH_MODE_SYSTEM,
+    BATCH_MODE_USER,
+  } from '../socketio/MessageBatch';
+  import {MESSAGE_BILI, MESSAGE_TEXT} from "../socketio/Message";
   import MessageBili from "./MessageBili";
   import MessageText from "./MessageText";
-  import {
-    MESSAGE_TEXT,
-    MESSAGE_BILI,
-  } from "../constants";
-
+  
   export default {
     name: "BatchItem",
     components: {
@@ -55,14 +52,14 @@
     },
     computed : {
       isSelf() {
-        return this.batch.mode === MODE_SELF;
+        return this.batch.mode === BATCH_MODE_SELF;
       },
       isSystem() {
-        return this.batch.mode === MODE_SYSTEM;
+        return this.batch.mode === BATCH_MODE_SYSTEM;
       },
       isReceive() {
         let mode = this.batch.mode;
-        return mode === MODE_BOT || MODE_USER === mode;
+        return mode === BATCH_MODE_BOT || BATCH_MODE_USER === mode;
       }
     }
   }

@@ -1,14 +1,14 @@
 <template>
-    <div>
+    <div >
         <div class="chat-row chat-receive">
             <div class="chat-content">
                 <span class="chat-bubble">
-                    <span>hello world</span>
+                    <span>hello world {{ session }}</span>
                 </span>
             </div>
         </div>
         <batch-item
-          v-for="batch in batches"
+          v-for="batch in getBatches()"
           v-bind:key="batch.batchId"
           v-bind:batch="batch"
         ></batch-item>
@@ -26,12 +26,11 @@
 
         <!-- suggestion -->
         <div class="chat-row chat-say chat-suggestion"
-             :class="{'selected':isSuggestionSelected}">
+             :class="{'selected':true}">
             <div class="chat-content">
                 <v-btn class="chat-bubble" text
                   v-for="(suggestion, index) in chat.suggestions"
                   :key="index"
-                  @click="selectSuggestion(suggestion)"
                 >{{ suggestion }}</v-btn>
             </div>
         </div>
@@ -40,77 +39,55 @@
 </template>
 <script>
   // import BatchItem from "./BatchItem";
-  import ChatInfo from "../protocals/ChatInfo";
-  import TextMessage from "../protocals/TextMessage";
-  import Request from "../socketio/Request";
-  import Room from "../socketio/Room";
-  import {getResponse} from "../utils";
+  // import ChatInfo from "../protocals/ChatInfo";
+  // import TextMessage from "../protocals/TextMessage";
+  // import Request from "../socketio/Request";
+  // import Room from "../socketio/Room";
+  // import {getResponse} from "../utils";
   import BatchItem from "./BatchItem";
 
   export default {
     name: "ChatList",
-    props : {
-      chat: ChatInfo
-    },
+    props : ['chat'],
     components: {
       BatchItem,
     },
-    created() {
-      let $this = this;
-      let chat = $this.chat;
-      let req = new Request({
-        token: $this.$store.getters.token,
-        proto: new Room({
-          session: chat.session,
-          scene: chat.scene,
-        })
-      });
-
-      // 监听频道.
-      this.$socket.emit('JOIN', req);
-    },
-    mounted() {
-      console.log('chatlist mounted');
-    },
-    destroyed() {
-
-      let $this = this;
-      let req = new Request({
-        token: $this.$store.state.user.token,
-        proto: new Room({session: $this.chat.session})
-      });
-
-      // 监听频道.
-      this.$socket.emit('LEAVE', req);
-
-    },
-    sockets : {
-      message(res) {
-        let $this = this;
-        getResponse($this.$store, res, function(store, proto) {
-          console.log(proto);
-        });
+    // sockets : {
+    //   message(res) {
+    //     let $this = this;
+    //     getResponse($this.$store, res, function(store, proto) {
+    //       console.log(proto);
+    //     });
+    //   }
+    // },
+    // methods : {
+    //   selectSuggestion(suggestion) {
+    //     let text = TextMessage.create(suggestion);
+    //     this.$emit('deliver-message', text);
+    //   },
+    // },
+    methods: {
+      getBatches() {
+        return Object.values(this.chat.batches);
       }
     },
-    methods : {
-      selectSuggestion(suggestion) {
-        let text = TextMessage.create(suggestion);
-        this.$emit('deliver-message', text);
-      },
-    },
     computed : {
-      batches() {
-        return this.chat.batches;
-      },
-      isSuggestionSelected() {
-        /**
-         * @type {ChatInfo} chat
-         */
-        let chat = this.chat;
-        let suggestions = chat.suggestions;
-        let hasSuggestion = suggestions && suggestions.length > 0;
-        return chat.isSaid || hasSuggestion;
-      },
+      session() {
+        return this.chat.session;
+      }
+      // chat () {
+      //   let $this = this;
+      //   return $this.$store.state.chat.connected[$this.session];
+      // },
+      // isSuggestionSelected() {
+      //   /**
+      //    * @type {ChatInfo} chat
+      //    */
+      //   let chat = this.chat;
+      //   let suggestions = chat.suggestions;
+      //   let hasSuggestion = suggestions && suggestions.length > 0;
+      //   return chat.isSaid || hasSuggestion;
+      // },
     }
   }
 </script>

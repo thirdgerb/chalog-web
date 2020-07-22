@@ -18,21 +18,10 @@
 <script>
   export default {
     name: "NotFound",
-    mounted () {
-      let $this = this;
-      setTimeout(function() {
-        $this.goAlive();
-      }, 2000);
-    },
     methods : {
       goAlive() {
         let $this = this;
-
-        if ($this.$store.getters.isLogin) {
-          return $this.$router.replace({name : 'alive'});
-        } else {
-          return $this.$router.replace({name : 'login'});
-        }
+        return $this.$router.replace({name : 'index'});
       }
     }
   }

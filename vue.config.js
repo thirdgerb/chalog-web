@@ -8,9 +8,5 @@ module.exports = {
   "transpileDependencies": [
     "vuetify"
   ],
-  chainWebpack: config => {
-    // config.resolve.alias
-    //   .set("@", resolve("src"));
-  }
-}
+};
 

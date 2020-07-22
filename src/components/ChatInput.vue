@@ -4,20 +4,23 @@
       v-model="message"
       rows="1"
       outlined
+      autofocus
       :loading="loading"
       :error="hasError"
       :error-messages="error"
-      :success="success"
+      :success="!loading"
       light
       flat
       single-line
       append-icon="mdi-send"
+      :prepend-inner-icon="prependIcon"
       clearable
       dense
       filled
       no-resize
       background-color="white"
       @click:append="sendMessage"
+      @click:prepend-inner="changeToBot"
       @click:clear="clearMessage"
       v-on:keyup.enter.prevent.stop="sendMessage"
       v-on:blur="clearError"
@@ -26,28 +29,16 @@
 </template>
 
 <script>
-  import {
-    TOGGLE_DRAWER,
-    VIDEO_PLAY_SETTER,
-    PLAY_VIDEO,
-    // CHAT_COMMIT_MESSAGE,
-    // ACTION_INPUT_MESSAGE,
-  } from '../constants';
-  import TextMessage from '../protocals/TextMessage';
-  // import Input from "../socketio/Input";
-  // import {MessageBatch} from "../protocals/MessageBatch";
-  // import Input from "../socketio/Input";
+  import {TextMessage} from "../socketio/Message";
+  import {CHAT_CHANGE_ALIVE_BOT} from "../store/chat";
+  import {LAYOUT_SNACK_BAR_TOGGLE} from "../store/layout";
+  import Room from "../socketio/Room";
+  import Request from "../socketio/Request";
 
   const rules = {
     require: value => (value.length > 0) || '消息不能为空',
     counter: value => (value.length <= 100) || '最多输入100字',
   };
-
-  const commands = [
-    VIDEO_PLAY_SETTER,
-    TOGGLE_DRAWER,
-    PLAY_VIDEO,
-  ];
 
   export default {
     name: "ChatInput",
@@ -57,8 +48,8 @@
         busy: false,
         error: '',
         rules: rules,
-        success: false,
         focus: false,
+        botChanging: false,
       }
     },
     created() {
@@ -70,6 +61,9 @@
         if ($this.loading) {
           return;
         }
+        setTimeout(function() {
+          $this.busy = false;
+        }, 1000);
 
         let error;
         let rulesArr = Object.values(rules);
@@ -83,21 +77,10 @@
             return;
           }
         }
-
         message = message.trim();
-        // 检查命令, 执行命令.
-        let i = commands.indexOf(message);
-        if (i >=0 ) {
-          $this.$store.commit(message);
-          $this.clearMessage();
-          return;
-        }
-
 
         $this.busy = true;
-        setTimeout(function() {
-          $this.busy = false;
-        }, 1000);
+
 
         let text = TextMessage.create(message);
         $this.$emit('deliver-message', text);
@@ -113,8 +96,37 @@
       },
       clearError() {
         this.error = '';
-      }
+      },
+      changeToBot() {
+        let $this = this;
 
+        // 不要按太频繁.
+        if ($this.botChanging) {
+          return;
+        }
+        $this.botChanging = true;
+        setTimeout(function(){
+          $this.botChanging = false;
+        }, 4000);
+
+        let alive = $this.$store.getters.aliveChat;
+
+        if (!alive) {
+          return;
+        }
+
+        // 切换到人工的话, 给管理员发消息
+        let bot = alive.bot;
+        if (bot) {
+          let room = new Room(alive);
+          let request = new Request({proto:room, token:$this.$store.getters.token});
+          $this.$socket.emit('TO_ADMIN', request);
+        }
+
+
+        $this.$store.commit(CHAT_CHANGE_ALIVE_BOT, !bot);
+        $this.$store.commit(LAYOUT_SNACK_BAR_TOGGLE, bot ? '切换到群聊' : '切换到机器人');
+      },
     },
     computed: {
       hasError() {
@@ -123,6 +135,13 @@
       loading() {
         return this.busy;
       },
+      prependIcon() {
+        let alive = this.$store.getters.aliveChat;
+        if (!alive) {
+          return;
+        }
+        return alive.bot ?  'mdi-robot' : 'mdi-face-agent';
+      }
     }
 
   }

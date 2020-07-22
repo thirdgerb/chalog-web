@@ -15,9 +15,9 @@
 </template>
 
 <script>
-  import {VIDEO_PLAY_SETTER} from '../constants';
+    import {BILI_TOGGLE} from "../store/bili";
 
-  export default {
+    export default {
     name: "biliVideo",
     data() {
       return {
@@ -26,15 +26,15 @@
     computed : {
       play: {
         get() {
-          return this.$store.state.video.play;
+          return this.$store.state.bili.play;
         },
         set(val) {
-          this.$store.commit(VIDEO_PLAY_SETTER, val);
+          this.$store.commit(BILI_TOGGLE, val);
         }
       } ,
       src()  {
         let $this = this;
-        let url = $this.$store.state.video.url;
+        let url = $this.$store.state.bili.resource;
 
         return url
           + '&as_wide=1&danmaku=0'

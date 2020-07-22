@@ -1,28 +1,29 @@
 <template>
-    <v-list-item
-        outlined
-        @click.stop="$emit('select-chat', item)"
-        :disabled="isAlive"
-    >
+
+    <v-list-item outlined :value="session" :to="to">
         <v-badge
-            avatar
-            dot
-            :value="hasNew"
-            color="error"
-            offset-x="26"
-            offset-y="20"
+        :dot="dot"
+        :value="chat.unread !==0 "
+        :content="getUnread()"
+        color="error"
+        :offset-x="offsetX"
+        :offset-y="offsetY"
         >
-            <v-list-item-avatar class="purple lighten-1">
-                <v-icon dark>{{item.icon}}</v-icon>
+
+            <v-list-item-avatar
+                class="lighten-2"
+                :class="{'purple':!isAlive, 'green':isAlive}"
+            >
+                <v-icon dark>{{chat.icon}}</v-icon>
             </v-list-item-avatar>
         </v-badge>
         <v-list-item-content>
-            <v-list-item-title>{{item.title}}</v-list-item-title>
-            <v-list-item-subtitle style="color:grey">{{lastMessage}}</v-list-item-subtitle>
+            <v-list-item-title>{{chat.title}}</v-list-item-title>
+            <v-list-item-subtitle style="color:grey">{{chat.lastMessage}}</v-list-item-subtitle>
         </v-list-item-content>
         <v-list-item-action>
             <v-btn
-                v-if="item.closable"
+                v-if="chat.closable"
                 icon
                 color="#bbb"
                 @click.stop="close"
@@ -32,40 +33,59 @@
 </template>
 
 <script>
-  import NavItem from '../protocals/NavItem';
-
-  // import {
-  //   ACTION_CHAT_CONNECT,
-  //   ACTION_CHAT_CLOSE,
-  // } from '../constants';
+  // import {getLastMessage} from '../store/chat';
 
   export default {
     name: "ChatItem",
     props : {
-      item: NavItem,
-      isAlive : {
-        type : Boolean,
-        default : false,
+      session: String,
+      connected: Boolean,
+    },
+    methods: {
+      close() {
+        this.$emit('close-chat')
+      },
+      getUnread() {
+        let $this = this;
+        let session = $this.session;
+        let chat;
+        if ($this.connected) {
+          chat = $this.$store.state.chat.connected[session];
+        } else {
+          chat = $this.$store.state.chat.incoming[session];
+        }
+
+        let content = chat.unread > 9 ? '..' : chat.unread;
+        return content;
       },
     },
     computed: {
-      lastMessage () {
+      chat () {
         let $this = this;
-        let chats = $this.$store.state.chats;
-        let session = $this.item.session;
-
-        let chat = chats[session];
-        return chat ? chat.lastMessage : '';
+        let session = $this.session;
+        if ($this.connected) {
+          return $this.$store.state.chat.connected[session];
+        } else {
+          return $this.$store.state.chat.incoming[session];
+        }
       },
-      hasNew() {
+      to () {
+        let session = this.session;
+        return {name:'chat', params:{session}}
+      },
+      isAlive () {
         let $this = this;
-        let chat = $this.$store.state.chats[$this.item.session];
-        return (!!chat && chat.hasNew);
-      }
-    },
-    methods : {
-      close() {
-        this.$emit('close-chat')
+        return $this.session === $this.$store.state.chat.alive;
+      },
+
+      dot () {
+        return this.chat.unread < 0;
+      },
+      offsetX() {
+        return this.dot ? 25 : 28;
+      },
+      offsetY() {
+        return this.dot ? 20 : 25;
       },
     },
   }

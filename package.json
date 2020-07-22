@@ -10,6 +10,7 @@
   "dependencies": {
     "core-js": "^3.6.5",
     "js-cookie": "^2.2.1",
+    "js-logger": "^1.6.0",
     "js-md5": "^0.7.3",
     "socketio": "^1.0.0",
     "uuid": "^8.2.0",
@@ -45,6 +46,9 @@
     ],
     "parserOptions": {
       "parser": "babel-eslint"
+    },
+    "globals": {
+      "Logger": true
     },
     "rules": {}
   },

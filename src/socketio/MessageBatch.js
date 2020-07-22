@@ -1,13 +1,14 @@
 
-import Message from './Message';
-import createMessage from './CreateMessage';
-import User from './User';
+import {
+  createMessage,
+  Message,
+} from './Message';
 
 
-export const MODE_SELF = 0;
-export const MODE_BOT = 1;
-export const MODE_USER = 2;
-export const MODE_SYSTEM = 3;
+export const BATCH_MODE_SELF = 0;
+export const BATCH_MODE_BOT = 1;
+export const BATCH_MODE_USER = 2;
+export const BATCH_MODE_SYSTEM = 3;
 
 export class MessageBatch {
 
@@ -38,19 +39,34 @@ export class MessageBatch {
    */
   messages = [];
 
-  /**
-   * 时间表示.
-   */
-  date;
+  createdAt;
 
   suggestions;
 
+  context;
+
+
+  /**
+   *
+   * @param {int} mode
+   * @param {string} session
+   * @param {string} batchId
+   * @param {string} creatorId
+   * @param {string} creatorName
+   * @param {int} createdAt
+   * @param {Object} suggestions
+   * @param {Object} context
+   * @param {Message[]} messages
+   */
   constructor({
     mode,
     session,
     batchId,
     creatorId,
     creatorName,
+    createdAt,
+    suggestions ,
+    context,
     messages,
   }) {
     this.mode = mode;
@@ -58,14 +74,20 @@ export class MessageBatch {
     this.creatorName = creatorName;
     this.session = session;
     this.batchId = batchId;
+    this.createdAt = createdAt || Date.parse((new Date()).toString());
+    this.suggestions = suggestions || {};
+    this.context = context || {};
 
+    messages = messages || [];
     for(let i in messages) {
       let message = createMessage(messages[i]);
       this.appendMessage(message);
     }
+  }
 
-    let date = new Date();
-    this.date = date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
+  get date() {
+    let date = new Date(this.createdAt);
+    return date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
   }
 
   /**
@@ -81,34 +103,34 @@ export class MessageBatch {
     return this;
   }
 
-  isNew() {
-    return this.mode === MODE_USER || this.mode === MODE_BOT;
+  get isNew() {
+    return this.mode === BATCH_MODE_USER || this.mode === BATCH_MODE_BOT;
   }
 
   /**
    *
    * @param {string} session
    * @param {Message} message
-   * @param {User} user
+   * @param {string} id
+   * @param {string} name
    * @param {int}mode
    * @returns {MessageBatch}
    */
-  static createByMessage(session, message, user, mode = MODE_SELF) {
+  static createByMessage(session, message, {id, name}, mode = BATCH_MODE_SELF) {
     if (!(message instanceof Message)) {
       throw new Error('message must be instanceof Message');
     }
 
-    if (!(user instanceof User)) {
-      throw new Error('user must be instanceof User');
+    if (!id || !name) {
+      throw new Error('user id or name should not be empty');
     }
-
 
     let batch = new MessageBatch({
       mode,
       session,
       batchId : message.id,
-      creatorId: user.id,
-      creatorName: user.name,
+      creatorId: id,
+      creatorName: name,
     });
 
     batch.appendMessage(createMessage(message));
@@ -125,7 +147,7 @@ export class MessageBatch {
     }
 
     let mode = this.mode;
-    if (mode !== MODE_SELF && mode !== MODE_SYSTEM) {
+    if (mode !== BATCH_MODE_SELF && mode !== BATCH_MODE_SYSTEM) {
       return this.creatorName + ':' + brief;
     }
     return brief;

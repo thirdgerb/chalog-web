@@ -1,4 +1,4 @@
-import Message from "../protocals/Message";
+import {Message} from "./Message";
 
 export default class Input {
 

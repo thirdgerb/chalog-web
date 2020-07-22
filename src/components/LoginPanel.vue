@@ -100,18 +100,12 @@
 </template>
 
 <script>
-  // import {v4} from 'uuid';
-  // import User from "../protocals/User";
-  import {
-    // ACTION_LOGIN_USER,
-    LOADING_SETTER,
-    // USER_SETTER
-  } from "../constants";
+  import {LAYOUT_LOADING_TOGGLE} from '../store/layout';
   import Request from "../socketio/Request";
   import Sign from "../socketio/Sign";
 
   export default {
-    name: "Sign",
+    name: "LoginPanel",
     props: {
       show : Boolean,
     },
@@ -148,24 +142,12 @@
         password : '',
         confirm : '',
         valid : null,
-
       },
     }),
-    computed : {
-      isLogin() {
-        return this.$store.getters.isLogin;
-      }
-    },
-    watch: {
-      isLogin() {
-        this.$router.push({name: 'chat'})
-      }
-    },
     methods : {
       createGuest() {
         let $this = this;
         $this.$refs.guest.validate();
-
         if (!$this.guest.valid) {
           return;
         }
@@ -173,10 +155,7 @@
         let name = '访客-' + this.guest.name;
 
         // 打开 loading
-        $this.$store.commit(
-          LOADING_SETTER,
-          true
-        );
+        $this.$store.commit(LAYOUT_LOADING_TOGGLE, true);
 
         // 提交.
         $this.$socket.emit(
@@ -188,10 +167,7 @@
 
         // 延时关闭 loading.
         setTimeout(function() {
-          $this.$store.commit(
-            LOADING_SETTER,
-            false
-          );
+          $this.$store.commit(LAYOUT_LOADING_TOGGLE, false);
         }, 1500);
       }
     },

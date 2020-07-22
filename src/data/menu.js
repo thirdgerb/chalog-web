@@ -1,12 +1,13 @@
 
 export default {
-  alive : {
-    title: 'Commune助手',
-    scene: 'commune',
-    icon: 'mdi-robot',
-    closable: false,
-  },
   connected : [
+    {
+      title: 'Commune助手',
+      scene: 'commune',
+      icon: 'mdi-robot',
+      closable: false,
+      bot: true
+    },
 
     {
       title: '交流群',
@@ -18,7 +19,7 @@ export default {
     },
   ],
 
-  list : [
+  incoming : [
     {
       title: '联系作者',
       scene: 'thirdgerb',

@@ -17,12 +17,13 @@ const router = new VueRouter({
       component: Index,
     },
     {
-      path: '/chat',
+      path: '/chat/:session',
       name: 'chat',
       component: ChatPage,
     },
     // 404 未找到.
-    {path: '*', component: NotFound}
+    {path: '/404', component: NotFound},
+    {path: '*', component: NotFound},
   ]
 
 });

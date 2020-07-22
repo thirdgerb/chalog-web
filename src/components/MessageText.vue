@@ -5,16 +5,12 @@
 </template>
 
 <script>
-  import TextMessage from '../protocals/TextMessage';
-  export default {
+    import {TextMessage} from "../socketio/Message";
+
+    export default {
     name: "MessageText",
     props : {
-      message : {
-        type : TextMessage,
-        default() {
-            return TextMessage.fake();
-        }
-      },
+      message :TextMessage,
       picked : {
         type: Boolean,
         default: false

@@ -13,23 +13,23 @@
 </template>
 
 <script>
-  import BiliMessage from '../protocals/BiliMessage';
-  import {PLAY_VIDEO} from '../constants';
+  import {BILI_PLAY} from '../store/bili';
+  import {BiliMessage} from "../socketio/Message";
 
   export default {
     name: "MessageBili",
     props : {
-      message : {
-        type : BiliMessage,
-        default : function() {
-          return BiliMessage.fake();
-        }
-      }
+      message : BiliMessage,
+    },
+    mounted () {
+      let $this = this;
+      let resource = $this.message.resource;
+      $this.$store.commit(BILI_PLAY, {resource});
     },
     methods : {
       play() {
         let $this = this;
-        $this.$store.commit(PLAY_VIDEO, $this.message.url);
+        $this.$store.commit(BILI_PLAY, {resource:$this.message.resource});
       }
     }
   }

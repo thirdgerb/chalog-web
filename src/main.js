@@ -4,22 +4,26 @@ import vuetify from './plugins/vuetify';
 import store from './store'
 import router from './router'
 import VueSocketIO from 'vue-socket.io'
-// import io from "socket.io-client"
+import io from "socket.io-client"
+import Logger from 'js-logger';
+
+Logger.useDefaults();
+Logger.setLevel(process.env.VUE_APP_DEBUG ? Logger.DEBUG : Logger.WARN);
 
 const option = {
   transports: ["websocket"]
 };
-// const socket = io(process.env.VUE_APP_SOCKET_IO_CONNECTION, option);
+const socket = io(process.env.VUE_APP_SOCKET_IO_CONNECTION, option);
+window.socket = socket;
 
 Vue.use(new VueSocketIO({
     debug: process.env.VUE_APP_DEBUG,
-    connection: process.env.VUE_APP_SOCKET_IO_CONNECTION,
+    connection: socket,
     vuex: {
       store,
       actionPrefix: 'SOCKET_ACTION_',
       mutationPrefix: 'SOCKET_MUTATOR_'
     },
-    options: option
   })
 );
 
