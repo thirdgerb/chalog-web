@@ -76,15 +76,24 @@ export const CHAT_CHANGE_ALIVE_BOT = 'CHAT_CHANGE_ALIVE_BOT';
 export const initChat = () => ({
   // 已连接的会话
   alive: null,
+  unread: 0,
   connectedSessions: [],
   incomingSessions: [],
   connected: {},
   incoming: {},
 });
 
-export function pushNewBatchToChat(batch, chat, alive) {
+export function countUnread(connected) {
+  let connectedArr = Object.values(connected);
+  let unread = 0;
+  for(let c of connectedArr) {
+    unread += c.unread;
+  }
+  return unread;
+}
+
+export function pushNewBatchToChat(batch, chat, isAlive) {
   let batches = chat.batches;
-  let session = batch.session;
 
   // 消息变更.
   batches.push(batch);
@@ -92,7 +101,7 @@ export function pushNewBatchToChat(batch, chat, alive) {
   chat.updatedAt = batch.createdAt;
 
   // unread 处理.
-  if (batch.isNew && session !== alive) {
+  if (batch.isNew && !isAlive) {
     chat.unread += 1;
   }
   chat.lastMessage = batch.lastMessage;
@@ -127,7 +136,7 @@ export const chat = {
     aliveChat(state) {
       let alive = state.alive;
       return state.connected[alive];
-    }
+    },
   },
 
   mutations : {
@@ -192,6 +201,7 @@ export const chat = {
       if (con) {
         state.alive = session;
         con.unread = 0;
+        state.unread = countUnread(state.connected);
         return;
       }
 
@@ -207,7 +217,6 @@ export const chat = {
         state.connected[session] = con;
         state.connectedSessions.unshift(session);
         state.alive = session;
-
         return;
       }
 
@@ -249,17 +258,20 @@ export const chat = {
         return;
       }
 
-
-
       // 将 batch 的信息提交给 chat
       if (batch.createdAt > chat.updatedAt) {
-        chat = pushNewBatchToChat(batch, chat, state.alive);
+        let isAlive = batch.session === state.alive;
+        chat = pushNewBatchToChat(batch, chat, isAlive);
         // 变更会话顺序.
         let i = state.connectedSessions.indexOf(session);
         if (i >=0) {
           state.connectedSessions.splice(i, 1);
         }
         state.connectedSessions.unshift(session);
+
+        if (!isAlive) {
+          state.unread = countUnread(state.connected);
+        }
 
       } else {
         chat = mergeOldBatchToChat(batch, chat);
