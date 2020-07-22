@@ -120,7 +120,7 @@
         if (bot) {
           let room = new Room(alive);
           let request = new Request({proto:room, token:$this.$store.getters.token});
-          $this.$socket.emit('TO_ADMIN', request);
+          $this.$socket.emit('MANUAL', request);
         }
 
 
