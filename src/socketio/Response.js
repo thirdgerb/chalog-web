@@ -1,3 +1,4 @@
+import Logger from "js-logger";
 
 export class Response {
 
@@ -7,6 +8,7 @@ export class Response {
   constructor({trace, proto}) {
     this.trace = trace;
     this.proto = proto;
+    Logger.trace(this);
   }
 
 }

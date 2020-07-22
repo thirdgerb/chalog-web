@@ -10,7 +10,7 @@
     >
         <v-app-bar-nav-icon
             v-if="isLogin"
-            @click.stop="TOGGLE_DRAWER">
+            @click.stop="toggleDrawer">
         </v-app-bar-nav-icon>
         <v-toolbar-title>{{ version }}</v-toolbar-title>
         <v-spacer></v-spacer>
@@ -31,7 +31,7 @@
           },
 
           isLogin() {
-            return this.$store.getters.isLogin;
+            return this.$store.getters.isUserLogin;
           },
           drawer : {
             get() {
@@ -43,6 +43,11 @@
           }
         },
         methods: {
+          toggleDrawer() {
+            let $this = this;
+            let drawer = $this.$store.state.layout.drawer;
+            $this.$store.commit(LAYOUT_DRAWER_TOGGLE, !drawer);
+          }
         }
     }
 </script>

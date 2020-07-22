@@ -26,7 +26,7 @@
                 v-if="chat.closable"
                 icon
                 color="#bbb"
-                @click.stop="close"
+                @click.stop.prevent="closeItem"
             >X</v-btn>
         </v-list-item-action>
     </v-list-item>
@@ -35,6 +35,9 @@
 <script>
   // import {getLastMessage} from '../store/chat';
 
+  import Room from "../socketio/Room";
+  import Request from "../socketio/Request";
+
   export default {
     name: "ChatItem",
     props : {
@@ -42,8 +45,26 @@
       connected: Boolean,
     },
     methods: {
-      close() {
-        this.$emit('close-chat')
+      closeItem() {
+        let $this = this;
+        let session = $this.session;
+
+        if ($this.connected) {
+          let chat = $this.$store.state.chat.connected[session];
+          let room = new Room(chat);
+          let request = new Request({proto:room, token:$this.$store.getters.token});
+          $this.$socket.emit('LEAVE', request);
+        }
+
+        // 删除当前会话的话, 要准备好替代的.
+        let chatData = $this.$store.state.chat;
+        if (session === chatData.alive) {
+          let next = chatData.connectedSessions[0];
+          next = next !== session ? next : chatData.connectedSessions[1];
+          $this.$router.push({name:'chat', params:{session:next}});
+        }
+
+        $this.$emit('close-chat', $this.session);
       },
       getUnread() {
         let $this = this;
@@ -55,8 +76,7 @@
           chat = $this.$store.state.chat.incoming[session];
         }
 
-        let content = chat.unread > 9 ? '..' : chat.unread;
-        return content;
+        return chat.unread > 9 ? '..' : chat.unread;
       },
     },
     computed: {

@@ -15,7 +15,7 @@ export default new Vuex.Store({
     user,
     bili,
     chat
-  }
+  },
   // // 属性
   // state: {
   //   // 用户的信息

@@ -37,7 +37,7 @@
   import BiliVideo from '../components/BiliVideo';
   import ChatInput from '../components/ChatInput';
   import Drawer from '../components/Drawer';
-  import {CHAT_SET_ALIVE, CHAT_COMMIT_MESSAGE} from "../store/chat";
+  import {CHAT_SET_ALIVE, CHAT_COMMIT_MESSAGE, CHAT_INCOMING} from "../store/chat";
   import Room from '../socketio/Room';
   import Logger from 'js-logger';
 
@@ -94,6 +94,16 @@
             batch
           );
           $this.refreshConnected();
+          if (batch.session === $this.$store.state.chat.alive) {
+            $this.rollToTheBottom();
+          }
+        });
+      },
+      CHAT_INFO (res) {
+        let $this= this;
+        getResponse(res, function(proto) {
+          let userId = $this.$store.state.user.id;
+          $this.$store.commit(CHAT_INCOMING, {chat:proto, userId});
         });
       }
     },

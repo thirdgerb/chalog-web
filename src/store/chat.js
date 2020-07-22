@@ -57,11 +57,13 @@ export function createConversation(
  * @param {Array} sessions
  * @param {string} session
  * @param {int} max
+ * @return Array
  */
 export function insertSession(sessions, session, max = 100) {
   delete sessions[session];
   sessions.unshift(session);
   sessions.slice(0, max);
+  return sessions;
 }
 
 export const CHAT_SET_ALIVE = 'CHAT_SET_ALIVE';
@@ -212,30 +214,10 @@ export const chat = {
       Logger.warn('session ' + session + ' not exists');
     },
 
-    [CHAT_INCOMING] (state, chat) {
-      let session = chat.session;
-      if (!session) {
-        Logger.error('incoming chat is invalid', chat);
-        return;
-      }
-
-      // 如果是已连接会话, 不做任何处理.
-      let con = state.connected[session];
-      if (con) {
-        return;
-      }
-
-      // 未连接会话, 创建或标记红点.
-      con = state.incoming[session] || createConversation(chat, null);
-      con.unread = -1;  // 红点.
-
-      // 插入
-      insertSession(state.incoming, session);
-    },
-
     [CHAT_DELETE] (state, session) {
 
       let con = state.connected[session];
+
       // 删除连接中对象.
       if (con) {
         delete state.connected[session];
@@ -248,7 +230,7 @@ export const chat = {
       if (con) {
         delete state.incoming[session];
         let i = state.incomingSessions.indexOf(session);
-        state.connectedSessions.splice(i, 1);
+        state.incomingSessions.splice(i, 1);
         return;
       }
 
@@ -284,9 +266,34 @@ export const chat = {
       }
 
       state.connected[session] = chat;
-    }
+    },
+
+
+    [CHAT_INCOMING] (state, {chat, userId}) {
+      let session = chat.session;
+      if (!session) {
+        Logger.error('incoming chat is invalid', chat);
+        return;
+      }
+
+      // 如果是已连接会话, 不做任何处理.
+      let con = state.connected[session];
+      if (con) {
+        return;
+      }
+
+      // 未连接会话, 创建或标记红点.
+      con = state.incoming[session] || createConversation(chat, userId);
+      console.log(con);
+      con.unread = -1;  // 红点.
+      state.incoming[session] = con;
+
+      // 插入
+      state.incomingSessions = insertSession(state.incomingSessions, session);
+    },
   },
   actions : {
+
 
   }
 };

@@ -20,6 +20,7 @@
            :session="session"
            :connected="true"
            :key="session"
+           v-on:close-chat="closeChat"
         ></menu-item>
       </v-list-item-group>
     </v-list>
@@ -31,6 +32,7 @@
            :session="session"
            :connected="false"
            :key="session"
+           v-on:close-chat="closeChat"
         ></menu-item>
       </v-list-item-group>
     </v-list>
@@ -42,6 +44,7 @@
 <script>
   import MenuItem from './MenuItem';
   import {LAYOUT_DRAWER_TOGGLE} from "../store/layout";
+  import {CHAT_DELETE} from "../store/chat";
 
   export default {
       name: "Drawer",
@@ -71,6 +74,11 @@
         }
       },
       methods : {
+        closeChat(session) {
+          let $this = this;
+          $this.$store.commit(CHAT_DELETE, session);
+          $this.$forceUpdate();
+        }
 
         // onSelect(item) {
         //

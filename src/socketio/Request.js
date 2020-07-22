@@ -11,9 +11,6 @@ export default class Request {
     this.token = token;
     // 是否要校验 proto
     this.proto = proto;
-
-    if (process.env.VUE_APP_DEBUG) {
-      Logger.debug(this);
-    }
+    Logger.trace(this);
   }
 }
