@@ -68,10 +68,10 @@
               $this.logout();
               break;
             case 'github':
-              $this.$router.push('https://github.com/thirdgerb/studio-hyperf');
+              window.location.href = 'https://github.com/thirdgerb/studio-hyperf';
               break;
             case 'commune':
-              $this.$router.push('https://communechatbot.com');
+              window.location.href = 'https://communechatbot.com';
               break;
             case 'abilities':
             default:
