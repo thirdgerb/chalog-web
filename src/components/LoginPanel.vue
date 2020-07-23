@@ -8,6 +8,7 @@
                 <v-form
                     ref="guest"
                     v-model="guest.valid"
+                    :readonly="disabled"
                     @submit.prevent="createGuest"
                     dense
                 >
@@ -22,7 +23,11 @@
                     </v-card-text>
                     <v-card-actions>
                         <v-spacer></v-spacer>
-                        <v-btn color="success" type="submit">进入对话</v-btn>
+                        <v-btn
+                        color="success"
+                        type="submit"
+                        :disabled="disabled"
+                        >进入对话</v-btn>
                     </v-card-actions>
                 </v-form>
             </v-tab-item>
@@ -30,10 +35,14 @@
                 <v-form
                     ref="login"
                     v-model="login.valid"
+                    :readonly="disabled"
+                    @submit.prevent="loginUser"
+                    dense
                 >
                     <v-card-text>
                         <v-text-field
                             v-model="login.name"
+                            autocomplete="username"
                             :counter="10"
                             :rules="nameRules"
                             label="请输入昵称"
@@ -46,13 +55,18 @@
                             :type="showPass ? 'text' : 'password'"
                             label="请输入密码"
                             hint="最少 8 个字符"
+                            autocomplete="current-password"
                             counter
                             @click:append="showPass = !showPass"
                         ></v-text-field>
                     </v-card-text>
                     <v-card-actions>
                         <v-spacer></v-spacer>
-                        <v-btn color="blue darken-1" text type="submit" >提交</v-btn>
+                        <v-btn
+                        color="success"
+                        type="submit"
+                        :disabled="disabled"
+                        >登录</v-btn>
                     </v-card-actions>
                 </v-form>
             </v-tab-item>
@@ -60,38 +74,47 @@
                 <v-form
                     ref="register"
                     v-model="register.valid"
+                    :readonly="disabled"
+                    @submit.prevent="registerUser"
                 >
                     <v-card-text>
 
                         <v-text-field
                                 v-model="register.name"
+                                autocomplete="new-username"
                                 :counter="10"
                                 :rules="nameRules"
                                 label="请输入昵称"
                                 required
                         ></v-text-field>
                         <v-text-field
-                                v-model="register.password"
-                                :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
-                                :rules="[rules.required, rules.min, rules.max]"
-                                :type="showPass ? 'text' : 'password'"
-                                label="请输入密码"
-                                hint="最少 8 个字符"
-                                counter
-                                @click:append="showPass = !showPass"
+                            v-model="register.password"
+                            :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
+                            :rules="[rules.required, rules.min, rules.max]"
+                            :type="showPass ? 'text' : 'password'"
+                            autocomplete="new-password"
+                            label="请输入密码"
+                            hint="最少 8 个字符"
+                            counter
+                            @click:append="showPass = !showPass"
                         ></v-text-field>
                         <v-text-field
-                                v-model="register.confirm"
-                                :rules="[rules.required, rules.min, rules.max]"
-                                type="password"
-                                label="确认密码"
-                                hint="最少 8 个字符"
-                                counter
+                            v-model="register.confirm"
+                            :rules="[rules.required, rules.min, rules.max]"
+                            type="password"
+                            autocomplete="new-password"
+                            label="确认密码"
+                            :error-messages="confirmPassword"
+                            counter
                         ></v-text-field>
                     </v-card-text>
                     <v-card-actions>
                         <v-spacer></v-spacer>
-                        <v-btn color="blue darken-1"  >提交</v-btn>
+                        <v-btn
+                        color="success"
+                        type="submit"
+                        :disabled="disabled"
+                        >注册</v-btn>
                     </v-card-actions>
                 </v-form>
             </v-tab-item>
@@ -100,7 +123,6 @@
 </template>
 
 <script>
-  import {LAYOUT_LOADING_TOGGLE} from '../store/layout';
   import Request from "../socketio/Request";
   import Sign from "../socketio/Sign";
 
@@ -124,18 +146,17 @@
       rules: {
         required: value => !!value || '不能为空',
         min: v => v.length >= 8 || '最少 8 个字符',
-        max: v => v.length < 28 || '最多 28 个字符',
+        max: v => v.length < 16 || '最多 16 个字符',
       },
+      disabled: false,
       guest: {
         name : '',
         valid : null,
-
       },
       login : {
         name : '',
         valid : null,
         password : '',
-
       },
       register : {
         name : '',
@@ -144,18 +165,56 @@
         valid : null,
       },
     }),
+    sockets : {
+    },
     methods : {
+      disableForm() {
+        let $this = this;
+        $this.disabled = true;
+        setTimeout(function() {
+          $this.disabled = false;
+        }, 2000);
+      },
+      loginUser() {
+        let $this = this;
+
+        $this.$refs.login.validate();
+        if (!$this.login.valid) {
+          return;
+        }
+
+        if ($this.disabled) {
+          return;
+        }
+        $this.disableForm();
+
+        let name = $this.login.name;
+        let password = $this.login.password;
+
+        // 提交.
+        $this.$socket.emit(
+          'SIGN',
+          new Request({
+            proto: new Sign({name, password})
+          })
+        );
+
+      },
       createGuest() {
         let $this = this;
+
         $this.$refs.guest.validate();
         if (!$this.guest.valid) {
           return;
         }
 
-        let name = '访客-' + this.guest.name;
+        if ($this.disabled) {
+          return;
+        }
+        $this.disableForm();
 
-        // 打开 loading
-        $this.$store.commit(LAYOUT_LOADING_TOGGLE, true);
+
+        let name = '访客-' + this.guest.name;
 
         // 提交.
         $this.$socket.emit(
@@ -164,13 +223,42 @@
             proto: new Sign({name: name})
           })
         );
+      },
+      registerUser() {
+        let $this = this;
 
-        // 延时关闭 loading.
-        setTimeout(function() {
-          $this.$store.commit(LAYOUT_LOADING_TOGGLE, false);
-        }, 1500);
+        $this.$refs.register.validate();
+        if (!$this.register.valid) {
+          return;
+        }
+
+        if ($this.disabled) {
+          return;
+        }
+        $this.disableForm();
+
+        let name = $this.register.name;
+        let password = $this.register.password;
+
+        // 提交.
+        $this.$socket.emit(
+          'REGISTER',
+          new Request({
+            proto: new Sign({name, password})
+          })
+        );
+
       }
     },
+    computed : {
+      confirmPassword() {
+        let $this = this;
+        if ($this.register.password !== $this.register.confirm) {
+          return ['输入密码不一致'];
+        }
+        return [];
+      }
+    }
   }
 </script>
 

@@ -15,25 +15,25 @@
     <!-- subscribe chats -->
     <v-list dense nav>
       <v-list-item-group transition="scroll-y-transition" :value="alive">
-        <menu-item
+        <chat-item
            v-for="session in connected"
            :session="session"
            :connected="true"
            :key="session"
            v-on:close-chat="closeChat"
-        ></menu-item>
+        ></chat-item>
       </v-list-item-group>
     </v-list>
     <v-divider></v-divider>
     <v-subheader>未连接</v-subheader>
     <v-list dense nav>
       <v-list-item-group transition="scroll-y-transition">
-        <menu-item v-for="session in incoming"
+        <chat-item v-for="session in incoming"
            :session="session"
            :connected="false"
            :key="session"
            v-on:close-chat="closeChat"
-        ></menu-item>
+        ></chat-item>
       </v-list-item-group>
     </v-list>
   </v-navigation-drawer>
@@ -42,14 +42,14 @@
 </template>
 
 <script>
-  import MenuItem from './MenuItem';
+  import ChatItem from './ChatItem';
   import {LAYOUT_DRAWER_TOGGLE} from "../store/layout";
   import {CHAT_DELETE} from "../store/chat";
 
   export default {
       name: "Drawer",
       components : {
-        MenuItem: MenuItem
+        ChatItem
       },
       computed : {
         title() {

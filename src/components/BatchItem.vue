@@ -12,11 +12,13 @@
                 <message-bili
                     v-if="isBili(message.type)"
                     :message="message"
+                    :session="batch.session"
                     :key="message.id"
                 ></message-bili>
                 <message-text
                     v-if="isText(message.type)"
                     :message="message"
+                    :session="batch.session"
                     :key="message.id"
                 >
                 </message-text>

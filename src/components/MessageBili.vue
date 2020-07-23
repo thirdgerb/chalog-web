@@ -20,11 +20,13 @@
     name: "MessageBili",
     props : {
       message : BiliMessage,
+      session: String,
     },
     mounted () {
       let $this = this;
-      let resource = $this.message.resource;
-      $this.$store.commit(BILI_PLAY, {resource});
+      if ($this.session === $this.$store.state.chat.alive) {
+        $this.play();
+      }
     },
     methods : {
       play() {

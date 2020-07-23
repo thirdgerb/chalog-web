@@ -49,6 +49,14 @@
     data: () => ({
       login: false,
     }),
+    sockets : {
+
+      // 服务端传来登录信息
+      LOGIN() {
+        let $this = this;
+        $this.$router.push($this.$store.getters.currentSessionRoute);
+      },
+    },
     mounted() {
       let $this = this;
 

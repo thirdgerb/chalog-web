@@ -11,6 +11,7 @@
     name: "MessageText",
     props : {
       message :TextMessage,
+      session: String,
       picked : {
         type: Boolean,
         default: false

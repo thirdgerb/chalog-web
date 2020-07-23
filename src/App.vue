@@ -14,7 +14,7 @@
             color="pink"
             text
             v-bind="attrs"
-            @click="error = ''"
+            @click="error = !error"
         >
           关闭
         </v-btn>
@@ -89,6 +89,7 @@ export default {
       let $this = this;
       getResponse(res, function(proto) {
         let login = new Login(proto);
+
         $this.$store.dispatch(ACTION_USER_LOGIN, {
           id: login.id,
           name: login.name,
@@ -107,12 +108,16 @@ export default {
         switch (error.errcode) {
           // 退出登录.
           case 401 :
-            this.$store.dispatch(ACTION_USER_LOGOUT);
+            $this.$store.dispatch(ACTION_USER_LOGOUT);
+            if ($this.$route.name !== 'index') {
+              $this.$router.push({name:'index'});
+            }
             break;
           default :
         }
 
         // 用 snack bar 提示异常.
+        $this.error = true;
         $this.$store.commit(
           LAYOUT_SNACK_BAR_TOGGLE,
           'error:' + error.errcode + '; msg:' + error.errmsg

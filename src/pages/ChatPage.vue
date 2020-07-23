@@ -3,7 +3,7 @@
 
         <!-- drawer -->
         <Drawer />
-
+        <AppMenu />
         <bili-video></bili-video>
         <v-container id="chat-container" fluid>
             <!--<div class="chat-wrap">-->
@@ -40,7 +40,7 @@
   import {CHAT_SET_ALIVE, CHAT_COMMIT_MESSAGE, CHAT_INCOMING} from "../store/chat";
   import Room from '../socketio/Room';
   import Logger from 'js-logger';
-
+  import AppMenu from '../components/AppMenu';
   import Input from "../socketio/Input";
   import Request from "../socketio/Request";
   import {MessageBatch} from "../socketio/MessageBatch";
@@ -55,6 +55,7 @@
       ChatList,
       ChatInput,
       Drawer,
+      AppMenu
     },
     data: () => ({
       // 滚动中禁止循环滚动

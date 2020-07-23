@@ -4,7 +4,6 @@
       v-model="message"
       rows="1"
       outlined
-      autofocus
       :loading="loading"
       :error="hasError"
       :error-messages="error"
@@ -122,7 +121,6 @@
           let request = new Request({proto:room, token:$this.$store.getters.token});
           $this.$socket.emit('MANUAL', request);
         }
-
 
         $this.$store.commit(CHAT_CHANGE_ALIVE_BOT, !bot);
         $this.$store.commit(LAYOUT_SNACK_BAR_TOGGLE, bot ? '切换到群聊' : '切换到机器人');

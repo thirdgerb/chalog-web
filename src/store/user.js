@@ -52,13 +52,12 @@ export const user = {
     },
 
     [ACTION_USER_LOGOUT] ({commit}) {
-
       commit(USER_SETTER, {id:'', name:'', token:''});
-      commit(CHAT_INIT_MENU);
-
       Cookies.remove('userid');
       Cookies.remove('username');
       Cookies.remove('token');
+      // 通过reload 来重连.
+      window.location.reload();
     }
   }
 };

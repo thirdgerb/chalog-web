@@ -8,15 +8,15 @@
         flat
         abusolute
     >
-
         <v-app-bar-nav-icon
             v-if="isLogin"
-            @click.stop="toggleDrawer">
+            @click.stop="toggleMenu">
         </v-app-bar-nav-icon>
+
         <v-toolbar-title>{{ title }}</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn text href="https://communechatbot.com">v0.1</v-btn>
         <v-badge
+        v-if="isLogin"
         avatar
         dot
         :value="unread > 0 "
@@ -26,12 +26,13 @@
         >
             <v-btn icon @click.stop="toggleBell"><v-icon>mdi-bell</v-icon></v-btn>
         </v-badge>
-        <v-btn icon><v-icon>mdi-github</v-icon></v-btn>
+
+
     </v-app-bar>
 </template>
 
 <script>
-    import {LAYOUT_DRAWER_TOGGLE} from "../store/layout";
+    import {LAYOUT_DRAWER_TOGGLE, LAYOUT_MENU_TOGGLE} from "../store/layout";
 
     export default {
       name: "AppBar",
@@ -62,19 +63,25 @@
           }
         },
         methods: {
-          toggleDrawer() {
+          toggleMenu() {
             let $this = this;
-            let drawer = $this.$store.state.layout.drawer;
-            $this.$store.commit(LAYOUT_DRAWER_TOGGLE, !drawer);
+            $this.$store.commit(LAYOUT_MENU_TOGGLE, null);
           },
           toggleBell() {
             let $this = this;
-            let unread = $this.unread;
-            if (unread > 0) {
-              $this.$store.commit(LAYOUT_DRAWER_TOGGLE, true);
-
-            }
-          }
+            $this.$store.commit(LAYOUT_DRAWER_TOGGLE, null);
+          },
+          // commitVideo() {
+          //   let $this =this;
+          //   // 准备需要发送的消息.
+          //   let chat = $this.$store.getters.aliveChat;
+          //
+          //   let message = BiliMessage.create("//player.bilibili.com/player.html?aid=201417469&bvid=BV1rh411o7Pz&cid=215225970&page=1");
+          //   let input = new Input(chat, message);
+          //   let request = new Request({proto:input, token:$this.$store.getters.token});
+          //
+          //   $this.$socket.emit('INPUT', request);
+          // }
         }
     }
 </script>
