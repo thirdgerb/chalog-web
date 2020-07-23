@@ -29,7 +29,7 @@ export const user = {
       state.id = id;
       state.name = name;
       state.token = token;
-      Logger.info("user_setter " + id);
+      Logger.debug("user_setter " + id);
     }
 
   },
@@ -44,11 +44,13 @@ export const user = {
       Cookies.set('userid', id, options);
       Cookies.set('username', name, options);
       Cookies.set('token', token, options);
-
-      // 提交用户信息.
-      commit(USER_SETTER, {id, name, token});
       // 初始化菜单.
       commit(CHAT_INIT_MENU, id);
+      // 提交用户信息.
+      setTimeout(function() {
+        commit(USER_SETTER, {id, name, token});
+      }, 100);
+
     },
 
     [ACTION_USER_LOGOUT] ({commit}) {
@@ -56,6 +58,10 @@ export const user = {
       Cookies.remove('userid');
       Cookies.remove('username');
       Cookies.remove('token');
+
+      // 清空本地缓存.
+      localStorage.clear();
+
       // 通过reload 来重连.
       window.location.reload();
     }

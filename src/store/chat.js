@@ -2,6 +2,8 @@ import md5 from "js-md5";
 import menu from '../data/menu';
 import Logger from 'js-logger';
 
+let localStorageKey = null;
+
 /**
  * 创建会话
  * @param title
@@ -51,6 +53,34 @@ export function createConversation(
     // 最后消息
     lastMessage: '',
   }
+}
+
+export function saveConnectedToStorage(connected, storageKey) {
+
+  if (!storageKey) {
+    Logger.error('try to save storage without valid key');
+    return;
+  }
+
+  let save = {};
+  for (let key of Object.keys(connected)) {
+    let chat = connected[key];
+    save[key] = {
+      title: chat.title,
+      scene: chat.scene,
+      icon: chat.icon,
+      session: chat.session,
+      closable : chat.closable,
+      bot: chat.bot,
+      context : {},
+      suggestions : {},
+      unread : 0,
+      updatedAt : 0,
+      batches: [],
+      lastMessage: '',
+    };
+  }
+  localStorage.setItem(storageKey, JSON.stringify(save));
 }
 
 /**
@@ -153,16 +183,34 @@ export const chat = {
      */
     [CHAT_INIT_MENU] (state, userId) {
 
+      localStorageKey = userId;
+      let connected = localStorage.getItem(localStorageKey);
+
+      if (!connected) {
+        localStorage.clear();
+      } else {
+        state.connected = JSON.parse(connected);
+      }
+
       if (menu.connected) {
         for(let o of menu.connected) {
           let con = createConversation(o, userId);
           let session = con.session;
           // 加入连接的会话.
-          state.connected[session] = state.connected[session] || state.incoming[session] || con;
-          delete state.incoming[session];
+          if (state.connected[session]) {
+            continue;
+          }
+          if (state.incoming[session]) {
+            continue;
+          }
 
+          state.connected[session] = con;
+          delete state.incoming[session];
         }
       }
+
+      // 立刻保存.
+      saveConnectedToStorage(state.connected, localStorageKey);
 
       if (menu.incoming) {
         for(let o of menu.incoming) {
@@ -217,6 +265,8 @@ export const chat = {
         state.connected[session] = con;
         state.connectedSessions.unshift(session);
         state.alive = session;
+
+        saveConnectedToStorage(state.connected, localStorageKey);
         return;
       }
 
@@ -232,6 +282,8 @@ export const chat = {
         delete state.connected[session];
         let i = state.connectedSessions.indexOf(session);
         state.connectedSessions.splice(i, 1);
+
+        saveConnectedToStorage(state.connected, localStorageKey);
         return;
       }
 
@@ -296,7 +348,6 @@ export const chat = {
 
       // 未连接会话, 创建或标记红点.
       con = state.incoming[session] || createConversation(chat, userId);
-      console.log(con);
       con.unread = -1;  // 红点.
       state.incoming[session] = con;
 

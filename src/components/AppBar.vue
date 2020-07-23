@@ -8,13 +8,6 @@
         flat
         abusolute
     >
-        <v-app-bar-nav-icon
-            v-if="isLogin"
-            @click.stop="toggleMenu">
-        </v-app-bar-nav-icon>
-
-        <v-toolbar-title>{{ title }}</v-toolbar-title>
-        <v-spacer></v-spacer>
         <v-badge
         v-if="isLogin"
         avatar
@@ -26,6 +19,13 @@
         >
             <v-btn icon @click.stop="toggleBell"><v-icon>mdi-bell</v-icon></v-btn>
         </v-badge>
+        <v-toolbar-title>{{ title }}</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-app-bar-nav-icon
+                v-if="isLogin"
+                @click.stop="toggleMenu">
+        </v-app-bar-nav-icon>
+
 
 
     </v-app-bar>
