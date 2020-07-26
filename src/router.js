@@ -17,6 +17,11 @@ const router = new VueRouter({
       component: Index,
     },
     {
+      path: '/chat',
+      name: 'chatIndex',
+      component: ChatPage,
+    },
+    {
       path: '/chat/:session',
       name: 'chat',
       component: ChatPage,

@@ -1,9 +1,6 @@
 <template>
     <v-main app class="indigo lighten-5" >
 
-        <!-- drawer -->
-        <Drawer />
-        <AppMenu />
         <bili-video></bili-video>
         <v-container id="chat-container" fluid>
             <!--<div class="chat-wrap">-->
@@ -19,6 +16,7 @@
             <!--- input --->
         </v-container>
         <v-footer
+            v-show="aliveSession"
             fixed
             app
             dense
@@ -36,16 +34,16 @@
   import ChatList from '../components/ChatList';
   import BiliVideo from '../components/BiliVideo';
   import ChatInput from '../components/ChatInput';
-  import Drawer from '../components/Drawer';
-  import {CHAT_SET_ALIVE, CHAT_COMMIT_MESSAGE, CHAT_INCOMING} from "../store/chat";
-  import Room from '../socketio/Room';
+  import {
+    CHAT_SET_ALIVE,
+    CHAT_COMMIT_MESSAGE,
+    CHAT_RESET_UNREAD, EMITTER_ACTION_DELIVER_MESSAGE
+  } from '../constants';
+
   import Logger from 'js-logger';
-  import AppMenu from '../components/AppMenu';
-  import Input from "../socketio/Input";
-  import Request from "../socketio/Request";
   import {MessageBatch} from "../socketio/MessageBatch";
   import {Message} from "../socketio/Message";
-  import {getResponse} from "../utils";
+  import {EMITTER_ACTION_JOIN} from "../constants";
 
 
   export default {
@@ -54,8 +52,6 @@
       BiliVideo,
       ChatList,
       ChatInput,
-      Drawer,
-      AppMenu
     },
     data: () => ({
       // 滚动中禁止循环滚动
@@ -63,69 +59,46 @@
       connected : [],
     }),
     mounted () {
-      let $this =this;
-      // 如果没有登录, 则跳转到首页.
-      if (!$this.$store.getters.isUserLogin) {
-        $this.$router.replace({name:'index'});
-        return;
-      }
-
-      // 检查路由的页面是否存在.
-      let chat = $this.$store.state.chat;
-      let session = $this.$route.params.session;
-      let selected = chat.connected[session] || chat.incoming[session];
-
-      if (selected) {
-        $this.$store.commit(CHAT_SET_ALIVE, session);
-        $this.joinAll();
-      } else {
-        $this.$router.push('/404');
-      }
-    },
-    sockets : {
-      reconnect() {
-        this.joinAll();
-      },
-      MESSAGE_BATCH (res) {
-        let $this = this;
-        getResponse(res, function(proto) {
-          let batch = new MessageBatch(proto);
-          $this.$store.commit(
-            CHAT_COMMIT_MESSAGE,
-            batch
-          );
-          $this.refreshConnected();
-          if (batch.session === $this.$store.state.chat.alive) {
-            $this.rollToTheBottom();
-          }
-        });
-      },
-      CHAT_INFO (res) {
-        let $this= this;
-        getResponse(res, function(proto) {
-          let userId = $this.$store.state.user.id;
-          $this.$store.commit(CHAT_INCOMING, {chat:proto, userId});
-        });
-      }
     },
     computed : {
       aliveSession() {
         return this.$store.state.chat.alive;
+      },
+      aliveUnread() {
+        return this.$store.getters.aliveChat.unread;
       },
       isLogin() {
         return this.$store.getters.isUserLogin;
       },
     },
     watch : {
+      aliveUnread(newVal) {
+        if (newVal > 0) {
+          this.rollToTheBottom();
+        }
+      },
+      // 初始化后的逻辑.
+      aliveSession(newVal, oldVal) {
+        if (oldVal === newVal) {
+          return;
+        }
+        let $this = this;
+        let name = $this.$route.name;
+        if (name === 'chatIndex' || name === 'chat') {
+          $this.$router.push({name:'chat', params:{session:newVal}});
+        }
+      },
       // 监听路由.
       $route (to) {
         let name = to.name;
-
         // 处理 chat
         if (name !== 'chat') {
           return;
         }
+
+        // chat 页.
         let $this = this;
+
         let session = to.params.session;
         let chatData = $this.$store.state.chat;
 
@@ -145,7 +118,7 @@
         chat = chatData.incoming[session];
         if (chat) {
           $this.$store.commit(CHAT_SET_ALIVE, session);
-          $this.join(chat);
+          $this.$store.dispatch(EMITTER_ACTION_JOIN, chat);
           $this.refreshConnected();
           $this.rollToTheBottom();
           return;
@@ -163,25 +136,11 @@
       },
       rollToTheBottom(option = null) {
         let $this = this;
-        setTimeout(function() {
-          let target = document.body.offsetHeight;
-          $this.$vuetify.goTo(target, option);
-        }, 100);
-      },
-      join(chat) {
-        let room = new Room(chat);
-        let $this = this;
-        let token = $this.$store.state.user.token;
-        let request = new Request({proto:room, token:token});
-        $this.$socket.emit('JOIN', request);
-        Logger.info("join room " + room.scene + ' ' + room.session);
-      },
-      joinAll() {
-        let $this = this;
-        $this.refreshConnected();
-        for(let c of $this.connected) {
-          $this.join(c);
-        }
+        // 做一个判断逻辑.
+        let target = document.body.offsetHeight;
+
+        $this.$store.commit(CHAT_RESET_UNREAD, )
+        $this.$vuetify.goTo(target, option);
       },
       /**
        * @param {Message} message
@@ -201,18 +160,7 @@
           return;
         }
 
-        let input = new Input(
-          {session , bot : chat.bot, scene: chat.scene},
-          message
-        );
-
-        let request = new Request({
-          token: $this.$store.getters.token,
-          proto: input
-        });
-
-        // 向服务端投递消息.
-        $this.$socket.emit('INPUT', request);
+        $this.$store.dispatch(EMITTER_ACTION_DELIVER_MESSAGE, {message, session});
 
         // 提交消息到当前列表.
         let batch = MessageBatch.createByMessage(
@@ -229,19 +177,6 @@
         $this.refreshConnected();
         $this.rollToTheBottom();
       },
-      // toTheEnd() {
-      //   let $this = this;
-      //   $this.$store.commit(CHAT_TO_BOTTOM, 0);
-      //   if ($this.scrolling) {
-      //     return;
-      //   }
-      //
-      //   $this.scrolling = true;
-      //   setTimeout(function(){
-      //     $this.$vuetify.goTo(document.body.offsetHeight);
-      //     $this.scrolling = false;
-      //   }, 200);
-      // },
     },
   }
 </script>

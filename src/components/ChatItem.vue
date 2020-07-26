@@ -33,17 +33,12 @@
 </template>
 
 <script>
-  // import {getLastMessage} from '../store/chat';
-
   import Room from "../socketio/Room";
   import Request from "../socketio/Request";
 
   export default {
     name: "ChatItem",
-    props : {
-      session: String,
-      connected: Boolean,
-    },
+    props : ['session', 'connected', 'chat'],
     methods: {
       closeItem() {
         let $this = this;
@@ -80,15 +75,6 @@
       },
     },
     computed: {
-      chat () {
-        let $this = this;
-        let session = $this.session;
-        if ($this.connected) {
-          return $this.$store.state.chat.connected[session];
-        } else {
-          return $this.$store.state.chat.incoming[session];
-        }
-      },
       to () {
         let session = this.session;
         return {name:'chat', params:{session}}

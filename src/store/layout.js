@@ -1,8 +1,10 @@
 
-export const LAYOUT_LOADING_TOGGLE = 'LAYOUT_LOADING_TOGGLE';
-export const LAYOUT_DRAWER_TOGGLE = 'LAYOUT_DRAWER_TOGGLE';
-export const LAYOUT_SNACK_BAR_TOGGLE = 'LAYOUT_SNACK_BAR_TOGGLE';
-export const LAYOUT_MENU_TOGGLE = 'LAYOUT_MENU_TOGGLE';
+import {
+  LAYOUT_DRAWER_TOGGLE,
+  LAYOUT_LOADING_TOGGLE,
+  LAYOUT_MENU_TOGGLE,
+  LAYOUT_SNACK_BAR_TOGGLE,
+} from '../constants';
 
 export const layout = {
   state: () => ({

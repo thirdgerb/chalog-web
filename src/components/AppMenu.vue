@@ -37,8 +37,7 @@
 </template>
 
 <script>
-  import {LAYOUT_MENU_TOGGLE} from "../store/layout";
-  import {ACTION_USER_LOGOUT} from "../store/user";
+  import {LAYOUT_MENU_TOGGLE, USER_ACTION_LOGOUT} from "../constants";
 
   export default {
       name: "appMenu",
@@ -79,7 +78,7 @@
           }
         },
         logout() {
-          this.$store.dispatch(ACTION_USER_LOGOUT);
+          this.$store.dispatch(USER_ACTION_LOGOUT);
         }
 
       },

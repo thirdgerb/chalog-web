@@ -29,10 +29,9 @@
 
 <script>
   import {TextMessage} from "../socketio/Message";
-  import {CHAT_CHANGE_ALIVE_BOT} from "../store/chat";
-  import {LAYOUT_SNACK_BAR_TOGGLE} from "../store/layout";
-  import Room from "../socketio/Room";
-  import Request from "../socketio/Request";
+  import {
+    EMITTER_ACTION_MANUAL,
+  } from "../constants";
 
   const rules = {
     require: value => (value.length > 0) || '消息不能为空',
@@ -115,15 +114,9 @@
         }
 
         // 切换到人工的话, 给管理员发消息
-        let bot = alive.bot;
-        if (bot) {
-          let room = new Room(alive);
-          let request = new Request({proto:room, token:$this.$store.getters.token});
-          $this.$socket.emit('MANUAL', request);
-        }
+        let manual = !alive.bot;
+      $this.$store.dispatch(EMITTER_ACTION_MANUAL, {manual, scene:alive.scene, session:alive.session});
 
-        $this.$store.commit(CHAT_CHANGE_ALIVE_BOT, !bot);
-        $this.$store.commit(LAYOUT_SNACK_BAR_TOGGLE, bot ? '切换到群聊' : '切换到机器人');
       },
     },
     computed: {

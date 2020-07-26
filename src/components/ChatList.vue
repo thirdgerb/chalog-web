@@ -38,12 +38,6 @@
 
 </template>
 <script>
-  // import BatchItem from "./BatchItem";
-  // import ChatInfo from "../protocals/ChatInfo";
-  // import TextMessage from "../protocals/TextMessage";
-  // import Request from "../socketio/Request";
-  // import Room from "../socketio/Room";
-  // import {getResponse} from "../utils";
   import BatchItem from "./BatchItem";
 
   export default {
@@ -52,20 +46,6 @@
     components: {
       BatchItem,
     },
-    // sockets : {
-    //   message(res) {
-    //     let $this = this;
-    //     getResponse($this.$store, res, function(store, proto) {
-    //       console.log(proto);
-    //     });
-    //   }
-    // },
-    // methods : {
-    //   selectSuggestion(suggestion) {
-    //     let text = TextMessage.create(suggestion);
-    //     this.$emit('deliver-message', text);
-    //   },
-    // },
     methods: {
       getBatches() {
         return Object.values(this.chat.batches);
@@ -75,19 +55,6 @@
       session() {
         return this.chat.session;
       }
-      // chat () {
-      //   let $this = this;
-      //   return $this.$store.state.chat.connected[$this.session];
-      // },
-      // isSuggestionSelected() {
-      //   /**
-      //    * @type {ChatInfo} chat
-      //    */
-      //   let chat = this.chat;
-      //   let suggestions = chat.suggestions;
-      //   let hasSuggestion = suggestions && suggestions.length > 0;
-      //   return chat.isSaid || hasSuggestion;
-      // },
     }
   }
 </script>

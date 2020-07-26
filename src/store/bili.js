@@ -1,6 +1,8 @@
 
-export const BILI_TOGGLE = 'BILI_TOGGLE';
-export const BILI_PLAY = 'BILI_PLAY';
+import {
+  BILI_PLAY,
+  BILI_TOGGLE
+} from "../constants";
 
 export const bili = {
   state: () => ({

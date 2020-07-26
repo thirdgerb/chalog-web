@@ -15,7 +15,6 @@
                     md="7"
                     lg="7"
                     xl="7"
-                   @click.stop="goAlive"
                    style="padding-bottom: 60px"
                 >
                     <h1 class="display-1 font-weight-thin mb-4">{{ appName }}</h1>
@@ -50,12 +49,6 @@
       login: false,
     }),
     sockets : {
-
-      // 服务端传来登录信息
-      LOGIN() {
-        let $this = this;
-        $this.$router.push($this.$store.getters.currentSessionRoute);
-      },
     },
     mounted() {
       let $this = this;
@@ -63,10 +56,8 @@
       // 稍微延迟一下再打开.
       setTimeout(function() {
         // 进入当前页面.
-        if (!$this.$store.getters.isUserLogin) {
+        if (!$this.$store.getters.token) {
           $this.login = true;
-        } else {
-          $this.$router.push($this.$store.getters.currentSessionRoute);
         }
       }, 1000);
     },

@@ -22,17 +22,14 @@
         <v-toolbar-title>{{ title }}</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-app-bar-nav-icon
-                v-if="isLogin"
-                @click.stop="toggleMenu">
+            v-if="isLogin"
+            @click.stop="toggleMenu">
         </v-app-bar-nav-icon>
-
-
-
     </v-app-bar>
 </template>
 
 <script>
-    import {LAYOUT_DRAWER_TOGGLE, LAYOUT_MENU_TOGGLE} from "../store/layout";
+    import {LAYOUT_DRAWER_TOGGLE, LAYOUT_MENU_TOGGLE} from "../constants";
 
     export default {
       name: "AppBar",
@@ -71,17 +68,6 @@
             let $this = this;
             $this.$store.commit(LAYOUT_DRAWER_TOGGLE, null);
           },
-          // commitVideo() {
-          //   let $this =this;
-          //   // 准备需要发送的消息.
-          //   let chat = $this.$store.getters.aliveChat;
-          //
-          //   let message = BiliMessage.create("//player.bilibili.com/player.html?aid=201417469&bvid=BV1rh411o7Pz&cid=215225970&page=1");
-          //   let input = new Input(chat, message);
-          //   let request = new Request({proto:input, token:$this.$store.getters.token});
-          //
-          //   $this.$socket.emit('INPUT', request);
-          // }
         }
     }
 </script>

@@ -15,7 +15,7 @@
 </template>
 
 <script>
-    import {BILI_TOGGLE} from "../store/bili";
+    import {BILI_TOGGLE} from "../constants";
 
     export default {
     name: "biliVideo",

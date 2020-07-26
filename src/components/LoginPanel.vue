@@ -123,10 +123,9 @@
 </template>
 
 <script>
-  import Request from "../socketio/Request";
-  import Sign from "../socketio/Sign";
+    import {EMITTER_ACTION_SIGN} from "../constants";
 
-  export default {
+    export default {
     name: "LoginPanel",
     props: {
       show : Boolean,
@@ -191,14 +190,7 @@
         let name = $this.login.name;
         let password = $this.login.password;
 
-        // 提交.
-        $this.$socket.emit(
-          'SIGN',
-          new Request({
-            proto: new Sign({name, password})
-          })
-        );
-
+        $this.$store.dispatch(EMITTER_ACTION_SIGN, {name, password});
       },
       createGuest() {
         let $this = this;
@@ -214,15 +206,10 @@
         $this.disableForm();
 
 
-        let name = '访客-' + this.guest.name;
+        let date = new Date();
+        let name = '访客-' + this.guest.name + date.getMinutes() + date.getSeconds();
 
-        // 提交.
-        $this.$socket.emit(
-          'SIGN',
-          new Request({
-            proto: new Sign({name: name})
-          })
-        );
+        $this.$store.dispatch(EMITTER_ACTION_SIGN, {name, password:''});
       },
       registerUser() {
         let $this = this;
@@ -240,14 +227,7 @@
         let name = $this.register.name;
         let password = $this.register.password;
 
-        // 提交.
-        $this.$socket.emit(
-          'REGISTER',
-          new Request({
-            proto: new Sign({name, password})
-          })
-        );
-
+        $this.$store.dispatch(EMITTER_ACTION_SIGN, {name, password});
       }
     },
     computed : {

@@ -13,7 +13,7 @@
 </template>
 
 <script>
-  import {BILI_PLAY} from '../store/bili';
+  import {BILI_PLAY} from '../constants';
   import {BiliMessage} from "../socketio/Message";
 
   export default {

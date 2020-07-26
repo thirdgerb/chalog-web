@@ -16,11 +16,11 @@
     <v-list dense nav>
       <v-list-item-group transition="scroll-y-transition" :value="alive">
         <chat-item
-           v-for="session in connected"
-           :session="session"
+           v-for="chat in connected"
+           :session="chat.session"
            :connected="true"
-           :key="session"
-           v-on:close-chat="closeChat"
+           :chat="chat"
+           :key="chat.session"
         ></chat-item>
       </v-list-item-group>
     </v-list>
@@ -28,11 +28,11 @@
     <v-subheader>未连接</v-subheader>
     <v-list dense nav>
       <v-list-item-group transition="scroll-y-transition">
-        <chat-item v-for="session in incoming"
-           :session="session"
+        <chat-item v-for="chat in incoming"
+           :session="chat.session"
            :connected="false"
-           :key="session"
-           v-on:close-chat="closeChat"
+           :chat="chat"
+           :key="chat.session"
         ></chat-item>
       </v-list-item-group>
     </v-list>
@@ -67,77 +67,32 @@
             return this.$store.state.chat.alive;
         },
         connected () {
-          return this.$store.state.chat.connectedSessions;
+          let chats = this.$store.state.chat;
+          let sessions = chats.connectedSessions;
+          if (!sessions) {
+            return [];
+          }
+
+          return sessions.map(function(session){
+                return chats.connected[session];
+              }).filter(function(chat) {
+                return !!chat;
+              });
         },
         incoming () {
-          return this.$store.state.chat.incomingSessions;
+          let chats = this.$store.state.chat;
+          let sessions = chats.incomingSessions;
+          if (!sessions) {
+            return [];
+          }
+
+          return sessions.map(function(session){
+            return chats.incoming[session];
+          }).filter(function(chat) {
+            return !!chat;
+          });
         }
       },
-      methods : {
-        closeChat(session) {
-          let $this = this;
-          $this.$store.commit(CHAT_DELETE, session);
-          $this.$forceUpdate();
-        }
-
-        // onSelect(item) {
-        //
-        //   this.$store.commit(
-        //     CHAT_ALIVE_SETTER,
-        //     item
-        //   );
-        // },
-        // /**
-        //  * 删除会话.
-        //  * @param {NavItem} item
-        //  */
-        // onClose(item) {
-        //   if (confirm('关闭当前对话?')) {
-        //     this.$store.commit(
-        //       CHAT_DELETE,
-        //       item
-        //     );
-        //   }
-        // },
-        // /**
-        //  * 退出房间, 删除会话.
-        //  * @param {NavItem} item
-        //  */
-        // onDisconnect(item) {
-        //   let $this = this;
-        //   let proto = new Room({
-        //     session: item.session,
-        //     scene: item.scene,
-        //   });
-        //
-        //   // 退出房价.
-        //   $this.$socket.emit('LEAVE', new Request({
-        //     token: $this.$store.getters.token,
-        //     proto,
-        //   }));
-        //
-        //   // 删除会话.
-        //   $this.onClose(item);
-        // },
-        // onConnect(item) {
-        //   let $this = this;
-        //   let proto = new Room({
-        //     session: item.session,
-        //     scene: item.scene,
-        //   });
-        //
-        //   $this.onSelect(item);
-        //
-        //   // 进入房间.
-        //   $this.$socket.emit('JOIN', new Request({
-        //     token: $this.$store.getters.token,
-        //     proto,
-        //   }));
-        //
-        // },
-
-      },
-
   }
 </script>
 
