@@ -43,8 +43,7 @@
 
 <script>
   import ChatItem from './ChatItem';
-  import {LAYOUT_DRAWER_TOGGLE} from "../store/layout";
-  import {CHAT_DELETE} from "../store/chat";
+  import {LAYOUT_DRAWER_TOGGLE} from "../constants";
 
   export default {
       name: "Drawer",

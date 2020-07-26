@@ -62,9 +62,11 @@ export const socket = {
 
     SOCKET_ACTION_reconnect({rootState, dispatch}) {
       // 弹出通知.
-      // 重新连接所有房间.
+      // 用户未登录.
+      if (!rootState.user.id) {
+        return;
+      }
 
-      // 用户已经登录.
       // 重连所有的会话.
       if (rootState.user.id) {
         dispatch(EMITTER_ACTION_JOIN_ALL);
@@ -78,7 +80,7 @@ export const socket = {
      * 用户登录确认事件.
      * 接下来触发一系列操作.
      */
-   SOCKET_ACTION_USER_LOGIN({commit, dispatch}, res) {
+   SOCKET_ACTION_USER_LOGIN({dispatch}, res) {
      getResponse('USER_LOGIN', res, function({id, name, token}) {
        dispatch(USER_ACTION_LOGIN, {id, name, token});
      });
@@ -119,8 +121,8 @@ export const socket = {
     /**
      * 服务端下发房间信息.
      */
-    SOCKET_ACTION_CHAT_INFO({dispatch}, res) {
-      getResponse('CHAT_INFO', res, function({ chats }){
+    SOCKET_ACTION_USER_CHATS({dispatch}, res) {
+      getResponse('USER_CHATS', res, function({ chats }){
         for (let c of chats) {
           dispatch(CHAT_ACTION_INFO_MERGE, c);
         }
@@ -186,5 +188,14 @@ export const socket = {
 
       })
     },
+
+    /**
+     * 服务器告知要删除会话.
+     */
+    SOCKET_ACTION_QUIT_CHAT ({commit}, res) {
+      getResponse('QUIT_CHAT', res, function({session, reason}) {
+        commit(CHAT_DELETE, {session, reason});
+      });
+    }
   }
 };

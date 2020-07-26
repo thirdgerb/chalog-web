@@ -30,7 +30,7 @@
 <script>
   import {TextMessage} from "../socketio/Message";
   import {
-    EMITTER_ACTION_MANUAL,
+    CHAT_ACTION_TOGGLE_MANUAL,
   } from "../constants";
 
   const rules = {
@@ -115,7 +115,10 @@
 
         // 切换到人工的话, 给管理员发消息
         let manual = !alive.bot;
-      $this.$store.dispatch(EMITTER_ACTION_MANUAL, {manual, scene:alive.scene, session:alive.session});
+        $this.$store.dispatch(
+          CHAT_ACTION_TOGGLE_MANUAL,
+          {manual, scene:alive.scene, session:alive.session}
+        );
 
       },
     },

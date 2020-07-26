@@ -33,8 +33,8 @@
 </template>
 
 <script>
-  import Room from "../socketio/Room";
-  import Request from "../socketio/Request";
+
+  import {CHAT_ACTION_CLOSE} from "../constants";
 
   export default {
     name: "ChatItem",
@@ -43,23 +43,7 @@
       closeItem() {
         let $this = this;
         let session = $this.session;
-
-        if ($this.connected) {
-          let chat = $this.$store.state.chat.connected[session];
-          let room = new Room(chat);
-          let request = new Request({proto:room, token:$this.$store.getters.token});
-          $this.$socket.emit('LEAVE', request);
-        }
-
-        // 删除当前会话的话, 要准备好替代的.
-        let chatData = $this.$store.state.chat;
-        if (session === chatData.alive) {
-          let next = chatData.connectedSessions[0];
-          next = next !== session ? next : chatData.connectedSessions[1];
-          $this.$router.push({name:'chat', params:{session:next}});
-        }
-
-        $this.$emit('close-chat', $this.session);
+        $this.$store.dispatch(CHAT_ACTION_CLOSE, session);
       },
       getUnread() {
         let $this = this;

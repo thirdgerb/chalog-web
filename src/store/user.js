@@ -24,7 +24,7 @@ export const user = {
   getters: {
     // 代表服务端已经发送了正确的 LOGIN 响应.
     isUserLogin: (state) => {
-      return !!state.userId;
+      return !!state.id;
     },
     token: (state) => {
       return state.token;

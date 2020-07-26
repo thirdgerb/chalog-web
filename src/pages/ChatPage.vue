@@ -65,7 +65,8 @@
         return this.$store.state.chat.alive;
       },
       aliveUnread() {
-        return this.$store.getters.aliveChat.unread;
+        let alive = this.$store.getters.aliveChat;
+        return alive ? alive.unread : 0;
       },
       isLogin() {
         return this.$store.getters.isUserLogin;
@@ -84,6 +85,11 @@
         }
         let $this = this;
         let name = $this.$route.name;
+
+        if (name === 'chat' && newVal === $this.$route.params.session) {
+          return;
+        }
+
         if (name === 'chatIndex' || name === 'chat') {
           $this.$router.push({name:'chat', params:{session:newVal}});
         }
@@ -104,6 +110,8 @@
 
         // 就是当前会话.
         if (session === chatData.alive) {
+          $this.refreshConnected();
+          $this.rollToTheBottom();
           return;
         }
 
@@ -139,7 +147,7 @@
         // 做一个判断逻辑.
         let target = document.body.offsetHeight;
 
-        $this.$store.commit(CHAT_RESET_UNREAD, )
+        $this.$store.commit(CHAT_RESET_UNREAD, $this.$store.state.chat.alive);
         $this.$vuetify.goTo(target, option);
       },
       /**

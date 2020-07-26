@@ -2,7 +2,6 @@
 import {v4} from 'uuid';
 import Logger from "js-logger";
 import Input from "../socketio/Input";
-import {MessageBatch} from "../socketio/MessageBatch";
 import {Message} from "../socketio/Message";
 import {
   EMITTER_ACTION_REQUEST,
@@ -21,8 +20,6 @@ import {
 
   EMITTER_ACTION_MANUAL,
 
-  CHAT_CHANGE_ALIVE_BOT,
-  LAYOUT_SNACK_BAR_TOGGLE,
 } from '../constants';
 
 
@@ -108,7 +105,7 @@ export const emitter = {
     /**
      * 发送消息到服务端.
      */
-    [EMITTER_ACTION_DELIVER_MESSAGE] ({commit, dispatch, rootState}, {message, session}) {
+    [EMITTER_ACTION_DELIVER_MESSAGE] ({dispatch, rootState}, {message, session}) {
       if (!(message instanceof Message)) {
         Logger.error('message must be instance of Message');
         return;
@@ -127,15 +124,7 @@ export const emitter = {
         message
       );
 
-      dispatch(EMITTER_ACTION_REQUEST, ['INPUT', input]);
-
-      // 提交消息到当前列表.
-      let batch = MessageBatch.createByMessage(
-        session,
-        message,
-        $this.$store.state.user
-      );
-      commit(CHAT_COMMIT_MESSAGE, batch);
+      dispatch(EMITTER_ACTION_REQUEST, ['INPUT', input, message.id]);
     },
 
     /**
@@ -188,7 +177,6 @@ export const emitter = {
      * @param all       当 all 为空, 只要求服务端主动推荐, 用户无法挑选的房间.
      */
     [EMITTER_ACTION_QUERY_CHATS] ({dispatch}, {category, all}) {
-
       category = category || '';
       all = !!all;
 
@@ -207,13 +195,10 @@ export const emitter = {
     /**
      * 转人工通知.
      */
-    [EMITTER_ACTION_MANUAL] ({dispatch, commit}, {manual, scene, session}) {
-
+    [EMITTER_ACTION_MANUAL] ({dispatch}, {manual, scene, session}) {
       if (manual) {
         dispatch(EMITTER_ACTION_REQUEST, ['MANUAL', {scene, session}]);
       }
-      commit(CHAT_CHANGE_ALIVE_BOT, !manual);
-      commit(LAYOUT_SNACK_BAR_TOGGLE, manual ? '切换到群聊' : '切换到机器人');
     }
   }
 };

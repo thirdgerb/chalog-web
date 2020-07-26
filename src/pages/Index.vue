@@ -68,7 +68,8 @@
       },
       appName() {
         return process.env.VUE_APP_NAME;
-      }
+      },
+
 
     },
     methods : {

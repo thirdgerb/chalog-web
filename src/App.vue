@@ -41,6 +41,7 @@ import AppBar from './components/AppBar';
 import Cookies from 'js-cookie';
 import Drawer from './components/Drawer';
 import AppMenu from './components/AppMenu';
+import {EMITTER_ACTION_SIGN, USER_SETTER} from "./constants";
 
 
 export default {
@@ -60,9 +61,10 @@ export default {
     // 我现在很不喜欢弱类型不严谨的代码写法, 因为项目代码量太大了, 自己要看懂每一块很难.
     // js 应该也可以约束得更清楚, 但现在没有时间精力去爬坡了.
     if (token) {
+      console.log('token', token);
       $this.$store.commit(USER_SETTER, {token});
       // 告知服务端.
-      this.$socket.emit('SIGN', new Request({}));
+      $this.$store.dispatch(EMITTER_ACTION_SIGN, {});
     }
   },
   data: () =>({
@@ -76,7 +78,7 @@ export default {
       return this.$store.state.layout.error;
     },
     isLogin() {
-      return this.$store.getters.isUserLogin;
+      return this.$store.state.user.id;
     }
   },
   watch : {
@@ -92,7 +94,7 @@ export default {
 
       // 登录了就跳入目标页面.
       if (newVal) {
-        $this.$router.push($this.store.getters.onLoginRoute);
+        $this.$router.push($this.$store.getters.onLoginRoute);
 
       // 否则跳回首页.
       } else if($this.$route.name !== 'index') {
