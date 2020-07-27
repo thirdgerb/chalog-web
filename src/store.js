@@ -24,15 +24,20 @@ export const store = new Vuex.Store({
     next: null,
   },
   getters: {
-    onLoginRoute(state) {
+    popNextRoute(state) {
       if (state.next) {
-        return state.next;
+        let next = state.next;
+        state.next = null;
+        return next;
       }
-      let session = state.chat.alive;
+      let session = state.chat.alive
+        || state.chat.connectedSessions[0]
+        || state.chat.incomingSessions[0];
       if (session) {
         return {name:'chat', params:{session}};
+      } else {
+        return {name:'chatIndex'};
       }
-      return {name:'chatIndex'};
     },
   },
   actions : {

@@ -21,6 +21,7 @@ import {
   EMITTER_ACTION_MANUAL,
 
 } from '../constants';
+import {BATCH_MODE_SYSTEM} from "../socketio/MessageBatch";
 
 
 export class Request {
@@ -33,7 +34,6 @@ export class Request {
     this.token = token;
     // 是否要校验 proto
     this.proto = proto;
-    Logger.trace(this);
   }
 }
 
@@ -50,6 +50,7 @@ export const emitter = {
     [EMITTER_ACTION_REQUEST] ({rootState}, [event, proto, trace]) {
       let token = rootState.user.token;
       let request = new Request({trace, proto, token});
+      Logger.debug('emit ' + event + ':' + JSON.stringify(request));
       window.socket.emit(event, request);
     },
 
@@ -141,7 +142,7 @@ export const emitter = {
       }
 
       forward = !!forward;
-      limit = limit || 10;
+      limit = limit || 5;
 
       // 会话没有连接. 不请求消息.
       let con = rootState.chat.connected[session];
@@ -149,6 +150,7 @@ export const emitter = {
         return;
       }
 
+      let scene = con.scene;
       // 如果已经标记了没有更老的消息
       if (!forward && !con.hasElderMessages) {
         Logger.warn('session ' + session + ' has no more elder messages');
@@ -157,17 +159,31 @@ export const emitter = {
 
       // 确认游标.
       let vernier = null;
+
       if (forward && con.batches.length > 0) {
-        let batch = con.batches[0];
-        vernier = batch ? batch.batchId : null;
-      } else {
-        let batch = con.batches[con.batches.length - 1];
-        vernier = batch.batchId;
+        let max= con.batches.length;
+        for (let i = max -1 ; i >= 0 ; i--) {
+          let batch = con.batches[i];
+          if (batch.mode !== BATCH_MODE_SYSTEM) {
+            vernier = batch.batchId;
+            break;
+          }
+        }
+
+      } else if (!forward && con.batches.length > 0) {
+        let max= con.batches.length;
+        for (let i = 0 ; i < max ; i++) {
+          let batch = con.batches[i];
+          if (batch.mode !== BATCH_MODE_SYSTEM) {
+            vernier = batch.batchId;
+            break;
+          }
+        }
       }
 
       dispatch(
         EMITTER_ACTION_REQUEST,
-        ['QUERY_MESSAGES', {session, vernier, forward, limit}]
+        ['QUERY_MESSAGES', {scene, session, vernier, forward, limit}]
       );
     },
 

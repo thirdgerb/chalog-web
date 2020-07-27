@@ -4,6 +4,7 @@ import VueRouter from 'vue-router';
 import Index from './pages/Index';
 import NotFound from './pages/NotFound';
 import ChatPage from './pages/ChatPage';
+import ChatIndex from './pages/ChatIndex';
 
 Vue.use(VueRouter);
 
@@ -19,7 +20,7 @@ const router = new VueRouter({
     {
       path: '/chat',
       name: 'chatIndex',
-      component: ChatPage,
+      component: ChatIndex,
     },
     {
       path: '/chat/:session',

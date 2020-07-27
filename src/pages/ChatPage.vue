@@ -1,10 +1,9 @@
 <template>
     <v-main app class="indigo lighten-5" >
-
         <bili-video></bili-video>
-        <v-container id="chat-container" fluid>
+        <v-container id="chat-container" fluid >
             <!--<div class="chat-wrap">-->
-            <div class="chat" id="chat" >
+            <div class="chat" ref="chat" v-scroll.self="onScroll">
                 <chat-list
                     v-for="chat in connected"
                     v-show="chat.session === aliveSession"
@@ -58,7 +57,21 @@
       scrolling : false,
       connected : [],
     }),
-    mounted () {
+    // 权限检查.
+    beforeRouteEnter (to, from, next) {
+      next(vm => {
+        if (!vm.$store.getters.isUserLogin) {
+          vm.$store.state.next = to;
+          vm.$router.replace({name: 'index'});
+        } else {
+          vm.setAlive(to.params.session);
+        }
+      })
+    },
+    // 组件跳转.
+    beforeRouteUpdate(to, from, next) {
+      this.setAlive(to.params.session);
+      next();
     },
     computed : {
       aliveSession() {
@@ -68,9 +81,6 @@
         let alive = this.$store.getters.aliveChat;
         return alive ? alive.unread : 0;
       },
-      isLogin() {
-        return this.$store.getters.isUserLogin;
-      },
     },
     watch : {
       aliveUnread(newVal) {
@@ -78,40 +88,17 @@
           this.rollToTheBottom();
         }
       },
-      // 初始化后的逻辑.
-      aliveSession(newVal, oldVal) {
-        if (oldVal === newVal) {
-          return;
-        }
-        let $this = this;
-        let name = $this.$route.name;
-
-        if (name === 'chat' && newVal === $this.$route.params.session) {
-          return;
-        }
-
-        if (name === 'chatIndex' || name === 'chat') {
-          $this.$router.push({name:'chat', params:{session:newVal}});
-        }
-      },
-      // 监听路由.
-      $route (to) {
-        let name = to.name;
-        // 处理 chat
-        if (name !== 'chat') {
-          return;
-        }
-
+    },
+    methods : {
+      setAlive(session, animation = null) {
         // chat 页.
         let $this = this;
-
-        let session = to.params.session;
         let chatData = $this.$store.state.chat;
 
         // 就是当前会话.
         if (session === chatData.alive) {
           $this.refreshConnected();
-          $this.rollToTheBottom();
+          $this.rollToTheBottom(animation);
           return;
         }
 
@@ -119,7 +106,7 @@
         if (chat) {
           $this.$store.commit(CHAT_SET_ALIVE, session);
           $this.refreshConnected();
-          $this.rollToTheBottom();
+          $this.rollToTheBottom(animation);
           return;
         }
 
@@ -135,20 +122,33 @@
         Logger.error('route path ' + session + ' not exists');
         // 无法识别的路由.
         $this.$router.push('/404');
-      }
-    },
-    methods : {
+      },
+      /**
+       * 监控滚动.
+       */
+      onScroll(e) {
+        console.log(e.target.body.scrollTop);
+      },
+      /**
+       * 刷新连接对象, 从而刷新列表.
+       */
       refreshConnected() {
         let $this = this;
         $this.connected = Object.values($this.$store.state.chat.connected);
       },
+      /**
+       * 滚动到底部.
+       */
       rollToTheBottom(option = null) {
-        let $this = this;
-        // 做一个判断逻辑.
-        let target = document.body.offsetHeight;
 
+        let $this = this;
         $this.$store.commit(CHAT_RESET_UNREAD, $this.$store.state.chat.alive);
-        $this.$vuetify.goTo(target, option);
+
+        setTimeout(function() {
+          // 做一个判断逻辑.
+          let target = document.body.offsetHeight;
+          $this.$vuetify.goTo(target, option);
+        }, 200);
       },
       /**
        * @param {Message} message

@@ -58,10 +58,11 @@
         // 进入当前页面.
         if (!$this.$store.getters.token) {
           $this.login = true;
+        } else {
+          $this.$router.push($this.$store.getters.popNextRoute);
         }
       }, 1000);
     },
-
     computed : {
       appSlogan() {
         return process.env.VUE_APP_SLOGAN;

@@ -61,7 +61,6 @@ export default {
     // 我现在很不喜欢弱类型不严谨的代码写法, 因为项目代码量太大了, 自己要看懂每一块很难.
     // js 应该也可以约束得更清楚, 但现在没有时间精力去爬坡了.
     if (token) {
-      console.log('token', token);
       $this.$store.commit(USER_SETTER, {token});
       // 告知服务端.
       $this.$store.dispatch(EMITTER_ACTION_SIGN, {});
@@ -82,25 +81,6 @@ export default {
     }
   },
   watch : {
-    /**
-     * 观察登录信息.
-     */
-    isLogin(newVal, oldVal) {
-      if (newVal === oldVal) {
-        return;
-      }
-
-      let $this = this;
-
-      // 登录了就跳入目标页面.
-      if (newVal) {
-        $this.$router.push($this.$store.getters.onLoginRoute);
-
-      // 否则跳回首页.
-      } else if($this.$route.name !== 'index') {
-        $this.$router.replace({name:'index'});
-      }
-    },
     errorInfo(newVal) {
       this.error = !!newVal;
     }

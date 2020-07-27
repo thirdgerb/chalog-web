@@ -52,7 +52,7 @@
       },
       computed : {
         title() {
-          return process.env.VUE_APP_TITLE;
+          return this.$store.state.user.name || process.env.VUE_APP_TITLE;
         },
         drawer : {
           get () {

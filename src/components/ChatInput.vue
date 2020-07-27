@@ -102,6 +102,7 @@
         if ($this.botChanging) {
           return;
         }
+
         $this.botChanging = true;
         setTimeout(function(){
           $this.botChanging = false;
@@ -114,10 +115,10 @@
         }
 
         // 切换到人工的话, 给管理员发消息
-        let manual = !alive.bot;
+        let bot = !alive.bot;
         $this.$store.dispatch(
           CHAT_ACTION_TOGGLE_MANUAL,
-          {manual, scene:alive.scene, session:alive.session}
+          {bot, scene:alive.scene, session:alive.session}
         );
 
       },

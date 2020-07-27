@@ -10,7 +10,9 @@ import {
 
   LAYOUT_SNACK_BAR_TOGGLE,
 
-  EMITTER_ACTION_JOIN_ALL, CHAT_DELETE, EMITTER_ACTION_QUERY_MESSAGES,
+  EMITTER_ACTION_JOIN_ALL,
+  CHAT_DELETE,
+  EMITTER_ACTION_QUERY_MESSAGES,
 } from "../constants";
 import {BATCH_MODE_SELF, MessageBatch} from "../socketio/MessageBatch";
 
@@ -32,7 +34,7 @@ export class Response {
 export function getResponse(event, res, caller) {
 
   let response = new Response(event, res);
-  Logger.debug('getResponse', response);
+  Logger.debug('get response ' + event + ':' + JSON.stringify(response));
   caller(response.proto);
 }
 
@@ -112,9 +114,9 @@ export const socket = {
     /**
      * 连接到后, 立刻查询最新的消息以做合并.
      */
-    SOCKET_ACTION_JOIND_ROOM({dispatch}, res) {
+    SOCKET_ACTION_JOINED_ROOM({dispatch}, res) {
       getResponse('JOINED_ROOM', res, function({session}) {
-        dispatch(EMITTER_ACTION_QUERY_MESSAGES, {session, forward: true, limit:10});
+        dispatch(EMITTER_ACTION_QUERY_MESSAGES, {session, forward: true, limit:5});
       });
     },
 
@@ -161,6 +163,8 @@ export const socket = {
     SOCKET_ACTION_MESSAGES_MERGE({rootState, dispatch}, res) {
       getResponse('MESSAGES_MERGE', res, function({ session, limit, batches, forward }) {
 
+        batches = Object.values(batches);
+
         let count = batches.length;
         let chat = rootState.chat.connected[session];
 
@@ -169,7 +173,6 @@ export const socket = {
         }
 
         let userId = rootState.user.id;
-
         // 类型化.
         batches = batches.map((c) => {
           let b = new MessageBatch(c);
@@ -180,7 +183,6 @@ export const socket = {
 
           return b;
         });
-
         dispatch(
           CHAT_ACTION_MESSAGES_MERGE,
           {userId, session, limit, batches, forward}

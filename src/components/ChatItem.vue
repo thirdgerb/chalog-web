@@ -1,6 +1,9 @@
 <template>
 
-    <v-list-item outlined :value="session" :to="to">
+    <v-list-item outlined
+     :value="session"
+     :to="to"
+    >
         <v-badge
         :dot="dot"
         :value="chat.unread !==0 "

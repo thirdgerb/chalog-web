@@ -18,6 +18,7 @@ import {
   CHAT_ACTION_TOGGLE_MANUAL, LAYOUT_SNACK_BAR_TOGGLE, EMITTER_ACTION_MANUAL, CHAT_ACTION_CLOSE, EMITTER_ACTION_LEAVE,
 
 } from '../constants';
+import {BATCH_MODE_BOT, BATCH_MODE_SELF} from "../socketio/MessageBatch";
 
 let localStorageKey = null;
 
@@ -91,9 +92,9 @@ export function saveConnectedToStorage(connected, storageKey) {
       context : {},
       suggestions : {},
       unread : 0,
-      updatedAt : 0,
+      updatedAt : chat.updatedAt,
       batches: [],
-      lastMessage: '',
+      lastMessage: chat.lastMessage,
       hasElderMessages: true,
     };
   }
@@ -140,6 +141,12 @@ export function mergeBatches(chat, batches) {
   return chat;
 }
 
+export function getUnread(batch) {
+  if (batch.mode === BATCH_MODE_SELF || batch.mode === BATCH_MODE_BOT) {
+    return 0;
+  }
+  return batch.messages.length;
+}
 
 export const initChat = () => ({
   // 已连接的会话
@@ -165,15 +172,13 @@ export function pushNewBatchToChat(batch, chat) {
 
   // 消息变更.
   batches.push(batch);
-  chat.batches = batches.filter((i) => (i));
   chat.updatedAt = batch.createdAt;
-  chat.unread += batch.messages.length;
+  chat.unread += getUnread(batch);
   chat.lastMessage = batch.lastMessage;
   return chat;
 }
 
 export function mergeBatchToChat(batch, chat) {
-
   // 去重.
   let batches = chat.batches;
   for(let b of batches) {
@@ -184,10 +189,9 @@ export function mergeBatchToChat(batch, chat) {
 
   batches.push(batch);
   // 排序.
-  chat.batches = batches.sort((a, b) => {
+  batches.sort((a, b) => {
     return a.createdAt - b.createdAt;
   });
-
   return chat;
 }
 
@@ -209,18 +213,16 @@ export const chat = {
     /**
      * 切换当前会话的 bot 属性.
      */
-    [CHAT_TOGGLE_MANUAL] (state, {session, manual}) {
+    [CHAT_TOGGLE_MANUAL] (state, {session, bot}) {
       let con = state.connected[session];
       if (con) {
-        con.bot = !manual;
-        state.connected[session] = con;
+        con.bot = bot;
         return;
       }
 
       con = state.incoming[session];
       if (con) {
-        con.bot = !manual;
-        state.incoming[session] = con;
+        con.bot = bot;
       }
     },
 
@@ -254,6 +256,7 @@ export const chat = {
         .sort((a, b) => a.updatedAt - b.updatedAt)
         .map((c) => c.session);
 
+      state.alive = state.connectedSessions[0];
     },
 
     /**
@@ -390,15 +393,19 @@ export const chat = {
         return;
       }
 
+      let originUpdatedAt = chat.updatedAt;
+      let hasMessages = chat.batches.length;
+
       let batchIds = chat.batches.map((c) => c.batchId);
       let unread = 0;
       for (let b of batches) {
         // 消息已经存在, 则跳过.
         if (batchIds.indexOf(b.batchId) >= 0) {
           continue;
-        } else if (b.createdAt > chat.updatedAt){
+        } else if (b.createdAt > originUpdatedAt){
           chat.updatedAt = b.createdAt;
-          unread += b.messages.length;
+          chat.lastMessage = b.lastMessage;
+          unread += getUnread(b);
         }
         chat.batches.push(b);
       }
@@ -406,7 +413,11 @@ export const chat = {
       // 重新排序.
       chat.batches = chat.batches.sort((a, b) => a.createdAt - b.createdAt);
       // 增加未读数.
-      chat.unread += unread;
+      // 不过没有历史消息就不用增加了.
+      if (hasMessages) {
+        chat.unread += unread;
+      }
+
 
       state.connected[session] = chat;
       state.unread = countUnread(state.connected);
@@ -491,23 +502,24 @@ export const chat = {
     /**
      * 给一个 chat 开启人工.
      */
-    [CHAT_ACTION_TOGGLE_MANUAL] ({commit, state, dispatch}, {session, manual}) {
-      let alive = state.alive;
+    [CHAT_ACTION_TOGGLE_MANUAL] ({commit, state, dispatch}, {session, bot}) {
 
-      let con = state.connected[session] || state.incoming[session];
+      let con = state.connected[session];
       if (!con) {
         return;
       }
 
       // 告知服务端转人工.
-      if (manual) {
+      if (!bot) {
         dispatch(EMITTER_ACTION_MANUAL, {scene:con.scene, session:con.session});
       }
 
       // 提交当前改动.
-      commit(CHAT_TOGGLE_MANUAL, {session, manual});
+      commit(CHAT_TOGGLE_MANUAL, {session, bot});
+
+      let alive = state.alive;
       if (session === alive) {
-        commit(LAYOUT_SNACK_BAR_TOGGLE, manual ? '切换到群聊' : '切换到机器人');
+        commit(LAYOUT_SNACK_BAR_TOGGLE, bot ? '切换到机器人': '切换到群聊');
       }
     },
 

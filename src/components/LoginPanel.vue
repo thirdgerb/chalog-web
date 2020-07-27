@@ -205,9 +205,8 @@
         }
         $this.disableForm();
 
-
         let date = new Date();
-        let name = '访客-' + this.guest.name + date.getMinutes() + date.getSeconds();
+        let name = '访客-' + this.guest.name + '-' + date.getSeconds();
 
         $this.$store.dispatch(EMITTER_ACTION_SIGN, {name, password:''});
       },

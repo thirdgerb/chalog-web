@@ -76,12 +76,13 @@ export const user = {
      * @param dispatch
      */
     async [USER_ACTION_LOGOUT] ({commit, dispatch}) {
-      commit(USER_SETTER, {id:'', name:'', token:''});
-
-      Cookies.remove('token');
 
       // 提示 leave
       await dispatch(EMITTER_ACTION_LEAVE_ALL);
+
+      commit(USER_SETTER, {id:'', name:'', token:''});
+
+      Cookies.remove('token');
 
       // 清空本地缓存.
       await localStorage.clear();
