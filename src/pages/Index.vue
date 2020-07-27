@@ -16,6 +16,7 @@
                     lg="7"
                     xl="7"
                    style="padding-bottom: 60px"
+                    @click="goAlive()"
                 >
                     <h1 class="display-1 font-weight-thin mb-4">{{ appName }}</h1>
                     <h4 class="subheading">{{ appSlogan }}</h4>
@@ -51,7 +52,9 @@
     sockets : {
       USER_LOGIN () {
         let $this = this;
-        $this.$router.push($this.$store.getters.popNextRoute);
+        setTimeout(function() {
+          $this.goAlive();
+        }, 300);
       }
     },
     mounted() {
@@ -62,8 +65,6 @@
         // 进入当前页面.
         if (!$this.$store.getters.token) {
           $this.login = true;
-        } else {
-          $this.$router.push($this.$store.getters.popNextRoute);
         }
       }, 1000);
     },
@@ -75,6 +76,14 @@
         return process.env.VUE_APP_NAME;
       },
     },
+    methods : {
+      goAlive() {
+        let $this = this;
+        if ($this.$store.getters.isUserLogin) {
+          $this.$router.push($this.$store.getters.popNextRoute);
+        }
+      }
+    }
 
   }
 </script>

@@ -30,7 +30,7 @@ const router = new VueRouter({
     // 404 未找到.
     {path: '/404', component: NotFound},
     {path: '*', component: NotFound},
-  ]
+  ],
 
 });
 

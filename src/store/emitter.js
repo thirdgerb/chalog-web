@@ -6,6 +6,7 @@ import {Message} from "../socketio/Message";
 import {
   EMITTER_ACTION_REQUEST,
   EMITTER_ACTION_SIGN,
+  EMITTER_ACTION_REGISTER,
 
   EMITTER_ACTION_JOIN,
   EMITTER_ACTION_JOIN_ALL,
@@ -59,6 +60,14 @@ export const emitter = {
      */
     [EMITTER_ACTION_SIGN] ({dispatch}, {name, password}) {
       dispatch(EMITTER_ACTION_REQUEST, ['SIGN', {name, password}]);
+    },
+
+
+    /**
+     * 注册
+     */
+    [EMITTER_ACTION_REGISTER] ({dispatch}, {name, password}) {
+      dispatch(EMITTER_ACTION_REQUEST, ['REGISTER', {name, password}]);
     },
 
     /**

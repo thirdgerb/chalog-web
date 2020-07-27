@@ -43,6 +43,7 @@
   import {MessageBatch} from "../socketio/MessageBatch";
   import {Message} from "../socketio/Message";
   import {EMITTER_ACTION_JOIN} from "../constants";
+  import {intendTo} from "../utils";
 
 
   export default {
@@ -57,16 +58,13 @@
       scrolling : false,
       connected : [],
     }),
-    // 权限检查.
-    beforeRouteEnter (to, from, next) {
-      next(vm => {
-        if (!vm.$store.getters.isUserLogin) {
-          vm.$store.state.next = to;
-          vm.$router.replace({name: 'index'});
-        } else {
-          vm.setAlive(to.params.session);
-        }
-      })
+    created() {
+      let vm = this;
+      if (!vm.$store.getters.isUserLogin) {
+        intendTo(vm, {name:'index'});
+      } else {
+        vm.refreshConnected();
+      }
     },
     // 组件跳转.
     beforeRouteUpdate(to, from, next) {

@@ -8,6 +8,7 @@ import {
   CHAT_TOGGLE_MANUAL,
   CHAT_INIT_MENU,
   CHAT_RESET_UNREAD,
+  CHAT_CACHE_CONNECTED,
 
   CHAT_ACTION_MESSAGES_MERGE,
   CHAT_ADD_INFO,
@@ -164,11 +165,9 @@ export function countUnread(connected) {
 }
 
 export function pushNewBatchToChat(batch, chat) {
-  let batches = chat.batches;
-
   // 消息变更.
   chat.unread += getUnread(batch);
-  batches.push(batch);
+  chat.batches.push(batch);
   chat.updatedAt = batch.createdAt;
   chat.lastMessage = batch.lastMessage;
   return chat;
@@ -241,9 +240,6 @@ export const chat = {
         Object.assign(state.connected, JSON.parse(connected));
       }
 
-      // 立刻保存.
-      saveConnectedToStorage(state.connected, localStorageKey);
-
       state.incomingSessions = Object.values(state.incoming)
         .sort((a, b) => a.updatedAt - b.updatedAt)
         .map((c) => c.session);
@@ -309,7 +305,8 @@ export const chat = {
         delete state.connected[session];
         let i = state.connectedSessions.indexOf(session);
         state.connectedSessions.splice(i, 1);
-        saveConnectedToStorage(state.connected, localStorageKey);
+
+        console.log('delete connected');
       }
 
       // 删除 incoming 对象.
@@ -318,7 +315,12 @@ export const chat = {
         delete state.incoming[session];
         let i = state.incomingSessions.indexOf(session);
         state.incomingSessions.splice(i, 1);
+        console.log('delete incoming');
       }
+    },
+
+    [CHAT_CACHE_CONNECTED] (state) {
+      saveConnectedToStorage(state.connected, localStorageKey);
     },
 
     /**
@@ -333,15 +335,15 @@ export const chat = {
         if (!state.alive) {
           state.alive = session;
         }
-        saveConnectedToStorage(state.connected, localStorageKey);
         state.unread = countUnread(state.connected);
-        // 不需要排序.
-        return;
+        insertSession(state.connectedSessions, session);
+        // 不需要动排序.
+      } else {
+        // 添加一个新会话. 会改变排序.
+        state.incoming[session] = chat;
+        insertSession(state.incomingSessions, session);
       }
 
-      // 添加一个新会话. 会改变排序.
-      state.incoming[session] = chat;
-      insertSession(state.incomingSessions, session);
     },
 
     /**
@@ -370,7 +372,6 @@ export const chat = {
         chat = mergeBatchToChat(batch, chat);
       }
 
-      state.connected[session] = chat;
       state.unread = countUnread(state.connectedSessions);
       insertSession(state.connectedSessions, session);
     },
@@ -434,7 +435,7 @@ export const chat = {
     /**
      * 合并单个房间信息.
      */
-    [CHAT_ACTION_INFO_MERGE] ({state, commit, dispatch, rootState}, chat) {
+    async [CHAT_ACTION_INFO_MERGE] ({state, commit, dispatch, rootState}, chat) {
       let userId = rootState.user.id;
       let session = chat.session;
 
@@ -449,8 +450,8 @@ export const chat = {
 
       if (chat.autoJoin) {
         let merge = createConversation(chat, userId);
-        commit(CHAT_ADD_INFO, {chat:merge, connect: true});
-        dispatch(EMITTER_ACTION_JOIN, {scene:chat.scene, session:chat.session});
+        await commit(CHAT_ADD_INFO, {chat:merge, connect: true});
+        await dispatch(EMITTER_ACTION_JOIN, {scene:chat.scene, session:chat.session});
         return;
       }
 
@@ -459,7 +460,7 @@ export const chat = {
         state.incoming[session].unread = -1;
       } else {
         let merge = createConversation(chat, userId);
-        commit(CHAT_ADD_INFO, {chat:merge, connect:false});
+        await commit(CHAT_ADD_INFO, {chat:merge, connect:false});
       }
     },
 

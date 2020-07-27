@@ -123,7 +123,7 @@
 </template>
 
 <script>
-    import {EMITTER_ACTION_SIGN} from "../constants";
+    import {EMITTER_ACTION_SIGN, EMITTER_ACTION_REGISTER} from "../constants";
 
     export default {
     name: "LoginPanel",
@@ -226,7 +226,7 @@
         let name = $this.register.name;
         let password = $this.register.password;
 
-        $this.$store.dispatch(EMITTER_ACTION_SIGN, {name, password});
+        $this.$store.dispatch(EMITTER_ACTION_REGISTER, {name, password});
       }
     },
     computed : {

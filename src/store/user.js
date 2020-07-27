@@ -13,7 +13,7 @@ import {
 
 import Cookies from "js-cookie";
 
-export const cookieOption = {expires: 2};
+export const cookieOption = {expires: 2, SameSite:'Strict'};
 
 export const user = {
   state: () => ({

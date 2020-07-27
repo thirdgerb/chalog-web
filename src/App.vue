@@ -42,6 +42,7 @@ import Cookies from 'js-cookie';
 import Drawer from './components/Drawer';
 import AppMenu from './components/AppMenu';
 import {EMITTER_ACTION_SIGN, USER_SETTER} from "./constants";
+import {intendTo} from "./utils";
 
 
 export default {
@@ -56,6 +57,7 @@ export default {
     let $this = this;
 
     let token = Cookies.get('token');
+    let name = $this.$route.name;
 
     // 通知服务端用户已登录. 理论上要根据用户身份加入默认的房间, 提供默认的信息.
     // 我现在很不喜欢弱类型不严谨的代码写法, 因为项目代码量太大了, 自己要看懂每一块很难.
@@ -64,6 +66,8 @@ export default {
       $this.$store.commit(USER_SETTER, {token});
       // 告知服务端.
       $this.$store.dispatch(EMITTER_ACTION_SIGN, {});
+    } else if (name !== 'index') {
+      intendTo($this, {name:'index'});
     }
   },
   data: () =>({
@@ -80,10 +84,23 @@ export default {
       return this.$store.state.user.id;
     }
   },
+  sockets: {
+
+    ERROR_INFO (res) {
+      let code = res.proto ? res.proto['errcode'] : null;
+      let $this = this;
+      switch (code) {
+        case 401 :
+          if ($this.$route.name !== 'index') {
+            intendTo($this, {name:'index'});
+          }
+      }
+      $this.error = true;
+    },
+
+  },
   watch : {
-    errorInfo(newVal) {
-      this.error = !!newVal;
-    }
+
   }
 };
 </script>

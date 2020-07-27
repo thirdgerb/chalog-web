@@ -3,6 +3,7 @@
         <v-container
             class="fill-height commune-index"
             fluid
+            @click="goAlive()"
         >
             <v-row
                     align="center"
@@ -15,13 +16,27 @@
 </template>
 
 <script>
+  import {intendTo} from "../utils";
+
   export default {
     name: "ChatIndex",
     computed: {
       description () {
-        return this.$store.state.socket.connecting ? '服务器已连接' : '连接服务器中...' ;
+        return this.$store.state.socket.connecting ? '点击进入会话' : '连接服务器中...' ;
       },
     },
+    mounted() {
+      let $this = this;
+      if (!$this.$store.getters.isUserLogin) {
+        intendTo($this);
+      }
+    },
+    methods: {
+      goAlive() {
+          let $this = this;
+          $this.$router.push($this.$store.getters.popNextRoute);
+      }
+    }
   }
 </script>
 

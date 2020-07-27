@@ -2,11 +2,11 @@
 import Logger from "js-logger";
 import {
   USER_ACTION_LOGIN,
-  USER_ACTION_LOGOUT,
 
   CHAT_COMMIT_MESSAGE,
   CHAT_ACTION_MESSAGES_MERGE,
   CHAT_ACTION_INFO_MERGE,
+  CHAT_CACHE_CONNECTED,
 
   LAYOUT_SNACK_BAR_TOGGLE,
 
@@ -32,7 +32,6 @@ export class Response {
 }
 
 export function getResponse(event, res, caller) {
-
   let response = new Response(event, res);
   Logger.debug('get response ' + event + ':' + JSON.stringify(response));
   caller(response.proto);
@@ -83,6 +82,7 @@ export const socket = {
      * 接下来触发一系列操作.
      */
    SOCKET_ACTION_USER_LOGIN({dispatch}, res) {
+     console.log(res);
      getResponse('USER_LOGIN', res, function({id, name, token}) {
        dispatch(USER_ACTION_LOGIN, {id, name, token});
      });
@@ -91,22 +91,13 @@ export const socket = {
     /**
      * 异常信息的通知.
      */
-    SOCKET_ACTION_ERROR_INFO({commit, dispatch}, res) {
+    SOCKET_ACTION_ERROR_INFO({commit}, res) {
       getResponse('ERROR_INFO', res, function({errcode, errmsg}) {
         // 用 snack bar 提示异常.
         commit(
           LAYOUT_SNACK_BAR_TOGGLE,
           'error:' + errmsg + ' code:' + errcode
         );
-
-        // 对异常码的专门处理.
-        switch (errcode) {
-          // 退出登录.
-          case 401 :
-            dispatch(USER_ACTION_LOGOUT);
-            break;
-          default :
-        }
       });
 
     },
@@ -123,11 +114,12 @@ export const socket = {
     /**
      * 服务端下发房间信息.
      */
-    SOCKET_ACTION_USER_CHATS({dispatch}, res) {
-      getResponse('USER_CHATS', res, function({ chats }){
+    SOCKET_ACTION_USER_CHATS({dispatch, commit}, res) {
+      getResponse('USER_CHATS', res, async function({ chats }){
         for (let c of chats) {
-          dispatch(CHAT_ACTION_INFO_MERGE, c);
+          await dispatch(CHAT_ACTION_INFO_MERGE, c);
         }
+        commit(CHAT_CACHE_CONNECTED);
       });
     },
 
