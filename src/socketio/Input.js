@@ -16,6 +16,6 @@ export default class Input {
     this.session = session;
     this.scene = scene;
     this.bot = bot;
-    this.createdAt = Date.parse((new Date()).toString());
+    this.createdAt = Date.parse((new Date()).toString()) / 1000;
   }
 }

@@ -18,7 +18,6 @@ import {
   CHAT_ACTION_TOGGLE_MANUAL, LAYOUT_SNACK_BAR_TOGGLE, EMITTER_ACTION_MANUAL, CHAT_ACTION_CLOSE, EMITTER_ACTION_LEAVE,
 
 } from '../constants';
-import {BATCH_MODE_BOT, BATCH_MODE_SELF} from "../socketio/MessageBatch";
 
 let localStorageKey = null;
 
@@ -142,9 +141,6 @@ export function mergeBatches(chat, batches) {
 }
 
 export function getUnread(batch) {
-  if (batch.mode === BATCH_MODE_SELF || batch.mode === BATCH_MODE_BOT) {
-    return 0;
-  }
   return batch.messages.length;
 }
 
@@ -171,9 +167,9 @@ export function pushNewBatchToChat(batch, chat) {
   let batches = chat.batches;
 
   // 消息变更.
+  chat.unread += getUnread(batch);
   batches.push(batch);
   chat.updatedAt = batch.createdAt;
-  chat.unread += getUnread(batch);
   chat.lastMessage = batch.lastMessage;
   return chat;
 }

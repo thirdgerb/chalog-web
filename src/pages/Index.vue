@@ -49,6 +49,10 @@
       login: false,
     }),
     sockets : {
+      USER_LOGIN () {
+        let $this = this;
+        $this.$router.push($this.$store.getters.popNextRoute);
+      }
     },
     mounted() {
       let $this = this;
@@ -70,11 +74,8 @@
       appName() {
         return process.env.VUE_APP_NAME;
       },
-
-
     },
-    methods : {
-    },
+
   }
 </script>
 
