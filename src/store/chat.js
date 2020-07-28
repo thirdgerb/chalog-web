@@ -118,7 +118,6 @@ export function insertSession(sessions, session, max = 100) {
   }
   sessions.unshift(session);
   sessions.slice(0, max);
-  console.log('insert session', sessions);
   return sessions;
 }
 
@@ -147,10 +146,7 @@ export function mergeBatches(chat, batches) {
 }
 
 export function getUnread(batch) {
-  if (batch.isNew) {
-    return batch.messages.length;
-  }
-  return 0;
+  return batch.messages.length;
 }
 
 
@@ -300,7 +296,6 @@ export const chat = {
      * 合并一个 Chat 的信息
      */
     [CHAT_ADD_INFO] (state, {chat, connect}) {
-      console.log('chat_add_info' , chat.scene);
       let session = chat.session;
       // auto join connected 先加入.
       if (connect) {
@@ -502,7 +497,6 @@ export const chat = {
       commit(CHAT_TOGGLE_MANUAL, {session, bot});
       if (alive === session) {
         let info = bot ? '切换到机器人': '切换到群聊';
-        console.log(info);
         commit(LAYOUT_SNACK_BAR_TOGGLE, info);
       }
     },

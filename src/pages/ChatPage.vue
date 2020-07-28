@@ -4,7 +4,7 @@
         <bili-video></bili-video>
         <v-container id="chat-container" fluid >
             <!--<div class="chat-wrap">-->
-            <div class="chat" ref="chat" v-scroll.self="onScroll">
+            <div class="chat" ref="chat" v-scroll="onScroll">
                 <chat-list
                     v-for="chat in connected"
                     v-show="chat.session === aliveSession"
@@ -81,7 +81,6 @@
       unread(newVal, oldVal) {
         let $this = this;
         if (newVal > oldVal && $this.aliveSession === $this.$store.state.chat.updated) {
-          console.log(newVal, oldVal, $this.aliveSession, $this.$store.state.chat.updated);
           this.rollToTheBottom($this.aliveSession);
         }
       },

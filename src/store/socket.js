@@ -117,7 +117,6 @@ export const socket = {
       getResponse('USER_CHATS', res, async function({ chats, init }){
         chats = Object.values(chats).reverse();
 
-        console.log(chats.map((c) => (c.scene) ));
         for (let c of chats) {
           await dispatch(CHAT_ACTION_INFO_MERGE, c);
         }

@@ -99,7 +99,6 @@
         if (newVal !== oldVal) {
           this.refreshUnread();
         }
-        console.log(newVal, oldVal);
       }
     }
   }

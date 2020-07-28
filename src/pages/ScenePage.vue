@@ -93,10 +93,8 @@
       goAlive() {
         let $this = this;
         let next = popNextRoute($this);
-        console.log('############# next1', next);
         if (next.name === 'scene' && next.params.scene === $this.scene) {
           next = popNextRoute($this);
-          console.log('############# next2', next);
         }
         $this.$router.replace(next);
       },
