@@ -1,10 +1,14 @@
 <template>
-    <v-main app class="indigo lighten-5" >
+    <v-main app class="indigo lighten-5" v-scroll="onScroll">
         <Drawer :alive="aliveSession"/>
         <bili-video></bili-video>
         <v-container id="chat-container" fluid >
-            <!--<div class="chat-wrap">-->
-            <div class="chat" ref="chat" v-scroll="onScroll">
+            <v-overlay :value="querying" opacity="0.05">
+                <v-row justify="center" align="center">
+                    <v-progress-circular indeterminate color="green"></v-progress-circular>
+                </v-row>
+            </v-overlay>
+            <div class="chat" ref="chat">
                 <chat-list
                     v-for="chat in connected"
                     v-show="chat.session === aliveSession"
@@ -14,7 +18,6 @@
                 >
                 </chat-list>
             </div>
-            <!--- input --->
         </v-container>
 
         <chat-input
@@ -33,7 +36,7 @@
     CHAT_ACTION_CONNECT_INCOMING,
     CHAT_COMMIT_MESSAGE,
     CHAT_RESET_UNREAD,
-    EMITTER_ACTION_DELIVER_MESSAGE,
+    EMITTER_ACTION_DELIVER_MESSAGE, EMITTER_ACTION_QUERY_MESSAGES,
   } from '../constants';
 
 
@@ -57,8 +60,11 @@
     data: () => ({
       // 滚动中禁止循环滚动
       scrolling : false,
+      isAtBottom: false,
+      scrollTop: -10,
       connected : [],
-      aliveChat : null
+      aliveChat : null,
+      querying : false,
     }),
     beforeRouteEnter(to, from, next) {
       next((vm) => {
@@ -81,12 +87,12 @@
       unread(newVal, oldVal) {
         let $this = this;
         if (newVal > oldVal && $this.aliveSession === $this.$store.state.chat.updated) {
-          this.rollToTheBottom($this.aliveSession);
+          this.rollToTheBottom($this.aliveSession, false);
         }
       },
     },
     methods : {
-      onRoute(route, animation = null) {
+      onRoute(route) {
 
         if (route.name !== 'chat') {
           return ;
@@ -103,7 +109,7 @@
 
         let chat = $this.$store.state.chat.connected[session];
         if (chat) {
-          $this.setAlive(chat, animation);
+          $this.setAlive(chat);
           return;
         }
 
@@ -118,19 +124,62 @@
         }
 
         $this.$store.dispatch(CHAT_ACTION_CONNECT_INCOMING, session);
-        $this.setAlive(chat, animation);
+        $this.setAlive(chat);
       },
-      setAlive(chat, animation) {
+      setAlive(chat) {
         let $this = this;
         $this.aliveChat = chat;
         $this.refreshConnected();
-        $this.rollToTheBottom(chat.session, animation);
+        setTimeout(function() {
+          $this.rollToTheBottom(chat.session, true);
+        }, 200);
       },
       /**
        * 监控滚动.
        */
-      onScroll(e) {
-        console.log(e.target.body.scrollTop);
+      onScroll() {
+        let $this = this;
+        if ($this.scrolling) {
+          return;
+        }
+        let prev = $this.scrollTop;
+
+        let el = document.documentElement;
+        let top = $this.scrollTop = el.scrollTop;
+        $this.isAtBottom = (el.scrollTop + el.clientHeight + 15) >= el.scrollHeight;
+
+        if (top === 0 && top < prev ) {
+          $this.queryElderMessages();
+        }
+      },
+      /**
+       * 尝试查询较老的信息.
+       */
+      queryElderMessages() {
+        let $this = this;
+        if ($this.querying) {
+          return;
+        }
+
+        let aliveChat = $this.aliveChat;
+        if (!aliveChat) {
+          return;
+        }
+
+        if (!aliveChat.hasElderMessages) {
+          return;
+        }
+
+        $this.querying = true;
+        setTimeout(function() {
+          $this.querying = false;
+        }, 500);
+
+        $this.$store.dispatch(
+          EMITTER_ACTION_QUERY_MESSAGES,
+          {session:aliveChat.session, forward:false, limit:5}
+        );
+
       },
       /**
        * 刷新连接对象, 从而刷新列表.
@@ -143,16 +192,17 @@
       /**
        * 滚动到底部.
        */
-      rollToTheBottom(session, option = null) {
+      rollToTheBottom(session, force) {
 
         let $this = this;
-        $this.$store.commit(CHAT_RESET_UNREAD, session);
+        if (!force && !$this.isAtBottom) {
+          return;
+        }
 
-        setTimeout(function() {
-          // 做一个判断逻辑.
-          let target = document.body.offsetHeight;
-          $this.$vuetify.goTo(target, option);
-        }, 200);
+        $this.$store.commit(CHAT_RESET_UNREAD, session);
+        // 做一个判断逻辑.
+        let target = document.documentElement.offsetHeight - 15;
+        $this.$vuetify.goTo(target);
       },
       /**
        * @param {Message} message
@@ -186,9 +236,10 @@
           batch
         );
 
+        $this.rollToTheBottom(session, true);
         $this.refreshConnected();
-        $this.rollToTheBottom(session);
       },
+
     },
   }
 </script>

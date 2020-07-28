@@ -73,6 +73,7 @@ export function createConversation(
     // 最后消息
     lastMessage: '',
     count: 0,
+    hasElderMessages: true,
   }
 }
 
@@ -450,7 +451,7 @@ export const chat = {
       }
 
       // 认为还有更多消息.
-      let more = limit === batches.length;
+      let more = limit <= batches.length;
 
       // 提交消息合并.
       commit(CHAT_MERGE_MESSAGES, {session, batches});

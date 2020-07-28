@@ -1,11 +1,7 @@
 <template>
-    <div >
-        <div class="chat-row chat-receive">
-            <div class="chat-content">
-                <span class="chat-bubble">
-                    <span>hello world {{ session }}</span>
-                </span>
-            </div>
+    <div class="chat-list" >
+        <div class="chat-row chat-system" v-if="!chat.hasElderMessages">
+            ~ 没有更多消息了 ~
         </div>
         <batch-item
           v-for="batch in getBatches()"
@@ -48,7 +44,7 @@
     methods: {
       getBatches() {
         return Object.values(this.chat.batches);
-      }
+      },
     },
     computed : {
       session() {

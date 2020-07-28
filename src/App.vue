@@ -25,11 +25,9 @@
       </template>
     </v-snackbar>
 
-    <transition name="slide-fade">
-      <keep-alive>
-          <router-view></router-view>
-      </keep-alive>
-    </transition>
+    <keep-alive>
+        <router-view></router-view>
+    </keep-alive>
 
   </v-app>
 </template>
@@ -106,15 +104,4 @@ export default {
 
 <style>
   @import "./assets/commune.css";
-
-  .slide-fade-enter-active {
-    transition: opacity 20s ease;
-  }
-  .slide-fade-leave-active {
-    transition: opacity 20s cubic-bezier(1.0, 0.5, 0.8, 1.0);
-  }
-  .slide-fade-enter, .slide-fade-leave-to
-    /* .slide-fade-leave-active for below version 2.1.8 */ {
-    opacity: 0;
-  }
 </style>

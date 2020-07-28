@@ -85,13 +85,13 @@ export class MessageBatch {
     }
   }
 
-  _date;
+  dateStr;
   get date() {
-    if (this._date) {
-      return this._date;
+    if (this.dateStr) {
+      return this.dateStr;
     }
-    let date = new Date(this.createdAt);
-    return this._date = date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
+    let date = new Date(this.createdAt * 1000);
+    return this.dateStr = date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
   }
 
   /**
