@@ -1,8 +1,9 @@
 <template>
-
+    <v-tooltip right>
+    <template v-slot:activator="{ on, attrs }">
     <v-list-item outlined
      :value="session"
-     :to="to"
+     :to="to" v-bind="attrs" v-on="on"
     >
         <v-badge
         :dot="!connected"
@@ -33,6 +34,9 @@
             >X</v-btn>
         </v-list-item-action>
     </v-list-item>
+    </template>
+        <span>{{chat.title}}</span>
+    </v-tooltip>
 </template>
 
 <script>
@@ -50,13 +54,13 @@
       closeItem() {
         let $this = this;
         let session = $this.session;
-        $this.$store.dispatch(CHAT_ACTION_CLOSE, {session});
 
-        let route = $this.$route;
-        if (route.name ==='chat' && route.params.session === 'session') {
-          let next = popNextRoute($this);
-          $this.$router.push(next);
-        }
+        $this.$store.dispatch(CHAT_ACTION_CLOSE, {session});
+        setTimeout(function() {
+            let next = popNextRoute($this);
+            $this.$router.push(next);
+        }, 100);
+
       },
       refreshUnread() {
         let $this = this;

@@ -25,9 +25,7 @@
       </template>
     </v-snackbar>
 
-    <keep-alive>
-        <router-view></router-view>
-    </keep-alive>
+    <router-view></router-view>
 
   </v-app>
 </template>
