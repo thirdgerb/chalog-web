@@ -5,6 +5,7 @@ import Index from './pages/Index';
 import NotFound from './pages/NotFound';
 import ChatPage from './pages/ChatPage';
 import ChatIndex from './pages/ChatIndex';
+import ScenePage from './pages/ScenePage';
 
 Vue.use(VueRouter);
 
@@ -18,6 +19,12 @@ const router = new VueRouter({
       component: Index,
     },
     {
+      path: '/scene/:scene',
+      name: 'scene',
+      component: ScenePage,
+      props: (r) => ({scene:r.params.scene}),
+    },
+    {
       path: '/chat',
       name: 'chatIndex',
       component: ChatIndex,
@@ -26,6 +33,7 @@ const router = new VueRouter({
       path: '/chat/:session',
       name: 'chat',
       component: ChatPage,
+      props: (r) => ({aliveSession:r.params.session}),
     },
     // 404 未找到.
     {path: '/404', component: NotFound},

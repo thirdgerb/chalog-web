@@ -33,7 +33,7 @@ export class Response {
 
 export function getResponse(event, res, caller) {
   let response = new Response(event, res);
-  Logger.debug('get response ' + event + ':' + JSON.stringify(response));
+  // Logger.debug('get response ' + event + ':' + JSON.stringify(response));
   caller(response.proto);
 }
 
@@ -82,7 +82,6 @@ export const socket = {
      * 接下来触发一系列操作.
      */
    SOCKET_ACTION_USER_LOGIN({dispatch}, res) {
-     console.log(res);
      getResponse('USER_LOGIN', res, function({id, name, token}) {
        dispatch(USER_ACTION_LOGIN, {id, name, token});
      });
@@ -114,12 +113,20 @@ export const socket = {
     /**
      * 服务端下发房间信息.
      */
-    SOCKET_ACTION_USER_CHATS({dispatch, commit}, res) {
-      getResponse('USER_CHATS', res, async function({ chats }){
+    SOCKET_ACTION_USER_CHATS({dispatch, commit, rootState}, res) {
+      getResponse('USER_CHATS', res, async function({ chats, init }){
+        chats = Object.values(chats).reverse();
+
+        console.log(chats.map((c) => (c.scene) ));
         for (let c of chats) {
           await dispatch(CHAT_ACTION_INFO_MERGE, c);
         }
+
         commit(CHAT_CACHE_CONNECTED);
+
+        if (init) {
+          rootState.chat.init = true;
+        }
       });
     },
 

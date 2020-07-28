@@ -1,5 +1,6 @@
 <template>
     <v-main app class="indigo lighten-5" >
+        <Drawer :alive="aliveSession"/>
         <bili-video></bili-video>
         <v-container id="chat-container" fluid >
             <!--<div class="chat-wrap">-->
@@ -9,23 +10,18 @@
                     v-show="chat.session === aliveSession"
                     :key="chat.session"
                     :chat="chat"
+                    :count="chat.count"
                 >
                 </chat-list>
             </div>
             <!--- input --->
         </v-container>
-        <v-footer
-            v-show="aliveSession"
-            fixed
-            app
-            dense
-            padless
-            inset
-        >
-            <chat-input
-                v-on:deliver-message="deliverMessage"
-            ></chat-input>
-        </v-footer>
+
+        <chat-input
+            v-if="aliveChat"
+            v-on:deliver-message="deliverMessage"
+            :alive="aliveChat"
+        ></chat-input>
     </v-main>
 </template>
 
@@ -34,15 +30,17 @@
   import BiliVideo from '../components/BiliVideo';
   import ChatInput from '../components/ChatInput';
   import {
-    CHAT_SET_ALIVE,
+    CHAT_ACTION_CONNECT_INCOMING,
     CHAT_COMMIT_MESSAGE,
-    CHAT_RESET_UNREAD, EMITTER_ACTION_DELIVER_MESSAGE
+    CHAT_RESET_UNREAD,
+    EMITTER_ACTION_DELIVER_MESSAGE,
   } from '../constants';
 
+
+  import Drawer from '../components/Drawer';
   import Logger from 'js-logger';
   import {MessageBatch} from "../socketio/MessageBatch";
   import {Message} from "../socketio/Message";
-  import {EMITTER_ACTION_JOIN} from "../constants";
   import {intendTo} from "../utils";
 
 
@@ -52,74 +50,82 @@
       BiliVideo,
       ChatList,
       ChatInput,
+      Drawer
     },
+    // prop from router
+    props : ['aliveSession'],
     data: () => ({
       // 滚动中禁止循环滚动
       scrolling : false,
       connected : [],
+      aliveChat : null
     }),
-    created() {
-      let vm = this;
-      if (!vm.$store.getters.isUserLogin) {
-        intendTo(vm, {name:'index'});
-      } else {
-        vm.refreshConnected();
-      }
+    beforeRouteEnter(to, from, next) {
+      next((vm) => {
+        vm.onRoute(to)
+      });
     },
     // 组件跳转.
     beforeRouteUpdate(to, from, next) {
-      this.setAlive(to.params.session);
+      let $this= this;
+      $this.onRoute(to);
       next();
     },
     computed : {
-      aliveSession() {
-        return this.$store.state.chat.alive;
-      },
-      aliveUnread() {
-        let alive = this.$store.getters.aliveChat;
-        return alive ? alive.unread : 0;
+      unread() {
+        let $this = this;
+        return $this.$store.state.chat.unread;
       },
     },
     watch : {
-      aliveUnread(newVal) {
-        if (newVal > 0) {
-          this.rollToTheBottom();
+      unread(newVal, oldVal) {
+        let $this = this;
+        if (newVal > oldVal && $this.aliveSession === $this.$store.state.chat.updated) {
+          console.log(newVal, oldVal, $this.aliveSession, $this.$store.state.chat.updated);
+          this.rollToTheBottom($this.aliveSession);
         }
       },
     },
     methods : {
-      setAlive(session, animation = null) {
-        // chat 页.
+      onRoute(route, animation = null) {
+
+        if (route.name !== 'chat') {
+          return ;
+        }
+
         let $this = this;
-        let chatData = $this.$store.state.chat;
-
-        // 就是当前会话.
-        if (session === chatData.alive) {
-          $this.refreshConnected();
-          $this.rollToTheBottom(animation);
+        if (!$this.$store.getters.isUserLogin) {
+          intendTo($this, {name:'index'});
           return;
         }
 
-        let chat = chatData.connected[session];
+        let session = route.params.session;
+
+
+        let chat = $this.$store.state.chat.connected[session];
         if (chat) {
-          $this.$store.commit(CHAT_SET_ALIVE, session);
-          $this.refreshConnected();
-          $this.rollToTheBottom(animation);
+          $this.setAlive(chat, animation);
           return;
         }
 
-        chat = chatData.incoming[session];
-        if (chat) {
-          $this.$store.commit(CHAT_SET_ALIVE, session);
-          $this.$store.dispatch(EMITTER_ACTION_JOIN, chat);
-          $this.refreshConnected();
-          $this.rollToTheBottom();
+        chat = $this.$store.state.chat.incoming[session];
+
+        if (!chat) {
+          Logger.error('route path ' + session + ' not exists');
+          // 无法识别的路由.
+          $this.$store.state.next = null;
+          $this.$router.push('/404');
           return;
         }
 
-        Logger.error('route path ' + session + ' not exists');
-        // 无法识别的路由.
-        $this.$router.push('/404');
+        $this.$store.dispatch(CHAT_ACTION_CONNECT_INCOMING, session);
+        $this.setAlive(chat, animation);
+      },
+      setAlive(chat, animation) {
+        let $this = this;
+        $this.aliveChat = chat;
+        $this.refreshConnected();
+        $this.rollToTheBottom(chat.session, animation);
       },
       /**
        * 监控滚动.
@@ -132,15 +138,16 @@
        */
       refreshConnected() {
         let $this = this;
-        $this.connected = Object.values($this.$store.state.chat.connected);
+        let connected = $this.$store.state.chat.connected;
+        $this.connected = Object.values(connected);
       },
       /**
        * 滚动到底部.
        */
-      rollToTheBottom(option = null) {
+      rollToTheBottom(session, option = null) {
 
         let $this = this;
-        $this.$store.commit(CHAT_RESET_UNREAD, $this.$store.state.chat.alive);
+        $this.$store.commit(CHAT_RESET_UNREAD, session);
 
         setTimeout(function() {
           // 做一个判断逻辑.
@@ -158,7 +165,7 @@
         }
         let $this = this;
         // 准备需要发送的消息.
-        let session = $this.$store.state.chat.alive;
+        let session = $this.aliveSession;
         let chat = $this.$store.state.chat.connected[session];
 
         if (!chat) {
@@ -181,7 +188,7 @@
         );
 
         $this.refreshConnected();
-        $this.rollToTheBottom();
+        $this.rollToTheBottom(session);
       },
     },
   }

@@ -5,9 +5,9 @@
      :to="to"
     >
         <v-badge
-        :dot="dot"
-        :value="chat.unread !==0 "
-        :content="getUnread()"
+        :dot="!connected"
+        :value="unread"
+        :content="unread"
         color="error"
         :offset-x="offsetX"
         :offset-y="offsetY"
@@ -38,17 +38,27 @@
 <script>
 
   import {CHAT_ACTION_CLOSE} from "../constants";
+  import {popNextRoute} from "../utils";
 
   export default {
     name: "ChatItem",
-    props : ['session', 'connected', 'chat'],
+    props : ['session', 'connected', 'chat', 'alive'],
+    data: () => ({
+      unread : 0,
+    }),
     methods: {
       closeItem() {
         let $this = this;
         let session = $this.session;
-        $this.$store.dispatch(CHAT_ACTION_CLOSE, session);
+        $this.$store.dispatch(CHAT_ACTION_CLOSE, {session});
+
+        let route = $this.$route;
+        if (route.name ==='chat' && route.params.session === 'session') {
+          let next = popNextRoute($this);
+          $this.$router.push(next);
+        }
       },
-      getUnread() {
+      refreshUnread() {
         let $this = this;
         let session = $this.session;
         let chat;
@@ -58,29 +68,40 @@
           chat = $this.$store.state.chat.incoming[session];
         }
 
-        return chat.unread > 9 ? '..' : chat.unread;
+        $this.unread = chat.unread;
       },
     },
     computed: {
+      chatUnread() {
+        return this.$store.state.chat.unread;
+      },
+      content () {
+        let unread = this.unread;
+        return unread > 9 ? '..' : unread;
+      },
       to () {
         let session = this.session;
         return {name:'chat', params:{session}}
       },
       isAlive () {
         let $this = this;
-        return $this.session === $this.$store.state.chat.alive;
-      },
-
-      dot () {
-        return this.chat.unread < 0;
+        return $this.session === $this.alive;
       },
       offsetX() {
-        return this.dot ? 25 : 28;
+        return !this.connected ? 25 : 28;
       },
       offsetY() {
-        return this.dot ? 20 : 25;
+        return !this.connected ? 20 : 25;
       },
     },
+    watch : {
+      chatUnread(newVal, oldVal) {
+        if (newVal !== oldVal) {
+          this.refreshUnread();
+        }
+        console.log(newVal, oldVal);
+      }
+    }
   }
 </script>
 

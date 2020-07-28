@@ -24,7 +24,7 @@
     },
     mounted () {
       let $this = this;
-      if ($this.session === $this.$store.state.chat.alive) {
+      if ($this.session === $this.$route.params.session) {
         $this.play();
       }
     },

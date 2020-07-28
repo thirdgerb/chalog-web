@@ -150,10 +150,10 @@ export class MessageBatch {
       return '';
     }
 
-    let mode = this.mode;
-    if (mode !== BATCH_MODE_SELF && mode !== BATCH_MODE_SYSTEM) {
-      return this.creatorName + ':' + brief;
-    }
+    // let mode = this.mode;
+    // if (mode !== BATCH_MODE_SELF && mode !== BATCH_MODE_SYSTEM) {
+    //   return this.creatorName + ':' + brief;
+    // }
     return brief;
   }
 }

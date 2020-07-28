@@ -40,6 +40,7 @@
 </template>
 <script>
   import LoginPanel from '../components/LoginPanel';
+  import {popNextRoute} from "../utils";
 
   export default {
     name: "Index",
@@ -57,16 +58,16 @@
         }, 300);
       }
     },
-    mounted() {
-      let $this = this;
-
-      // 稍微延迟一下再打开.
-      setTimeout(function() {
-        // 进入当前页面.
-        if (!$this.$store.getters.token) {
-          $this.login = true;
-        }
-      }, 1000);
+    beforeRouteEnter(to, from, next) {
+      next((vm) => {
+        // 稍微延迟一下再打开.
+        setTimeout(function() {
+          // 进入当前页面.
+          if (!vm.$store.getters.token) {
+            vm.login = true;
+          }
+        }, 1000);
+      });
     },
     computed : {
       appSlogan() {
@@ -80,7 +81,8 @@
       goAlive() {
         let $this = this;
         if ($this.$store.getters.isUserLogin) {
-          $this.$router.push($this.$store.getters.popNextRoute);
+          let next = popNextRoute($this);
+          $this.$router.push(next);
         }
       }
     }

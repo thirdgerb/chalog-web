@@ -78,9 +78,10 @@
           }
         },
         logout() {
-          this.$store.dispatch(USER_ACTION_LOGOUT);
+          let $this = this;
+          $this.$store.dispatch(USER_ACTION_LOGOUT);
+          $this.$router.replace({name:'index'});
         }
-
       },
 
   }

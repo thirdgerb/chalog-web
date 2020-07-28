@@ -7,8 +7,18 @@ import {bili} from './store/bili';
 import {chat} from './store/chat';
 import {emitter} from './store/emitter';
 import {socket} from "./store/socket";
+import {BILI_RESET, CHAT_RESET, STORE_ACTION_RESET_ALL, USER_RESET} from "./constants";
 
 Vue.use(Vuex);
+
+const reset = () => ({
+  next : {
+    name: 'scene',
+    params: {
+      scene: 'commune',
+    }
+  }
+});
 
 
 export const store = new Vuex.Store({
@@ -20,26 +30,14 @@ export const store = new Vuex.Store({
     emitter,
     socket,
   },
-  state: {
-    next: null,
-  },
-  getters: {
-    popNextRoute(state) {
-      if (state.next) {
-        let next = state.next;
-        state.next = null;
-        return next;
-      }
-      let session = state.chat.alive
-        || state.chat.connectedSessions[0]
-        || state.chat.incomingSessions[0];
-      if (session) {
-        return {name:'chat', params:{session}};
-      } else {
-        return {name:'chatIndex'};
-      }
-    },
-  },
+  state: reset(),
   actions : {
+
+    [STORE_ACTION_RESET_ALL] ({state, commit}) {
+      Object.assign(state, reset());
+      commit(USER_RESET);
+      commit(CHAT_RESET);
+      commit(BILI_RESET);
+    }
   }
 });

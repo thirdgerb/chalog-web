@@ -8,19 +8,25 @@ import {
   CHAT_INIT_MENU,
 
   EMITTER_ACTION_JOIN_ALL,
-  EMITTER_ACTION_QUERY_CHATS, EMITTER_ACTION_LEAVE_ALL
+  EMITTER_ACTION_QUERY_CHATS,
+  EMITTER_ACTION_LEAVE_ALL,
+  EMITTER_ACTION_USER_LOGOUT,
+  USER_RESET,
+  STORE_ACTION_RESET_ALL
 } from '../constants';
 
 import Cookies from "js-cookie";
 
-export const cookieOption = {expires: 2, SameSite:'Strict'};
+const cookieOption = {expires: 2, SameSite:'Strict'};
+
+const reset = () => ({
+  id : '',
+  name : '',
+  token : '',
+});
 
 export const user = {
-  state: () => ({
-    id : '',
-    name : '',
-    token : '',
-  }),
+  state: reset(),
   getters: {
     // 代表服务端已经发送了正确的 LOGIN 响应.
     isUserLogin: (state) => {
@@ -40,6 +46,10 @@ export const user = {
       state.name = name;
       state.token = token;
       Logger.debug("user_setter " + id);
+    },
+
+    [USER_RESET] (state) {
+      Object.assign(state, reset());
     }
   },
   actions: {
@@ -72,23 +82,20 @@ export const user = {
 
     /**
      * 用户退出.
-     * @param commit
-     * @param dispatch
      */
-    async [USER_ACTION_LOGOUT] ({commit, dispatch}) {
+    async [USER_ACTION_LOGOUT] ({dispatch, rootState}) {
 
       // 提示 leave
       await dispatch(EMITTER_ACTION_LEAVE_ALL);
+      await dispatch(EMITTER_ACTION_USER_LOGOUT);
 
-      commit(USER_SETTER, {id:'', name:'', token:''});
 
       Cookies.remove('token');
-
+      rootState.next = null;
       // 清空本地缓存.
       await localStorage.clear();
 
-      // 重进入页面.
-      window.location.reload();
+      dispatch(STORE_ACTION_RESET_ALL);
     },
 
   }

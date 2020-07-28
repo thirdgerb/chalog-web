@@ -1,4 +1,11 @@
 <template>
+  <v-footer
+  fixed
+  app
+  dense
+  padless
+  inset
+  >
     <div class="chat-input" >
       <v-text-field ref="inputbox" placeholder="请输入..."
       v-model="message"
@@ -25,6 +32,7 @@
       v-on:blur="clearError"
       ></v-text-field>
     </div>
+ </v-footer>
 </template>
 
 <script>
@@ -40,6 +48,11 @@
 
   export default {
     name: "ChatInput",
+    props: {
+      alive : {
+        type: Object,
+      }
+    },
     data() {
       return {
         message: '',
@@ -102,25 +115,19 @@
         if ($this.botChanging) {
           return;
         }
-
         $this.botChanging = true;
         setTimeout(function(){
           $this.botChanging = false;
-        }, 4000);
+        }, 2000);
 
-        let alive = $this.$store.getters.aliveChat;
-
-        if (!alive) {
-          return;
-        }
-
-        // 切换到人工的话, 给管理员发消息
-        let bot = !alive.bot;
         $this.$store.dispatch(
           CHAT_ACTION_TOGGLE_MANUAL,
-          {bot, scene:alive.scene, session:alive.session}
+          {
+            session: $this.alive.session,
+            alive: $this.alive.session,
+            bot : null
+          }
         );
-
       },
     },
     computed: {
@@ -131,10 +138,9 @@
         return this.busy;
       },
       prependIcon() {
-        let alive = this.$store.getters.aliveChat;
-        if (!alive) {
-          return;
-        }
+        let $this = this;
+        let alive = $this.alive;
+
         return alive.bot ?  'mdi-robot' : 'mdi-face-agent';
       }
     }

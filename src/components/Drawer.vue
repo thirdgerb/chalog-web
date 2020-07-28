@@ -19,6 +19,7 @@
            v-for="chat in connected"
            :session="chat.session"
            :connected="true"
+           :alive="alive"
            :chat="chat"
            :key="chat.session"
         ></chat-item>
@@ -32,6 +33,8 @@
            :session="chat.session"
            :connected="false"
            :chat="chat"
+           :unread="chat.unread"
+           :alive="alive"
            :key="chat.session"
         ></chat-item>
       </v-list-item-group>
@@ -50,6 +53,7 @@
       components : {
         ChatItem
       },
+      props: ['alive', 'updated'],
       computed : {
         title() {
           return this.$store.state.user.name || process.env.VUE_APP_TITLE;
@@ -61,9 +65,6 @@
           set (val) {
             this.$store.commit(LAYOUT_DRAWER_TOGGLE, val);
           }
-        },
-        alive() {
-            return this.$store.state.chat.alive;
         },
         connected () {
           let chats = this.$store.state.chat;

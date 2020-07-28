@@ -16,12 +16,15 @@
 </template>
 
 <script>
+  import {popNextRoute} from "../utils";
+
   export default {
     name: "NotFound",
     methods : {
       goAlive() {
         let $this = this;
-        return $this.$router.replace({name : 'index'});
+        let next = popNextRoute($this);
+        return $this.$router.replace(next);
       }
     }
   }

@@ -35,14 +35,13 @@
             </div>
         </div>
     </div>
-
 </template>
 <script>
   import BatchItem from "./BatchItem";
 
   export default {
     name: "ChatList",
-    props : ['chat'],
+    props : ['chat', 'count'],
     components: {
       BatchItem,
     },
@@ -54,7 +53,7 @@
     computed : {
       session() {
         return this.chat.session;
-      }
+      },
     }
   }
 </script>

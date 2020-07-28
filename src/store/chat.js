@@ -4,7 +4,7 @@ import Logger from 'js-logger';
 import {
   CHAT_DELETE,
   CHAT_COMMIT_MESSAGE,
-  CHAT_SET_ALIVE,
+  CHAT_ACTION_CONNECT_INCOMING,
   CHAT_TOGGLE_MANUAL,
   CHAT_INIT_MENU,
   CHAT_RESET_UNREAD,
@@ -16,7 +16,12 @@ import {
   EMITTER_ACTION_JOIN,
   CHAT_MERGE_MESSAGES,
   EMITTER_ACTION_QUERY_MESSAGES,
-  CHAT_ACTION_TOGGLE_MANUAL, LAYOUT_SNACK_BAR_TOGGLE, EMITTER_ACTION_MANUAL, CHAT_ACTION_CLOSE, EMITTER_ACTION_LEAVE,
+  CHAT_ACTION_TOGGLE_MANUAL,
+  LAYOUT_SNACK_BAR_TOGGLE,
+  EMITTER_ACTION_MANUAL,
+  CHAT_ACTION_CLOSE,
+  EMITTER_ACTION_LEAVE,
+  CHAT_RESET,
 
 } from '../constants';
 
@@ -40,9 +45,7 @@ export function createConversation(
 
   bot = !!bot;
   title = title || scene;
-  if (icon) {
-    icon = 'mdi-' + icon;
-  } else {
+  if (!icon) {
     icon = bot ? 'mdi-robot' : 'mdi-forum';
   }
   closable = !!closable;
@@ -69,6 +72,7 @@ export function createConversation(
     batches: [],
     // 最后消息
     lastMessage: '',
+    count: 0,
   }
 }
 
@@ -79,10 +83,10 @@ export function saveConnectedToStorage(connected, storageKey) {
     return;
   }
 
-  let save = {};
+  let save = [];
   for (let key of Object.keys(connected)) {
     let chat = connected[key];
-    save[key] = {
+    save.push({
       title: chat.title,
       scene: chat.scene,
       icon: chat.icon,
@@ -91,12 +95,12 @@ export function saveConnectedToStorage(connected, storageKey) {
       bot: chat.bot,
       context : {},
       suggestions : {},
-      unread : 0,
       updatedAt : chat.updatedAt,
       batches: [],
+      unread: 0,
       lastMessage: chat.lastMessage,
       hasElderMessages: true,
-    };
+    });
   }
   localStorage.setItem(storageKey, JSON.stringify(save));
 }
@@ -114,6 +118,7 @@ export function insertSession(sessions, session, max = 100) {
   }
   sessions.unshift(session);
   sessions.slice(0, max);
+  console.log('insert session', sessions);
   return sessions;
 }
 
@@ -142,23 +147,21 @@ export function mergeBatches(chat, batches) {
 }
 
 export function getUnread(batch) {
-  return batch.messages.length;
+  if (batch.isNew) {
+    return batch.messages.length;
+  }
+  return 0;
 }
 
-export const initChat = () => ({
-  // 已连接的会话
-  alive: null,
-  unread: 0,
-  connectedSessions: [],
-  incomingSessions: [],
-  connected: {},
-  incoming: {},
-});
 
-export function countUnread(connected) {
-  let connectedArr = Object.values(connected);
+export function countUnread(state) {
+  let connectedArr = Object.values(state.connected);
   let unread = 0;
   for(let c of connectedArr) {
+    unread = unread + c.unread;
+  }
+
+  for (let c of Object.values(state.incoming)) {
     unread += c.unread;
   }
   return unread;
@@ -170,6 +173,7 @@ export function pushNewBatchToChat(batch, chat) {
   chat.batches.push(batch);
   chat.updatedAt = batch.createdAt;
   chat.lastMessage = batch.lastMessage;
+  chat.count = chat.batches.length;
   return chat;
 }
 
@@ -187,24 +191,28 @@ export function mergeBatchToChat(batch, chat) {
   batches.sort((a, b) => {
     return a.createdAt - b.createdAt;
   });
+  chat.count = chat.batches.length;
   return chat;
 }
 
+const reset = () => ({
+  // 已连接的会话
+  unread: 0,
+  updated: '',
+  connectedSessions: [],
+  incomingSessions: [],
+  connected: {},
+  incoming: {},
+  init: false, // 是否已经完成初始化.
+});
+
 export const chat = {
-  state: () => {
-    return initChat();
-  },
-  getters : {
-    aliveChat(state) {
-      let alive = state.alive;
-      if (alive) {
-        return state.connected[alive];
-      }
-      return null;
-    },
-  },
+  state: reset(),
 
   mutations : {
+    [CHAT_RESET] (state) {
+      Object.assign(state, reset());
+    },
     /**
      * 切换当前会话的 bot 属性.
      */
@@ -237,9 +245,14 @@ export const chat = {
         localStorage.clear();
 
       } else {
-        Object.assign(state.connected, JSON.parse(connected));
+        let unserialized = JSON.parse(connected);
+        let saved = Object.values(unserialized);
+        for (let c of saved) {
+          state.connected[c.session] = createConversation(c, userId);
+        }
       }
 
+      state.unread = countUnread(state);
       state.incomingSessions = Object.values(state.incoming)
         .sort((a, b) => a.updatedAt - b.updatedAt)
         .map((c) => c.session);
@@ -247,49 +260,8 @@ export const chat = {
       state.connectedSessions = Object.values(state.connected)
         .sort((a, b) => a.updatedAt - b.updatedAt)
         .map((c) => c.session);
-
-      state.alive = state.connectedSessions[0];
     },
 
-    /**
-     * 设置session 为当前session
-     * @param state
-     * @param {string} session
-     */
-    [CHAT_SET_ALIVE] (state, session) {
-
-      if (session === state.alive) {
-        return;
-      }
-
-      // 如果是已连接会话.
-      let con = state.connected[session];
-      if (con) {
-        state.alive = session;
-        con.unread = 0;
-        state.unread = countUnread(state.connected);
-        return;
-      }
-
-      con = state.incoming[session];
-      if (con) {
-        delete state.incoming[session];
-
-        let i = state.incomingSessions.indexOf(session);
-        state.incomingSessions.splice(i, 1);
-
-        // 变更 con 所属位置.
-        con.unread = 0;
-        state.connected[session] = con;
-        state.connectedSessions.unshift(session);
-        state.alive = session;
-
-        saveConnectedToStorage(state.connected, localStorageKey);
-        return;
-      }
-
-      Logger.warn('session ' + session + ' not exists');
-    },
 
     /**
      * 删除一个 chat
@@ -305,8 +277,6 @@ export const chat = {
         delete state.connected[session];
         let i = state.connectedSessions.indexOf(session);
         state.connectedSessions.splice(i, 1);
-
-        console.log('delete connected');
       }
 
       // 删除 incoming 对象.
@@ -315,10 +285,13 @@ export const chat = {
         delete state.incoming[session];
         let i = state.incomingSessions.indexOf(session);
         state.incomingSessions.splice(i, 1);
-        console.log('delete incoming');
       }
     },
 
+    /**
+     * 主动要求保存
+     * @param state
+     */
     [CHAT_CACHE_CONNECTED] (state) {
       saveConnectedToStorage(state.connected, localStorageKey);
     },
@@ -327,21 +300,22 @@ export const chat = {
      * 合并一个 Chat 的信息
      */
     [CHAT_ADD_INFO] (state, {chat, connect}) {
+      console.log('chat_add_info' , chat.scene);
       let session = chat.session;
       // auto join connected 先加入.
       if (connect) {
         state.connected[session] = chat;
-        // 如果没有 alive, 直接加入.
-        if (!state.alive) {
-          state.alive = session;
-        }
-        state.unread = countUnread(state.connected);
         insertSession(state.connectedSessions, session);
-        // 不需要动排序.
+        state.unread = countUnread(state);
       } else {
         // 添加一个新会话. 会改变排序.
+        if (state.init) {
+          chat.unread += 1;
+        }
         state.incoming[session] = chat;
         insertSession(state.incomingSessions, session);
+        state.unread = countUnread(state);
+        state.updated = session;
       }
 
     },
@@ -372,7 +346,8 @@ export const chat = {
         chat = mergeBatchToChat(batch, chat);
       }
 
-      state.unread = countUnread(state.connectedSessions);
+      state.unread = countUnread(state);
+      state.updated = session;
       insertSession(state.connectedSessions, session);
     },
 
@@ -415,9 +390,14 @@ export const chat = {
         chat.unread += unread;
       }
 
+      // 说明有新消息
+      if (unread) {
+        state.updated = session;
+      }
 
       state.connected[session] = chat;
-      state.unread = countUnread(state.connected);
+      state.unread = countUnread(state);
+      chat.count = chat.batches.length;
       insertSession(state.connectedSessions, session);
     },
 
@@ -425,7 +405,7 @@ export const chat = {
       let con = state.connected[session];
       if (con) {
         con.unread = 0;
-        state.unread = countUnread(state.connected);
+        state.unread = countUnread(state);
       }
     },
   },
@@ -438,10 +418,6 @@ export const chat = {
     async [CHAT_ACTION_INFO_MERGE] ({state, commit, dispatch, rootState}, chat) {
       let userId = rootState.user.id;
       let session = chat.session;
-
-      if (!state.alive) {
-        state.alive = session;
-      }
 
       let con = state.connected[session];
       if (con) {
@@ -457,7 +433,7 @@ export const chat = {
 
       con = state.incoming[session];
       if (con) {
-        state.incoming[session].unread = -1;
+        await commit(CHAT_ADD_INFO, {chat:con, connect:false});
       } else {
         let merge = createConversation(chat, userId);
         await commit(CHAT_ADD_INFO, {chat:merge, connect:false});
@@ -498,25 +474,36 @@ export const chat = {
 
     /**
      * 给一个 chat 开启人工.
+     * @param commit
+     * @param state
+     * @param dispatch
+     * @param {string} session
+     * @param {boolean|null} bot
+     * @param {string} alive
      */
-    [CHAT_ACTION_TOGGLE_MANUAL] ({commit, state, dispatch}, {session, bot}) {
+    [CHAT_ACTION_TOGGLE_MANUAL] ({commit, state, dispatch}, {session, bot, alive}) {
 
       let con = state.connected[session];
       if (!con) {
         return;
       }
 
+      // 表示取反.
+      if (bot === null) {
+        bot = !con.bot;
+      }
+
       // 告知服务端转人工.
-      if (!bot) {
+      if (bot === false) {
         dispatch(EMITTER_ACTION_MANUAL, {scene:con.scene, session:con.session});
       }
 
       // 提交当前改动.
       commit(CHAT_TOGGLE_MANUAL, {session, bot});
-
-      let alive = state.alive;
-      if (session === alive) {
-        commit(LAYOUT_SNACK_BAR_TOGGLE, bot ? '切换到机器人': '切换到群聊');
+      if (alive === session) {
+        let info = bot ? '切换到机器人': '切换到群聊';
+        console.log(info);
+        commit(LAYOUT_SNACK_BAR_TOGGLE, info);
       }
     },
 
@@ -536,6 +523,39 @@ export const chat = {
         commit(LAYOUT_SNACK_BAR_TOGGLE, info);
         Logger.error(info);
       }
-    }
+    },
+    /**
+     * 尝试连接一个 incoming 位置的 session
+     */
+    [CHAT_ACTION_CONNECT_INCOMING] ({state, dispatch}, session) {
+
+      // 如果是已连接会话.
+      let con = state.connected[session];
+      if (con) {
+        return;
+      }
+
+      con = state.incoming[session];
+      if (con) {
+        delete state.incoming[session];
+
+        let i = state.incomingSessions.indexOf(session);
+        state.incomingSessions.splice(i, 1);
+
+        // 变更 con 所属位置.
+        con.unread = 0;
+        state.connected[session] = con;
+
+        dispatch(EMITTER_ACTION_JOIN, {session, scene:con.scene});
+
+        insertSession(state.connectedSessions, session);
+        countUnread(state);
+        saveConnectedToStorage(state.connected, localStorageKey);
+        return;
+      }
+
+      Logger.warn('session ' + session + ' not exists');
+    },
+
   }
 };

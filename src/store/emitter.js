@@ -19,7 +19,7 @@ import {
   EMITTER_ACTION_QUERY_CHATS,
   EMITTER_ACTION_QUERY_SCENE,
 
-  EMITTER_ACTION_MANUAL,
+  EMITTER_ACTION_MANUAL, EMITTER_ACTION_USER_LOGOUT,
 
 } from '../constants';
 import {BATCH_MODE_SYSTEM} from "../socketio/MessageBatch";
@@ -51,7 +51,7 @@ export const emitter = {
     [EMITTER_ACTION_REQUEST] ({rootState}, [event, proto, trace]) {
       let token = rootState.user.token;
       let request = new Request({trace, proto, token});
-      Logger.debug('emit ' + event + ':' + JSON.stringify(request));
+      // Logger.debug('emit ' + event + ':' + JSON.stringify(request));
       window.socket.emit(event, request);
     },
 
@@ -220,10 +220,12 @@ export const emitter = {
     /**
      * 转人工通知.
      */
-    [EMITTER_ACTION_MANUAL] ({dispatch}, {manual, scene, session}) {
-      if (manual) {
-        dispatch(EMITTER_ACTION_REQUEST, ['MANUAL', {scene, session}]);
-      }
+    [EMITTER_ACTION_MANUAL] ({dispatch}, {scene, session}) {
+      dispatch(EMITTER_ACTION_REQUEST, ['MANUAL', {scene, session}]);
+    },
+
+    [EMITTER_ACTION_USER_LOGOUT] ({dispatch}) {
+      dispatch(EMITTER_ACTION_REQUEST, ['USER_LOGOUT', {}]);
     }
   }
 };

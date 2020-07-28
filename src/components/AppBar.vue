@@ -9,7 +9,7 @@
         abusolute
     >
         <v-badge
-        v-if="isLogin"
+        v-if="isAtChat"
         avatar
         dot
         :value="unread > 0 "
@@ -35,6 +35,9 @@
       name: "AppBar",
 
         computed: {
+          isAtChat() {
+            return this.$route.name === 'chat';
+          },
           isLogin() {
             return this.$store.getters.isUserLogin;
           },
@@ -55,8 +58,14 @@
             if (!$this.isLogin) {
               return version;
             }
-            let chat = $this.$store.getters.aliveChat;
-            return chat ? chat.title : version;
+
+            if ($this.$route.name === 'chat') {
+              let session = $this.$route.params.session;
+              let chat = $this.$store.state.chat.connected[session];
+              return chat ? chat.title : version;
+            }
+
+            return version;
           }
         },
         methods: {

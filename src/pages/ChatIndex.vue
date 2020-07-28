@@ -9,14 +9,14 @@
                     align="center"
                     justify="center"
             >
-                <h1>{{ description }}</h1>
+                <h3>{{ description }}</h3>
             </v-row>
         </v-container>
     </v-main>
 </template>
 
 <script>
-  import {intendTo} from "../utils";
+  import {intendTo, popNextRoute} from "../utils";
 
   export default {
     name: "ChatIndex",
@@ -34,7 +34,8 @@
     methods: {
       goAlive() {
           let $this = this;
-          $this.$router.push($this.$store.getters.popNextRoute);
+          let next = popNextRoute($this);
+          $this.$router.push(next);
       }
     }
   }
