@@ -8,7 +8,7 @@
   >
     <div class="chat-input" >
       <v-text-field ref="inputbox"
-      :placeholder="alive.hasElderMessages ? 'true' : 'false'"
+      placeholder="请输入..."
       v-model="message"
       rows="1"
       outlined
