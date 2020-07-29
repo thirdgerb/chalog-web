@@ -20,13 +20,14 @@
             </div>
         </div>
 
+        {{ JSON.stringify(chat.context) }}
         <!-- suggestion -->
-        <div class="chat-row chat-say chat-suggestion"
-             :class="{'selected':true}">
+        <div class="chat-row chat-say chat-suggestion">
             <div class="chat-content">
                 <v-btn class="chat-bubble" text
-                  v-for="(suggestion, index) in chat.suggestions"
+                  v-for="(suggestion, index) in suggestions"
                   :key="index"
+                  @click="select(suggestion)"
                 >{{ suggestion }}</v-btn>
             </div>
         </div>
@@ -34,10 +35,13 @@
 </template>
 <script>
   import BatchItem from "./BatchItem";
+  import {TextMessage} from "../socketio/Message";
 
   export default {
     name: "ChatList",
     props : ['chat', 'count'],
+    data : () => ({
+    }),
     components: {
       BatchItem,
     },
@@ -45,11 +49,22 @@
       getBatches() {
         return Object.values(this.chat.batches);
       },
+      select(suggestion) {
+
+        let $this = this;
+        let message = TextMessage.create(suggestion);
+
+        $this.$emit('deliver-message', message);
+        $this.chat.suggestions = [];
+      }
     },
     computed : {
       session() {
         return this.chat.session;
       },
+      suggestions() {
+        return Object.values(this.chat.suggestions);
+      }
     }
   }
 </script>

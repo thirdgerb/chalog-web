@@ -15,6 +15,7 @@
                     :key="chat.session"
                     :chat="chat"
                     :count="chat.count"
+                    v-on:deliver-message="deliverMessage"
                 >
                 </chat-list>
             </div>
@@ -130,9 +131,7 @@
         let $this = this;
         $this.aliveChat = chat;
         $this.refreshConnected();
-        setTimeout(function() {
-          $this.rollToTheBottom(chat.session, true);
-        }, 200);
+        $this.rollToTheBottom(chat.session, true);
       },
       /**
        * 监控滚动.
@@ -198,11 +197,13 @@
         if (!force && !$this.isAtBottom) {
           return;
         }
-
         $this.$store.commit(CHAT_RESET_UNREAD, session);
-        // 做一个判断逻辑.
-        let target = document.documentElement.offsetHeight - 15;
-        $this.$vuetify.goTo(target);
+
+        setTimeout(function() {
+          // 做一个判断逻辑.
+          let target = document.documentElement.offsetHeight - 5;
+          $this.$vuetify.goTo(target);
+        }, 200);
       },
       /**
        * @param {Message} message
@@ -222,8 +223,6 @@
           return;
         }
 
-        $this.$store.dispatch(EMITTER_ACTION_DELIVER_MESSAGE, {message, session});
-
         // 提交消息到当前列表.
         let batch = MessageBatch.createByMessage(
           session,
@@ -234,6 +233,11 @@
         $this.$store.commit(
           CHAT_COMMIT_MESSAGE,
           batch
+        );
+
+        $this.$store.dispatch(
+          EMITTER_ACTION_DELIVER_MESSAGE,
+          {message, session, query: $this.$route.query}
         );
 
         $this.rollToTheBottom(session, true);

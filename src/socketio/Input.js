@@ -6,9 +6,10 @@ export default class Input {
   scene;
   bot;
   message;
+  query;
   createdAt;
 
-  constructor({session, scene, bot}, message) {
+  constructor({session, scene, bot }, message, query) {
     if (!(message instanceof Message)) {
       throw new Error('message is not instance of Message:' + message);
     }
@@ -17,5 +18,6 @@ export default class Input {
     this.scene = scene;
     this.bot = bot;
     this.createdAt = Date.parse((new Date()).toString()) / 1000;
+    this.query = query;
   }
 }

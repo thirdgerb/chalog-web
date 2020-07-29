@@ -24,6 +24,7 @@ import {
   CHAT_RESET,
 
 } from '../constants';
+import {BATCH_MODE_BOT} from "../socketio/MessageBatch";
 
 let localStorageKey = null;
 
@@ -165,12 +166,20 @@ export function countUnread(state) {
 }
 
 export function pushNewBatchToChat(batch, chat) {
+  console.log(batch);
   // 消息变更.
-  chat.unread += getUnread(batch);
   chat.batches.push(batch);
+  chat.unread += getUnread(batch);
   chat.updatedAt = batch.createdAt;
   chat.lastMessage = batch.lastMessage;
   chat.count = chat.batches.length;
+  if (batch.mode === BATCH_MODE_BOT) {
+    chat.suggestions = batch.suggestions;
+    chat.context = batch.context;
+  } else {
+    chat.suggestions = [];
+  }
+
   return chat;
 }
 
@@ -334,8 +343,10 @@ export const chat = {
         return;
       }
 
+
       // 将 batch 的信息提交给 chat
-      if (batch.createdAt > chat.updatedAt) {
+      console.log('time', batch.createdAt, chat.updatedAt);
+      if (batch.createdAt >= chat.updatedAt) {
         chat = pushNewBatchToChat(batch, chat);
       // 有可能是老消息, 所以用 merge 的逻辑.
       } else {
