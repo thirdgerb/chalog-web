@@ -1,11 +1,13 @@
 <template>
     <div class="chat-content" :class="{'chat-pick': picked}">
-        <span class="chat-bubble">{{ message.text }}</span>
+        <span v-if="!rendered" class="chat-bubble">{{ text }}</span>
+        <span v-if="rendered" class="chat-bubble" v-html="rendered"></span>
     </div>
 </template>
 
 <script>
     import {TextMessage} from "../socketio/Message";
+    import {markdown} from "markdown";
 
     export default {
     name: "MessageText",
@@ -15,9 +17,23 @@
       picked : {
         type: Boolean,
         default: false
-      }
+      },
+    },
+    data: () => ({
+      text : '',
+      rendered: '',
+    }),
+    mounted() {
+      let $this = this;
+      let messageText = $this.message.text;
+      $this.text = messageText;
 
+      let lines = messageText.split("\n");
+      if (lines.length > 1) {
+        $this.rendered = markdown.toHTML(messageText);
+      }
     }
+
   }
 </script>
 

@@ -7,7 +7,7 @@ import {bili} from './store/bili';
 import {chat} from './store/chat';
 import {emitter} from './store/emitter';
 import {socket} from "./store/socket";
-import {BILI_RESET, CHAT_RESET, STORE_ACTION_RESET_ALL, USER_RESET} from "./constants";
+import {BILI_RESET, CHAT_RESET, STORE_ACTION_RESET_ALL, USER_RESET,LAYOUT_RESET} from "./constants";
 
 Vue.use(Vuex);
 
@@ -38,6 +38,7 @@ export const store = new Vuex.Store({
       commit(USER_RESET);
       commit(CHAT_RESET);
       commit(BILI_RESET);
+      commit(LAYOUT_RESET);
     }
   }
 });

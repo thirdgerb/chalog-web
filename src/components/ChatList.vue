@@ -19,16 +19,14 @@
             </span>
             </div>
         </div>
-
-        {{ JSON.stringify(chat.context) }}
         <!-- suggestion -->
         <div class="chat-row chat-say chat-suggestion">
             <div class="chat-content">
                 <v-btn class="chat-bubble" text
-                  v-for="(suggestion, index) in suggestions"
+                  v-for="(suggestion, index) in suggestionList"
                   :key="index"
                   @click="select(suggestion)"
-                >{{ suggestion }}</v-btn>
+                >{{ index }}{{ suggestion }}</v-btn>
             </div>
         </div>
     </div>
@@ -56,7 +54,7 @@
 
         $this.$emit('deliver-message', message);
         $this.chat.suggestions = [];
-      }
+      },
     },
     computed : {
       session() {
@@ -64,7 +62,23 @@
       },
       suggestions() {
         return Object.values(this.chat.suggestions);
-      }
+      },
+      suggestionList() {
+        let chat = this.chat;
+        let suggestions = chat.suggestions;
+        let keys = Object.keys(suggestions);
+        keys = keys.reverse();
+
+        let lists = {};
+        for (let key of keys) {
+          if (typeof(key) === 'number' || key.length < 3) {
+            lists['[' + key + '] '] = suggestions[key];
+          } else {
+            lists[key] = suggestions[key];
+          }
+        }
+        return lists;
+      },
     }
   }
 </script>

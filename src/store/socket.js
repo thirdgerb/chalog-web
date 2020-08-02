@@ -160,27 +160,12 @@ export const socket = {
      */
     SOCKET_ACTION_MESSAGES_MERGE({rootState, dispatch}, res) {
       getResponse('MESSAGES_MERGE', res, function({ session, limit, batches, forward }) {
-
-        batches = Object.values(batches);
-
-        let count = batches.length;
-        let chat = rootState.chat.connected[session];
-
-        if (!chat || !count) {
+        let userId = rootState.user.id;
+        if (!userId ) {
+          Logger.warn('invalid CHAT_ACTION_MESSAGES_MERGE user not exists ' + userId);
           return;
         }
 
-        let userId = rootState.user.id;
-        // 类型化.
-        batches = batches.map((c) => {
-          let b = new MessageBatch(c);
-
-          if (b.creatorId === userId) {
-            b.mode = BATCH_MODE_SELF;
-          }
-
-          return b;
-        });
         dispatch(
           CHAT_ACTION_MESSAGES_MERGE,
           {userId, session, limit, batches, forward}

@@ -4,20 +4,25 @@ import {
   LAYOUT_LOADING_TOGGLE,
   LAYOUT_MENU_TOGGLE,
   LAYOUT_SNACK_BAR_TOGGLE,
+  LAYOUT_RESET
 } from '../constants';
 
+const reset = () => ({
+  // 抽屉要在 app bar 操作.
+  drawer :null,
+  menu: false,
+
+  loading: false,
+
+  error: '',
+
+});
 export const layout = {
-  state: () => ({
-    // 抽屉要在 app bar 操作.
-    drawer :null,
-    menu: false,
-
-    loading: false,
-
-    error: '',
-  }),
-
+  state: reset(),
   mutations: {
+    [LAYOUT_RESET] (state) {
+      Object.assign(state, reset());
+    },
     /**
      * 开关.
      * @param state

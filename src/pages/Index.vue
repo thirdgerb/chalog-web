@@ -80,10 +80,12 @@
     methods : {
       goAlive() {
         let $this = this;
-        if ($this.$store.getters.isUserLogin) {
-          let next = popNextRoute($this);
-          $this.$router.push(next);
-        }
+        setTimeout(function() {
+          if ($this.$store.getters.isUserLogin) {
+            let next = popNextRoute($this);
+            $this.$router.push(next);
+          }
+        }, 200);
       }
     }
 

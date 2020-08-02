@@ -63,6 +63,7 @@
             return this.$store.state.layout.drawer;
           },
           set (val) {
+            console.log(val);
             this.$store.commit(LAYOUT_DRAWER_TOGGLE, val);
           }
         },
