@@ -194,10 +194,11 @@
       rollToTheBottom(session, force) {
 
         let $this = this;
+        $this.$store.commit(CHAT_RESET_UNREAD, session);
+
         if (!force && !$this.isAtBottom) {
           return;
         }
-        $this.$store.commit(CHAT_RESET_UNREAD, session);
 
         setTimeout(function() {
           // 做一个判断逻辑.
