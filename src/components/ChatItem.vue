@@ -23,7 +23,7 @@
         </v-badge>
         <v-list-item-content>
             <v-list-item-title>{{chat.title}}</v-list-item-title>
-            <v-list-item-subtitle style="color:grey">{{chat.lastMessage}}</v-list-item-subtitle>
+            <v-list-item-subtitle style="color:grey">{{lastMessage}}</v-list-item-subtitle>
         </v-list-item-content>
         <v-list-item-action>
             <v-btn
@@ -46,10 +46,7 @@
 
   export default {
     name: "ChatItem",
-    props : ['session', 'connected', 'chat', 'alive'],
-    data: () => ({
-      unread : 0,
-    }),
+    props : ['session', 'connected', 'chat', 'alive', 'unread', 'lastMessage'],
     methods: {
       closeItem() {
         let $this = this;
@@ -60,25 +57,9 @@
             let next = popNextRoute($this);
             $this.$router.push(next);
         }, 100);
-
-      },
-      refreshUnread() {
-        let $this = this;
-        let session = $this.session;
-        let chat;
-        if ($this.connected) {
-          chat = $this.$store.state.chat.connected[session];
-        } else {
-          chat = $this.$store.state.chat.incoming[session];
-        }
-
-        $this.unread = chat.unread;
       },
     },
     computed: {
-      chatUnread() {
-        return this.$store.state.chat.unread;
-      },
       content () {
         let unread = this.unread;
         return unread > 9 ? '..' : unread;
@@ -98,13 +79,6 @@
         return !this.connected ? 20 : 25;
       },
     },
-    watch : {
-      chatUnread(newVal, oldVal) {
-        if (newVal !== oldVal) {
-          this.refreshUnread();
-        }
-      }
-    }
   }
 </script>
 

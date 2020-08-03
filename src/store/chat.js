@@ -219,6 +219,7 @@ const reset = () => ({
   connected: {},
   incoming: {},
   init: false, // 是否已经完成初始化.
+  commit: 0,
 });
 
 export const chat = {
@@ -253,6 +254,7 @@ export const chat = {
     [CHAT_INIT_MENU] (state, userId) {
 
       localStorageKey = userId;
+      state.commit++;
       let connected = localStorage.getItem(localStorageKey);
 
       // 如果换身份登录, 把保存的全都删除.
@@ -286,6 +288,7 @@ export const chat = {
     [CHAT_DELETE] (state, session) {
 
       let con = state.connected[session];
+      state.commit++;
 
       // 删除连接中对象.
       if (con) {
@@ -316,6 +319,7 @@ export const chat = {
      */
     [CHAT_ADD_INFO] (state, {chat, connect}) {
       let session = chat.session;
+      state.commit++;
       // auto join connected 先加入.
       if (connect) {
         state.connected[session] = chat;
@@ -344,6 +348,7 @@ export const chat = {
         Logger.error(CHAT_COMMIT_MESSAGE + ' receive empty batch');
         return;
       }
+      state.commit++;
 
       let session = batch.session;
       let chat = state.connected[session];
@@ -372,7 +377,7 @@ export const chat = {
       if (!batches.length) {
         return;
       }
-
+      state.commit++;
       let chat = state.connected[session];
       if (!chat) {
         Logger.error(CHAT_MERGE_MESSAGES + ': session ' + session + ' not connected');
@@ -417,6 +422,7 @@ export const chat = {
 
     [CHAT_RESET_UNREAD] (state, session) {
       let con = state.connected[session];
+      state.commit++;
       if (con) {
         con.unread = 0;
         state.unread = countUnread(state);
