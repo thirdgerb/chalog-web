@@ -7,7 +7,7 @@
 
 <script>
     import {TextMessage} from "../socketio/Message";
-    import {markdown} from "markdown";
+    import marked from 'marked';
 
     export default {
     name: "MessageText",
@@ -29,17 +29,16 @@
       $this.text = messageText;
 
       if ($this.message.md) {
-        $this.rendered = markdown.toHTML(messageText);
+        $this.rendered = marked(messageText);
         return;
       }
 
       let lines = messageText.split("\n");
       if (lines.length > 1) {
         let output = lines.join("\n\n");
-        $this.rendered = markdown.toHTML(output);
+        $this.rendered = marked(output);
       }
-    }
-
+    },
   }
 </script>
 

@@ -24,7 +24,7 @@ import {
   CHAT_RESET,
 
 } from '../constants';
-import {BATCH_MODE_BOT, BATCH_MODE_SELF, MessageBatch} from "../socketio/MessageBatch";
+import {BATCH_MODE_BOT, BATCH_MODE_SELF, BATCH_MODE_SYSTEM, MessageBatch} from "../socketio/MessageBatch";
 
 let localStorageKey = null;
 
@@ -170,10 +170,13 @@ export function countUnread(state) {
 export function pushNewBatchToChat(batch, chat) {
   // 消息变更.
   chat.batches.push(batch);
-  chat.unread += getUnread(batch);
-  chat.updatedAt = batch.createdAt;
   chat.lastMessage = batch.lastMessage;
   chat.count = chat.batches.length;
+
+  if (batch.mode !== BATCH_MODE_SYSTEM) {
+    chat.updatedAt = batch.createdAt;
+    chat.unread += getUnread(batch);
+  }
 
   let isBot = batch.mode === BATCH_MODE_BOT;
   if (isBot && Object.keys(batch.suggestions).length > 0) {
@@ -394,9 +397,13 @@ export const chat = {
         if (batchIds.indexOf(b.batchId) >= 0) {
           continue;
         } else if (b.createdAt > originUpdatedAt){
-          chat.updatedAt = b.createdAt;
           chat.lastMessage = b.lastMessage;
-          unread += getUnread(b);
+          chat.updatedAt = b.createdAt;
+
+          // 合并的消息不轻易加红点
+          if (originUpdatedAt > 0) {
+            unread += getUnread(b);
+          }
         }
         chat.batches.push(b);
       }

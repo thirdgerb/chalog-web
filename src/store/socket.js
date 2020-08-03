@@ -14,7 +14,8 @@ import {
   CHAT_DELETE,
   EMITTER_ACTION_QUERY_MESSAGES,
 } from "../constants";
-import {BATCH_MODE_SELF, MessageBatch} from "../socketio/MessageBatch";
+import {BATCH_MODE_SELF, BATCH_MODE_SYSTEM, MessageBatch} from "../socketio/MessageBatch";
+import {TextMessage} from "../socketio/Message";
 
 export class Response {
 
@@ -104,9 +105,18 @@ export const socket = {
     /**
      * 连接到后, 立刻查询最新的消息以做合并.
      */
-    SOCKET_ACTION_JOINED_ROOM({dispatch}, res) {
-      getResponse('JOINED_ROOM', res, function({session}) {
-        dispatch(EMITTER_ACTION_QUERY_MESSAGES, {session, forward: true, limit:5});
+    SOCKET_ACTION_JOINED_ROOM({dispatch, commit, rootState}, res) {
+      getResponse('JOINED_ROOM', res, async function({session}) {
+        await dispatch(EMITTER_ACTION_QUERY_MESSAGES, {session, forward: true, limit:5});
+
+        let message = TextMessage.create("- 连接到会话 -");
+        let batch = MessageBatch.createByMessage(
+          session,
+          message,
+          rootState.user,
+          BATCH_MODE_SYSTEM
+        );
+        commit(CHAT_COMMIT_MESSAGE, batch);
       });
     },
 
