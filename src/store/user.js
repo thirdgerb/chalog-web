@@ -74,7 +74,7 @@ export const user = {
       await commit(USER_SETTER, {id, name, token});
 
       // 连接所有会话
-      await dispatch(EMITTER_ACTION_JOIN_ALL);
+      await dispatch(EMITTER_ACTION_JOIN_ALL, false);
 
       // 向服务端申请房间信息.
       dispatch(EMITTER_ACTION_QUERY_CHATS, {category:'', all:false});

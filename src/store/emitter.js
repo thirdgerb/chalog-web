@@ -73,8 +73,12 @@ export const emitter = {
     /**
      * 加入房间.
      */
-    [EMITTER_ACTION_JOIN] ({dispatch}, {scene, session}) {
-      dispatch(EMITTER_ACTION_REQUEST, ['JOIN', {scene, session}])
+    [EMITTER_ACTION_JOIN] ({dispatch}, {scene, session, rejoin}) {
+      if (rejoin) {
+        dispatch(EMITTER_ACTION_REQUEST, ['REJOIN', {scene, session}])
+      } else {
+        dispatch(EMITTER_ACTION_REQUEST, ['JOIN', {scene, session}])
+      }
     },
 
     /**
@@ -86,15 +90,17 @@ export const emitter = {
 
     /**
      * 加入所有已连接的房间.
+     *
      * @param dispatch
      * @param rootState
+     * @param rejoin
      */
-    [EMITTER_ACTION_JOIN_ALL] ({dispatch, rootState}) {
+    [EMITTER_ACTION_JOIN_ALL] ({dispatch, rootState}, rejoin) {
       let rooms = Object.values(rootState.chat.connected)
         .map(({scene, session}) => ({scene, session}));
 
       for (let room of rooms) {
-        dispatch(EMITTER_ACTION_JOIN, room);
+        dispatch(EMITTER_ACTION_JOIN, {scene:room.scene, session:room.session, rejoin});
       }
     },
 

@@ -68,12 +68,10 @@ export const socket = {
       if (!rootState.user.id) {
         return;
       }
-
       // 重连所有的会话.
       if (rootState.user.id) {
-        dispatch(EMITTER_ACTION_JOIN_ALL);
+        dispatch(EMITTER_ACTION_JOIN_ALL, true);
       }
-
     },
 
     /*----- 非系统事件. ------*/
