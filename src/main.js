@@ -6,6 +6,8 @@ import router from './router'
 import VueSocketIO from 'vue-socket.io'
 import io from "socket.io-client"
 import Logger from 'js-logger';
+import marked from 'marked';
+window.marked = marked;
 
 Logger.useDefaults();
 
@@ -35,5 +37,6 @@ new Vue({
   vuetify,
   store,
   router,
-  render: h => h(App)
+  render: h => h(App),
 }).$mount('#app');
+

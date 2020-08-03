@@ -26,5 +26,20 @@
     <div id="app">
     </div>
     <script src="//cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      // 不太熟悉 vue-cli, 用比较脏的方式传配置.
+      mermaid.initialize({ startOnLoad: false });
+      window.markedOption = {
+          renderer: {
+            code: function (code, lang) {
+              if (lang === "mermaid") {
+                return ('<div class="mermaid">' + mermaid.render(lang, code) + '</div>');
+              }
+              return this.origin.code.apply(this, arguments);
+            }
+          }
+      };
+    </script>
   </body>
+
 </html>

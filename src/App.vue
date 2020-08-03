@@ -59,6 +59,11 @@ export default {
       // 告知服务端.
       $this.$store.dispatch(EMITTER_ACTION_SIGN, {});
     }
+
+    // 用比较脏的方式传递配置...
+    if (window.markedOption) {
+      window.marked.setOptions(window.markedOption)
+    }
   },
   data: () =>({
     error:false,

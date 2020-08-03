@@ -170,10 +170,10 @@ export function countUnread(state) {
 export function pushNewBatchToChat(batch, chat) {
   // 消息变更.
   chat.batches.push(batch);
-  chat.lastMessage = batch.lastMessage;
   chat.count = chat.batches.length;
 
   if (batch.mode !== BATCH_MODE_SYSTEM) {
+    chat.lastMessage = batch.lastMessage;
     chat.updatedAt = batch.createdAt;
     chat.unread += getUnread(batch);
   }
