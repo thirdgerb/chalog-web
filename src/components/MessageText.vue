@@ -28,9 +28,15 @@
       let messageText = $this.message.text;
       $this.text = messageText;
 
+      if ($this.message.md) {
+        $this.rendered = markdown.toHTML(messageText);
+        return;
+      }
+
       let lines = messageText.split("\n");
       if (lines.length > 1) {
-        $this.rendered = markdown.toHTML(messageText);
+        let output = lines.join("\n\n");
+        $this.rendered = markdown.toHTML(output);
       }
     }
 

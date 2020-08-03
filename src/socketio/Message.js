@@ -55,15 +55,18 @@ export class Message {
 export class TextMessage extends Message{
 
   text = '';
+  md;
 
   /**
    *
    * @param text
    * @param id
+   * @param md
    */
-  constructor({text, id}) {
+  constructor({text, id, md}) {
     super(MESSAGE_TEXT, id);
     this.text = text;
+    this.md = !!md;
   }
 
   /**

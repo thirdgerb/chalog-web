@@ -75,6 +75,7 @@ export function createConversation(
     lastMessage: '',
     count: 0,
     hasElderMessages: true,
+    said : true,
   }
 }
 
@@ -102,6 +103,7 @@ export function saveConnectedToStorage(connected, storageKey) {
       unread: 0,
       lastMessage: chat.lastMessage,
       hasElderMessages: true,
+      said : true
     });
   }
   localStorage.setItem(storageKey, JSON.stringify(save));
@@ -172,12 +174,20 @@ export function pushNewBatchToChat(batch, chat) {
   chat.updatedAt = batch.createdAt;
   chat.lastMessage = batch.lastMessage;
   chat.count = chat.batches.length;
-  if (batch.mode === BATCH_MODE_BOT) {
+
+  let isBot = batch.mode === BATCH_MODE_BOT;
+  if (isBot && Object.keys(batch.suggestions).length > 0) {
     chat.suggestions = batch.suggestions;
-    chat.context = batch.context;
-  } else {
-    chat.suggestions = [];
+    chat.said = false;
   }
+  if (isBot && Object.keys(batch.context).length > 0) {
+    chat.context = batch.context;
+  }
+
+  if (batch.mode === BATCH_MODE_SELF) {
+    chat.said = true;
+  }
+
 
   return chat;
 }

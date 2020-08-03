@@ -20,7 +20,7 @@
             </div>
         </div>
         <!-- suggestion -->
-        <div class="chat-row chat-say chat-suggestion">
+        <div class="chat-row chat-say chat-suggestion" v-show="!chat.said">
             <div class="chat-content">
                 <v-btn class="chat-bubble" text
                   v-for="(suggestion, index) in suggestionList"
