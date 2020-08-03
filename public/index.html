@@ -29,16 +29,7 @@
     <script>
       // 不太熟悉 vue-cli, 用比较脏的方式传配置.
       mermaid.initialize({ startOnLoad: false });
-      window.markedOption = {
-          renderer: {
-            code: function (code, lang) {
-              if (lang === "mermaid") {
-                return ('<div class="mermaid">' + mermaid.render(lang, code) + '</div>');
-              }
-              return this.origin.code.apply(this, arguments);
-            }
-          }
-      };
+      window.mermaid= mermaid;
     </script>
   </body>
 

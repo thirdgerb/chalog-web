@@ -61,9 +61,19 @@ export default {
     }
 
     // 用比较脏的方式传递配置...
-    if (window.markedOption) {
-      window.marked.setOptions(window.markedOption)
-    }
+    let newRender = new window.marked.Renderer();
+    let originRender = new window.marked.Renderer();
+
+    newRender.code = function (code, lang) {
+      if (lang === "mermaid") {
+        return ('<div class="mermaid">' + window.mermaid.render(lang, code) + '</div>');
+      }
+      return originRender.code.apply(this, arguments);
+    };
+
+    window.marked.setOptions({
+      renderer: newRender
+    });
   },
   data: () =>({
     error:false,
