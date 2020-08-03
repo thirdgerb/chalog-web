@@ -8,7 +8,11 @@ import io from "socket.io-client"
 import Logger from 'js-logger';
 
 Logger.useDefaults();
-Logger.setLevel(process.env.VUE_APP_DEBUG ? Logger.DEBUG : Logger.WARN);
+
+const DEBUG = "true" === process.env.VUE_APP_DEBUG;
+let level = DEBUG ? Logger.DEBUG : Logger.WARN;
+Logger.setLevel(level);
+
 
 const option = {
   transports: ["websocket"]
@@ -17,7 +21,7 @@ const socket = io(process.env.VUE_APP_SOCKET_IO_CONNECTION, option);
 window.socket = socket;
 
 Vue.use(new VueSocketIO({
-    debug: process.env.VUE_APP_DEBUG,
+    debug: DEBUG,
     connection: socket,
     vuex: {
       store,
