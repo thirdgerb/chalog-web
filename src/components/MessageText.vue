@@ -34,7 +34,7 @@
 
       let lines = messageText.split("\n");
       if (lines.length > 1) {
-        let output = lines.join("\n\n");
+        let output = lines.join("<br>");
         $this.markdown = window.marked(output);
       }
     },
