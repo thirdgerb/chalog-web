@@ -13,9 +13,10 @@ import {
   EMITTER_ACTION_JOIN_ALL,
   CHAT_DELETE,
   EMITTER_ACTION_QUERY_MESSAGES,
+  BILI_NEW,
 } from "../constants";
 import {BATCH_MODE_SELF, BATCH_MODE_SYSTEM, MessageBatch} from "../socketio/MessageBatch";
-import {TextMessage} from "../socketio/Message";
+import {MESSAGE_BILI, TextMessage} from "../socketio/Message";
 
 export class Response {
 
@@ -155,11 +156,16 @@ export const socket = {
           batch.mode = BATCH_MODE_SELF;
         }
 
+        for (let m of batch.messages) {
+          if (m.type === MESSAGE_BILI) {
+            commit(BILI_NEW);
+          }
+        }
+
         commit(
           CHAT_COMMIT_MESSAGE,
           batch
         );
-
       });
     },
 

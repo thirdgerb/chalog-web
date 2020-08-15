@@ -1,15 +1,20 @@
 <template>
-    <div class="chat-content">
-        <span class="chat-bubble">
-            <v-btn
-                class="mx-2 red lighten-1" dark large
-                @click.stop="play"
-            >
-                <v-icon dark>mdi-play-box</v-icon>
-            </v-btn>
-        </span>
+    <div>
+        <div class="chat-content">
+            <span class="chat-bubble" v-html="text">
+            </span>
+        </div>
+        <div class="chat-content">
+            <span class="chat-bubble">
+                <v-btn
+                    class="mx-2 red lighten-1" dark large
+                    @click.stop="play"
+                >
+                    <v-icon dark>mdi-play-box</v-icon>
+                </v-btn>
+            </span>
+        </div>
     </div>
-    
 </template>
 
 <script>
@@ -24,14 +29,26 @@
     },
     mounted () {
       let $this = this;
-      if ($this.session === $this.$route.params.session) {
+      if ($this.session !== $this.$route.params.session) {
+        return;
+      }
+      if ($this.$store.state.bili.hasNew) {
         $this.play();
       }
+    },
+    computed: {
+      text() {
+        return window.marked(this.message.text);
+      }
+
     },
     methods : {
       play() {
         let $this = this;
-        $this.$store.commit(BILI_PLAY, {resource:$this.message.resource});
+        let resource = $this.message.resource;
+        if (resource) {
+          $this.$store.commit(BILI_PLAY, {resource});
+        }
       }
     }
   }

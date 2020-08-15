@@ -1,11 +1,13 @@
 
 import {
   BILI_PLAY, BILI_RESET,
-  BILI_TOGGLE
+  BILI_TOGGLE,
+  BILI_NEW,
 } from "../constants";
 
 const reset = () => ({
   play: false,
+  hasNew: false,
   resource: "//player.bilibili.com/player.html?aid=59609396&bvid=BV1Rt411g7t8&cid=103844486&page=1",
 });
 
@@ -37,7 +39,11 @@ export const bili = {
     [BILI_PLAY] (state, {resource}) {
       state.resource = resource;
       state.play = true;
-    }
+      state.hasNew = false;
+    },
 
+    [BILI_NEW] (state) {
+      state.hasNew = true;
+    }
   },
 };

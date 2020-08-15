@@ -56,17 +56,13 @@ export class TextMessage extends Message{
 
   text = '';
   md;
+  level;
 
-  /**
-   *
-   * @param text
-   * @param id
-   * @param md
-   */
-  constructor({text, id, md}) {
+  constructor({text, id, md, level}) {
     super(MESSAGE_TEXT, id);
     this.text = text;
     this.md = !!md;
+    this.level = level;
   }
 
   /**
@@ -90,11 +86,13 @@ export class BiliMessage extends Message {
    * 视频连接地址.
    */
   resource;
+  text = '';
 
-  constructor({id, resource})
+  constructor({id, resource, text})
   {
     super(MESSAGE_BILI, id);
     this.resource = resource;
+    this.text = text;
   }
 
   static create(resource) {
@@ -102,6 +100,6 @@ export class BiliMessage extends Message {
   }
 
   brief () {
-    return '视频';
+    return this.text || '视频';
   }
 }

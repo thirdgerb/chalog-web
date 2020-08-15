@@ -1,5 +1,5 @@
 <template>
-    <div class="chat-content" :class="{'chat-pick': picked}">
+    <div class="chat-content" :class="{'chat-pick': picked}" :color="color">
         <span v-if="!markdown" class="chat-bubble">{{ text }}</span>
         <div v-if="markdown" class="chat-bubble" v-html="markdown"></div>
     </div>
@@ -21,11 +21,13 @@
     data: () => ({
       text : '',
       markdown: '',
+      level : '',
     }),
     mounted() {
       let $this = this;
       let messageText = $this.message.text;
       $this.text = messageText;
+      $this.level = $this.message.level;
 
       if ($this.message.md) {
         $this.markdown = window.marked(messageText);
@@ -38,6 +40,21 @@
         $this.markdown = window.marked(output);
       }
     },
+    computed: {
+      color() {
+        let level = this.level;
+        switch(level) {
+          case 'error':
+            return 'red';
+          case 'warning':
+          case 'notice':
+            return 'orange';
+          case 'info' :
+          default:
+            return 'black';
+        }
+      }
+    }
   }
 </script>
 

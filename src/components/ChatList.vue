@@ -12,21 +12,22 @@
         <!-- loading -->
         <div class="chat-row chat-receive" v-show="chat.loading">
             <div class="chat-content">
-            <span class="chat-bubble">
-                <span class="dot_1 dot"></span>
-                <span class="dot_2 dot"></span>
-                <span class="dot_3 dot"></span>
-            </span>
+                <span class="chat-bubble">
+                    <span class="dot_1 dot"></span>
+                    <span class="dot_2 dot"></span>
+                    <span class="dot_3 dot"></span>
+                </span>
             </div>
         </div>
         <!-- suggestion -->
         <div class="chat-row chat-say chat-suggestion" v-show="!chat.said">
-            <div class="chat-content">
+            <div class="chat-content"
+                 v-for="(suggestion, index) in suggestionList"
+                 :key="index"
+            >
                 <v-btn class="chat-bubble" text
-                  v-for="(suggestion, index) in suggestionList"
-                  :key="index"
                   @click="select(suggestion)"
-                >{{ index }}{{ suggestion }}</v-btn>
+                >{{ suggestion }} {{ index }}</v-btn>
             </div>
         </div>
     </div>
@@ -67,12 +68,11 @@
         let chat = this.chat;
         let suggestions = chat.suggestions;
         let keys = Object.keys(suggestions);
-        keys = keys.reverse();
 
         let lists = {};
         for (let key of keys) {
           if (typeof(key) === 'number' || key.length < 3) {
-            lists['[' + key + '] '] = suggestions[key];
+            lists['[' + key + ']'] = suggestions[key];
           } else {
             lists[key] = suggestions[key];
           }
