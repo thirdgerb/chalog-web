@@ -73,6 +73,7 @@
         if ($this.loading) {
           return;
         }
+
         setTimeout(function() {
           $this.busy = false;
         }, 1000);
@@ -90,16 +91,15 @@
           }
         }
         message = message.trim();
-
         $this.busy = true;
 
 
         let text = TextMessage.create(message);
-        $this.$emit('deliver-message', text);
-
         // 清空输入框.
         $this.clearMessage();
         $this.clearError();
+        $this.$emit('deliver-message', text);
+
       },
 
       clearMessage() {
@@ -138,7 +138,7 @@
       loading() {
         let $this = this;
         return $this.busy
-          && !$this.$store.socket.connecting;
+          && !$this.$store.state.socket.connecting;
       },
       prependIcon() {
         let $this = this;
