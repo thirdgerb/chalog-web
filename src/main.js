@@ -17,8 +17,10 @@ Logger.setLevel(level);
 
 
 const option = {
-  transports: ["websocket"]
+  transports: ["websocket"],
+  path:process.env.VUE_APP_SOCKET_IO_PATH
 };
+
 const socket = io(process.env.VUE_APP_SOCKET_IO_CONNECTION, option);
 window.socket = socket;
 
