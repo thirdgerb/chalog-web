@@ -136,7 +136,9 @@
         return this.error.length > 0;
       },
       loading() {
-        return this.busy;
+        let $this = this;
+        return $this.busy
+          && !$this.$store.socket.connecting;
       },
       prependIcon() {
         let $this = this;
