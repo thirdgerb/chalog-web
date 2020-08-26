@@ -74,7 +74,7 @@ export class MessageBatch {
     this.creatorName = creatorName;
     this.session = session;
     this.batchId = batchId;
-    this.createdAt = createdAt || Date.parse((new Date()).toString()) / 1000;
+    this.createdAt = createdAt || Date.parse((new Date()).toString());
     this.suggestions = suggestions || {};
     this.context = context || {};
 
@@ -90,7 +90,7 @@ export class MessageBatch {
     if (this.dateStr) {
       return this.dateStr;
     }
-    let date = new Date(this.createdAt * 1000);
+    let date = new Date(this.createdAt);
     return this.dateStr = date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
   }
 

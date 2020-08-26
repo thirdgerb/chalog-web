@@ -95,11 +95,11 @@
 
 
         let text = TextMessage.create(message);
+
+        $this.$emit('deliver-message', text);
         // 清空输入框.
         $this.clearMessage();
         $this.clearError();
-        $this.$emit('deliver-message', text);
-
       },
 
       clearMessage() {
