@@ -74,7 +74,7 @@ export class MessageBatch {
     this.creatorName = creatorName;
     this.session = session;
     this.batchId = batchId;
-    this.createdAt = createdAt || Date.parse((new Date()).toString());
+    this.createdAt = createdAt || (new Date().getTime());
     this.suggestions = suggestions || {};
     this.context = context || {};
 

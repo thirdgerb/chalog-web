@@ -142,9 +142,14 @@
       },
       prependIcon() {
         let $this = this;
-        let alive = $this.alive;
-
-        return alive.bot ?  'mdi-robot' : 'mdi-face-agent';
+        let bot = $this.alive.bot;
+        if (bot === true) {
+          return 'mdi-robot';
+        }
+        if (bot === false) {
+          return 'mdi-face-agent';
+        }
+        return null;
       }
     }
 

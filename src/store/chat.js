@@ -43,8 +43,6 @@ export function createConversation(
  },
  userId,
 ) {
-
-  bot = !!bot;
   title = title || scene;
   if (!icon) {
     icon = bot ? 'mdi-robot' : 'mdi-forum';

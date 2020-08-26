@@ -17,7 +17,7 @@ export default class Input {
     this.session = session;
     this.scene = scene;
     this.bot = bot;
-    this.createdAt = Date.parse((new Date()).toString());
+    this.createdAt = new Date().getTime();
     this.query = query;
   }
 }
