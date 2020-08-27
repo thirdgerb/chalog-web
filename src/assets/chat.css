@@ -39,7 +39,13 @@
 
 }
 .chat-content {
-    overflow: hidden;
+    overflow: visible;
+    zoom: 1;
+    word-break: break-all;
+}
+.chat-clear {
+    height: 0;
+    clear:both
 }
 .chat-bubble {
     display: inline-block;
@@ -54,6 +60,8 @@
 
 .chat-say .chat-bubble {
     float: right;
+    word-break: break-all;
+    max-width: 100%;
     border-radius:  12px 12px 0 12px;
     color:white;
     background: rgba(44, 44, 44, 1);

@@ -1,7 +1,8 @@
 <template>
     <div class="chat-content" :class="{'chat-pick': picked}" :color="color">
-        <span v-if="!markdown" class="chat-bubble">{{ text }}</span>
+        <div v-if="!markdown" class="chat-bubble">{{ text }}</div>
         <div v-if="markdown" class="chat-bubble" v-html="markdown"></div>
+        <div class="chat-clear"></div>
     </div>
 </template>
 

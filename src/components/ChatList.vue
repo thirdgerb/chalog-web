@@ -25,9 +25,9 @@
                  v-for="(suggestion, index) in suggestionList"
                  :key="index"
             >
-                <v-btn class="chat-bubble" text
+                <div class="chat-bubble"
                   @click="select(suggestion)"
-                >{{ suggestion }} {{ index }}</v-btn>
+                >{{ suggestion }} {{ index }}</div>
             </div>
         </div>
     </div>
