@@ -51,7 +51,7 @@
     position: relative;
     width: 100%;
     height: 0;
-    padding-top: 56.2%;
+    padding-top: 80%;
 }
 .bili-video iframe {
     position: absolute;

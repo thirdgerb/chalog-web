@@ -1,5 +1,6 @@
 <template>
-    <div class="chat-content" :class="{'chat-pick': picked}" :color="color">
+    <div class="chat-content"
+         :class="{'chat-pick': picked, 'chat-notice':chatNotice, 'chat-error':chatError}" >
         <div v-if="!markdown" class="chat-bubble">{{ text }}</div>
         <div v-if="markdown" class="chat-bubble" v-html="markdown"></div>
         <div class="chat-clear"></div>
@@ -42,18 +43,13 @@
       }
     },
     computed: {
-      color() {
+      chatNotice() {
         let level = this.level;
-        switch(level) {
-          case 'error':
-            return 'red';
-          case 'warning':
-          case 'notice':
-            return 'orange';
-          case 'info' :
-          default:
-            return 'black';
-        }
+        return level === 'warning' || level === 'notice';
+      },
+      chatError() {
+        let level = this.level;
+        return level === 'error';
       }
     }
   }

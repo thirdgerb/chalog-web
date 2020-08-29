@@ -122,3 +122,15 @@
     color:grey;
     margin-bottom:15px;
 }
+
+
+
+.chat-notice{
+    color: yellow;
+    border-color: yellowgreen;
+}
+
+.chat-error {
+    color: red;
+    border-color: darkred;
+}
