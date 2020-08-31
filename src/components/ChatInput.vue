@@ -26,10 +26,10 @@
       filled
       no-resize
       background-color="white"
-      @click:append="sendMessage"
+      @click:append="buttonSendMessage"
       @click:prepend-inner="changeToBot"
       @click:clear="clearMessage"
-      v-on:keyup.enter.prevent.stop="sendMessage"
+      v-on:keyup.shift.enter.prevent.stop="sendMessage"
       v-on:blur="clearError"
       ></v-text-field>
     </div>
@@ -40,6 +40,7 @@
   import {TextMessage} from "../socketio/Message";
   import {
     CHAT_ACTION_TOGGLE_MANUAL,
+    LAYOUT_SNACK_BAR_TOGGLE,
   } from "../constants";
 
   const rules = {
@@ -62,6 +63,7 @@
         rules: rules,
         focus: false,
         botChanging: false,
+        announced: false,
       }
     },
     created() {
@@ -101,7 +103,17 @@
         $this.clearMessage();
         $this.clearError();
       },
-
+      buttonSendMessage(){
+        let $this = this;
+        if (!$this.announced) {
+          $this.$store.commit(
+            LAYOUT_SNACK_BAR_TOGGLE,
+            "发消息快捷键为 shift + enter"
+          )
+        }
+        $this.announced = true;
+        $this.sendMessage()
+      },
       clearMessage() {
         let $this = this;
         $this.message = '';

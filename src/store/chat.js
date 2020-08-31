@@ -99,7 +99,7 @@ export function saveConnectedToStorage(connected, storageKey) {
       updatedAt : chat.updatedAt,
       batches: [],
       unread: 0,
-      lastMessage: chat.lastMessage,
+      // lastMessage: chat.lastMessage,
       hasElderMessages: true,
       said : true
     });
@@ -391,19 +391,20 @@ export const chat = {
       let batchIds = chat.batches.map((c) => c.batchId);
       let unread = 0;
       for (let b of batches) {
-        // 消息已经存在, 则跳过.
-        if (batchIds.indexOf(b.batchId) >= 0) {
-          continue;
-        } else if (b.createdAt > originUpdatedAt){
+        if (b.createdAt > originUpdatedAt){
           chat.lastMessage = b.lastMessage;
           chat.updatedAt = b.createdAt;
 
+        }
+        // 消息已经存在, 则跳过.
+        if (!(batchIds.indexOf(b.batchId) >= 0)) {
           // 合并的消息不轻易加红点
           if (originUpdatedAt > 0) {
             unread += getUnread(b);
           }
+
+          chat.batches.push(b);
         }
-        chat.batches.push(b);
       }
 
       // 重新排序.
@@ -561,6 +562,8 @@ export const chat = {
         commit(LAYOUT_SNACK_BAR_TOGGLE, info);
         Logger.error(info);
       }
+
+      saveConnectedToStorage(state.connected, localStorageKey)
     },
     /**
      * 尝试连接一个 incoming 位置的 session

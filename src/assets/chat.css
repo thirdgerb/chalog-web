@@ -126,11 +126,11 @@
 
 
 .chat-notice{
-    color: yellow;
-    border-color: yellowgreen;
+    color: orange;
+    border-color: orange;
 }
 
 .chat-error {
-    color: red;
+    color: darkred;
     border-color: darkred;
 }
