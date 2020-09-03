@@ -12,6 +12,11 @@
                 >
                     <v-icon dark>mdi-play-box</v-icon>
                 </v-btn>
+                 <v-switch
+                     v-model="autoPlay"
+                     dense
+                     label="自动播放"
+                 ></v-switch>
             </span>
         </div>
     </div>
@@ -32,13 +37,22 @@
       if ($this.session !== $this.$route.params.session) {
         return;
       }
-      if ($this.$store.state.bili.hasNew) {
+
+      if ($this.$store.state.bili.hasNew && $this.$store.state.bili.autoPlay) {
         $this.play();
       }
     },
     computed: {
       text() {
         return window.marked(this.message.text);
+      },
+      autoPlay: {
+        set: function(val){
+          this.$store.state.bili.autoPlay = val;
+        },
+        get: function(){
+          return this.$store.state.bili.autoPlay;
+        }
       }
 
     },

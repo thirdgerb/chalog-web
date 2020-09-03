@@ -7,6 +7,7 @@ import {
 
 const reset = () => ({
   play: false,
+  autoPlay:true,
   hasNew: false,
   resource: "//player.bilibili.com/player.html?aid=59609396&bvid=BV1Rt411g7t8&cid=103844486&page=1",
 });

@@ -1,7 +1,10 @@
 <template>
     <v-main app class="indigo lighten-5" v-scroll="onScroll">
         <Drawer :alive="aliveSession"/>
-        <bili-video></bili-video>
+        <bili-video
+            :alive="aliveSession"
+            v-on:deliver-message="deliverMessage"
+        ></bili-video>
         <v-container id="chat-container" fluid >
             <v-overlay :value="querying" opacity="0.05">
                 <v-row justify="center" align="center">
