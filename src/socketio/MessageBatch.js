@@ -76,7 +76,11 @@ export class MessageBatch {
     this.batchId = batchId;
     this.createdAt = createdAt || (new Date().getTime());
     this.suggestions = suggestions || {};
-    this.context = context || {};
+    if (context && Object.values(context).length) {
+      this.context = context;
+    } else {
+      this.context = {};
+    }
 
     messages = messages || [];
     for(let i in messages) {

@@ -21,6 +21,8 @@
                     v-on:deliver-message="deliverMessage"
                 >
                 </chat-list>
+
+                <maze-view :alive="aliveSession"></maze-view>
             </div>
         </v-container>
 
@@ -36,6 +38,7 @@
   import ChatList from '../components/ChatList';
   import BiliVideo from '../components/BiliVideo';
   import ChatInput from '../components/ChatInput';
+  import MazeView from '../components/MazeView';
   import {
     CHAT_ACTION_CONNECT_INCOMING,
     CHAT_COMMIT_MESSAGE,
@@ -57,7 +60,8 @@
       BiliVideo,
       ChatList,
       ChatInput,
-      Drawer
+      Drawer,
+      MazeView
     },
     // prop from router
     props : ['aliveSession'],

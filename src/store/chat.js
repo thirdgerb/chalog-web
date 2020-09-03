@@ -181,6 +181,7 @@ export function pushNewBatchToChat(batch, chat) {
     chat.suggestions = batch.suggestions;
     chat.said = false;
   }
+
   if (isBot && Object.keys(batch.context).length > 0) {
     chat.context = batch.context;
   }
@@ -188,7 +189,6 @@ export function pushNewBatchToChat(batch, chat) {
   if (batch.mode === BATCH_MODE_SELF) {
     chat.said = true;
   }
-
 
   return chat;
 }
