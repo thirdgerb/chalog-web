@@ -30,6 +30,8 @@
       @click:prepend-inner="changeToBot"
       @click:clear="clearMessage"
       v-on:keyup.shift.enter.prevent.stop="sendMessage"
+      v-on:keyup.up="prevHistory"
+      v-on:keyup.down="nextHistory"
       v-on:blur="clearError"
       ></v-text-field>
     </div>
@@ -64,6 +66,8 @@
         focus: false,
         botChanging: false,
         announced: false,
+        history: [],
+        historyNeedle: 0,
       }
     },
     created() {
@@ -100,8 +104,35 @@
 
         $this.$emit('deliver-message', text);
         // 清空输入框.
+        $this.addHistory(message);
         $this.clearMessage();
         $this.clearError();
+      },
+      addHistory(message) {
+        let $this = this;
+        $this.history.push(message);
+        if ($this.history.length > 10) {
+          $this.history.pop();
+        }
+        $this.historyNeedle = $this.history.length;
+      },
+      prevHistory() {
+        let $this = this;
+        let needle = $this.historyNeedle - 1;
+        let message = $this.history[needle];
+        if (message) {
+          $this.message = message;
+          $this.historyNeedle = needle;
+        }
+      },
+      nextHistory() {
+        let $this = this;
+        let needle = $this.historyNeedle + 1;
+        let message = $this.history[needle];
+        if (message) {
+          $this.message = message;
+          $this.historyNeedle = needle;
+        }
       },
       buttonSendMessage(){
         let $this = this;
