@@ -73,11 +73,11 @@ export const emitter = {
     /**
      * 加入房间.
      */
-    [EMITTER_ACTION_JOIN] ({dispatch}, {scene, session, rejoin}) {
+    [EMITTER_ACTION_JOIN] ({dispatch}, {scene, session, rejoin, bot}) {
       if (rejoin) {
-        dispatch(EMITTER_ACTION_REQUEST, ['REJOIN', {scene, session}])
+        dispatch(EMITTER_ACTION_REQUEST, ['REJOIN', {scene, session, bot}])
       } else {
-        dispatch(EMITTER_ACTION_REQUEST, ['JOIN', {scene, session}])
+        dispatch(EMITTER_ACTION_REQUEST, ['JOIN', {scene, session, bot}])
       }
     },
 
@@ -97,10 +97,12 @@ export const emitter = {
      */
     [EMITTER_ACTION_JOIN_ALL] ({dispatch, rootState}, rejoin) {
       let rooms = Object.values(rootState.chat.connected)
-        .map(({scene, session}) => ({scene, session}));
+        .map(({scene, session, bot}) => ({scene, session, bot}));
 
       for (let room of rooms) {
-        dispatch(EMITTER_ACTION_JOIN, {scene:room.scene, session:room.session, rejoin});
+        dispatch(
+          EMITTER_ACTION_JOIN,
+          {scene:room.scene, session:room.session, bot:room.bot, rejoin});
       }
     },
 

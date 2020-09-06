@@ -90,6 +90,7 @@
         let $this = this;
         return $this.$store.state.chat.unread;
       },
+
     },
     watch : {
       unread(newVal, oldVal) {
@@ -214,7 +215,7 @@
         $this.scrolling = true;
         setTimeout(function() {
           // 做一个判断逻辑.
-          let target = document.documentElement.offsetHeight - 5;
+          let target = document.documentElement.offsetHeight - 10;
           $this.$vuetify.goTo(target);
           $this.scrolling = false;
         }, 200);

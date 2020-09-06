@@ -391,20 +391,25 @@ export const chat = {
       let batchIds = chat.batches.map((c) => c.batchId);
       let unread = 0;
       for (let b of batches) {
+        // 消息已经存在, 则跳过.
+        let existed = batchIds.indexOf(b.batchId) >= 0;
+        if (existed){
+          continue;
+
+        }
+
+        chat.batches.push(b);
+
         if (b.createdAt > originUpdatedAt){
           chat.lastMessage = b.lastMessage;
           chat.updatedAt = b.createdAt;
 
-        }
-        // 消息已经存在, 则跳过.
-        if (!(batchIds.indexOf(b.batchId) >= 0)) {
           // 合并的消息不轻易加红点
           if (originUpdatedAt > 0) {
             unread += getUnread(b);
           }
-
-          chat.batches.push(b);
         }
+
       }
 
       // 重新排序.
@@ -453,7 +458,14 @@ export const chat = {
       if (chat.autoJoin) {
         let merge = createConversation(chat, userId);
         await commit(CHAT_ADD_INFO, {chat:merge, connect: true});
-        await dispatch(EMITTER_ACTION_JOIN, {scene:chat.scene, session:chat.session});
+        await dispatch(
+          EMITTER_ACTION_JOIN,
+          {
+            scene:chat.scene,
+            session:chat.session,
+            bot:chat.bot
+          }
+        );
         return;
       }
 
@@ -541,7 +553,7 @@ export const chat = {
       // 提交当前改动.
       commit(CHAT_TOGGLE_MANUAL, {session, bot});
       if (alive === session) {
-        let info = bot ? '切换到机器人': '切换到群聊';
+        let info = bot ? '切换到机器人': '切换到人工';
         commit(LAYOUT_SNACK_BAR_TOGGLE, info);
       }
     },
@@ -587,7 +599,7 @@ export const chat = {
         con.unread = 0;
         state.connected[session] = con;
 
-        dispatch(EMITTER_ACTION_JOIN, {session, scene:con.scene});
+        dispatch(EMITTER_ACTION_JOIN, {session, scene:con.scene, bot:con.bot});
 
         insertSession(state.connectedSessions, session);
         countUnread(state);

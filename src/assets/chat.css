@@ -67,7 +67,12 @@
     background: rgba(44, 44, 44, 1);
 }
 
+.chat-suggestion {
+    text-align: right;
+    cursor: pointer;
+}
 .chat-say.chat-suggestion .chat-bubble {
+    float:none;
     background-color: rgba(44, 44, 44, 0.67);
 }
 

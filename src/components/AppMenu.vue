@@ -37,7 +37,7 @@
 </template>
 
 <script>
-  import {LAYOUT_MENU_TOGGLE, USER_ACTION_LOGOUT} from "../constants";
+  import {LAYOUT_MENU_TOGGLE, USER_ACTION_LOGOUT, LAYOUT_SNACK_BAR_TOGGLE} from "../constants";
 
   export default {
       name: "appMenu",
@@ -73,6 +73,8 @@
               window.location.href = 'https://communechatbot.com';
               break;
             case 'abilities':
+              $this.$store.commit(LAYOUT_SNACK_BAR_TOGGLE, "功能还未实装");
+              break;
             default:
              return;
           }

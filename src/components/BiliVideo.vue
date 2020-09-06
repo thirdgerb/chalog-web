@@ -29,7 +29,7 @@
                 <!--</v-list-item-group>-->
             <!--</v-list>-->
             <div v-if="hasSuggestions">
-                <v-card-text>
+                <v-card-text class="bili-options">
                     <v-btn
                         class="mx-1 mt-2"
                         dark
@@ -71,10 +71,12 @@
         let $this = this;
         let url = $this.$store.state.bili.resource;
 
-        return url
+        let src = url
           + '&as_wide=1&danmaku=0&high_quality=1'
-          + ($this.play ? '&autoplay=1' : '')
+          + ($this.domPlayed ? '&autoplay=1' : '')
           ;
+        $this.domPlayed = true;
+        return src;
       },
       commits () {
         return this.$store.state.chat.commit;
@@ -139,16 +141,12 @@
     position: relative;
     width: 100%;
     height: 0;
-    padding-top: 57.6%;
+    padding-top: 60%;
 }
-.bili-cover {
-    position: absolute;
-    top:0;
-    left:0;
-    height:100%;
-    width:100%;
-    opacity: 0;
-    z-index: 5;
+.bili-options{
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .bili-video iframe {

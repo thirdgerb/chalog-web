@@ -20,14 +20,14 @@
             </div>
         </div>
         <!-- suggestion -->
-        <div class="chat-row chat-say chat-suggestion" v-show="!chat.said">
+        <div class="chat-row chat-say chat-suggestion" v-show="showSuggestions">
             <div class="chat-content"
                  v-for="(suggestion, index) in suggestionList"
                  :key="index"
             >
                 <div class="chat-bubble"
                   @click="select(suggestion)"
-                >{{ suggestion }} {{ index }}</div>
+                >{{ index }} {{ suggestion }}</div>
             </div>
         </div>
     </div>
@@ -61,6 +61,10 @@
       session() {
         return this.chat.session;
       },
+      showSuggestions() {
+        let chat = this.chat;
+        return (!chat.said) && (chat.bot === true);
+      },
       suggestions() {
         return Object.values(this.chat.suggestions);
       },
@@ -86,11 +90,6 @@
 <style scoped>
     /* style "loading" or "typing" stae */
 
-    .bubble-typing {
-        width: 38px;
-        padding: 12px 16px;
-        height: 8px;
-    }
     .dot {
         background-color: rgb(255,255,255);
         float: left;

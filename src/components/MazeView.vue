@@ -6,7 +6,7 @@
             :class="`d-flex align-${a}`"
             color="grey lighten-2"
             flat
-            height="40"
+            height="30"
             outlined
             tile
         >
@@ -82,18 +82,18 @@
 
 <style scoped>
     .play-maze {
-        width:200px;
-        height:200px;
+        width:150px;
+        height:150px;
         position: fixed;
         top: 90px;
-        left: 50%;
-        margin-left:-12.5%;
+        right: 60px;
+        opacity: 0.45;
     }
     .maze-cell {
         text-align: center;
-        height:40px;
-        width:40px;
-        line-height: 40px;
+        height:30px;
+        width:30px;
+        line-height: 30px;
     }
 
 
