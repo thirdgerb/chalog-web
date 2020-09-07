@@ -9,7 +9,7 @@ export default class Input {
   query;
   createdAt;
 
-  constructor({session, scene, bot }, message, query) {
+  constructor({session, scene, bot, createdAt }, message, query) {
     if (!(message instanceof Message)) {
       throw new Error('message is not instance of Message:' + message);
     }
@@ -17,7 +17,7 @@ export default class Input {
     this.session = session;
     this.scene = scene;
     this.bot = bot;
-    this.createdAt = new Date().getTime();
+    this.createdAt = createdAt || new Date().getTime();
     this.query = query;
   }
 }

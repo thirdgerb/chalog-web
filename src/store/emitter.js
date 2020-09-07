@@ -123,7 +123,7 @@ export const emitter = {
     /**
      * 发送消息到服务端.
      */
-    [EMITTER_ACTION_DELIVER_MESSAGE] ({dispatch, rootState}, {message, session, query}) {
+    [EMITTER_ACTION_DELIVER_MESSAGE] ({dispatch, rootState}, {message, session, query, createdAt}) {
       if (!(message instanceof Message)) {
         Logger.error('message must be instance of Message');
         return;
@@ -138,7 +138,7 @@ export const emitter = {
 
       // 封装参数.
       let input = new Input(
-        {session , bot : chat.bot, scene: chat.scene},
+        {session , bot : chat.bot, scene: chat.scene, createdAt},
         message,
         query
       );

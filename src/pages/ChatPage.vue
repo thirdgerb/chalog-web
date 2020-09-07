@@ -252,7 +252,7 @@
 
         $this.$store.dispatch(
           EMITTER_ACTION_DELIVER_MESSAGE,
-          {message, session, query: $this.$route.query}
+          {message, session, query: $this.$route.query, createdAt: batch.createdAt}
         );
 
         $this.rollToTheBottom(session, true);
