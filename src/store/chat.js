@@ -181,7 +181,7 @@ export function pushNewBatchToChat(batch, chat) {
     chat.unread += getUnread(batch);
   }
 
-  if (batch.mode !== BATCH_MODE_USER) {
+  if (batch.mode !== BATCH_MODE_SELF) {
     chat.updatedAt = batch.createdAt;
   }
 
