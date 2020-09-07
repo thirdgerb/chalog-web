@@ -24,7 +24,13 @@ import {
   CHAT_RESET,
 
 } from '../constants';
-import {BATCH_MODE_BOT, BATCH_MODE_SELF, BATCH_MODE_SYSTEM, MessageBatch} from "../socketio/MessageBatch";
+import {
+  BATCH_MODE_BOT,
+  BATCH_MODE_SELF,
+  BATCH_MODE_SYSTEM,
+  BATCH_MODE_USER,
+  MessageBatch
+} from "../socketio/MessageBatch";
 
 let localStorageKey = null;
 
@@ -172,8 +178,11 @@ export function pushNewBatchToChat(batch, chat) {
 
   if (batch.mode !== BATCH_MODE_SYSTEM) {
     chat.lastMessage = batch.lastMessage;
-    chat.updatedAt = batch.createdAt;
     chat.unread += getUnread(batch);
+  }
+
+  if (batch.mode !== BATCH_MODE_USER) {
+    chat.updatedAt = batch.createdAt;
   }
 
   let isBot = batch.mode === BATCH_MODE_BOT;

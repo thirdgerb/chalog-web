@@ -223,7 +223,7 @@
       /**
        * @param {Message} message
        */
-      deliverMessage(message) {
+      async deliverMessage(message) {
         if (!(message instanceof Message)) {
           Logger.error('message must be instance of Message');
           return;
@@ -245,7 +245,7 @@
           $this.$store.state.user
         );
 
-        $this.$store.commit(
+        await $this.$store.commit(
           CHAT_COMMIT_MESSAGE,
           batch
         );
