@@ -61,4 +61,5 @@ export const BILI_RESET = 'BILI_RESET';
 export const BILI_TOGGLE = 'BILI_TOGGLE';
 export const BILI_PLAY = 'BILI_PLAY';
 export const BILI_NEW = 'BILI_NEW';
+export const BILI_ADD = 'BILI_ADD';
 

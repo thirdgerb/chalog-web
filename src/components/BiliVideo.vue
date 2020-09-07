@@ -12,22 +12,6 @@
                     allowfullscreen="true"
                 ></iframe>
             </div>
-            <!--<v-list dense nav>-->
-                <!--<v-subheader>接下来</v-subheader>-->
-                <!--<v-list-item-group transition="scroll-y-transition">-->
-                    <!--<v-list-item-->
-                     <!--v-for="(suggestion, index) in suggestions"-->
-                     <!--:key="index"-->
-                    <!--&gt;-->
-                        <!--<v-list-item-icon>-->
-                            <!--{{ index }}-->
-                        <!--</v-list-item-icon>-->
-                        <!--<v-list-item-content>-->
-                            <!--<v-list-item-title v-text="suggestion"></v-list-item-title>-->
-                        <!--</v-list-item-content>-->
-                    <!--</v-list-item>-->
-                <!--</v-list-item-group>-->
-            <!--</v-list>-->
             <div v-if="hasSuggestions">
                 <v-card-text class="bili-options">
                     <v-btn
@@ -55,8 +39,8 @@
     props:["alive"],
     data: () => ({
       selected: false,
-      domPlayed: false,
       suggestions: {},
+      played: 0,
     }),
     computed : {
       play: {
@@ -69,14 +53,14 @@
       } ,
       src()  {
         let $this = this;
-        let url = $this.$store.state.bili.resource;
-
-        let src = url
+        let auto = $this.play && ($this.played > 0);
+        return $this.resource
           + '&as_wide=1&danmaku=0&high_quality=1'
-          + ($this.domPlayed ? '&autoplay=1' : '')
+          + ( auto ? '&autoplay=1' : '')
           ;
-        $this.domPlayed = true;
-        return src;
+      },
+      resource() {
+        return this.$store.state.bili.resource;
       },
       commits () {
         return this.$store.state.chat.commit;
@@ -87,6 +71,11 @@
       },
     },
     watch: {
+      resource (newVal, oldVal) {
+        if (oldVal && newVal !== oldVal) {
+          this.played += 1;
+        }
+      },
       commits() {
         let $this = this;
         let chat = $this.$store.state.chat.connected[$this.alive];
@@ -141,7 +130,7 @@
     position: relative;
     width: 100%;
     height: 0;
-    padding-top: 60%;
+    padding-top: 70%;
 }
 .bili-options{
     max-height: 200px;

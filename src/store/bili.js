@@ -2,14 +2,15 @@
 import {
   BILI_PLAY, BILI_RESET,
   BILI_TOGGLE,
-  BILI_NEW,
+  BILI_NEW, BILI_ADD,
 } from "../constants";
 
 const reset = () => ({
   play: false,
   autoPlay:true,
   hasNew: false,
-  resource: "//player.bilibili.com/player.html?aid=59609396&bvid=BV1Rt411g7t8&cid=103844486&page=1",
+  history: [],
+  resource: "",
 });
 
 export const bili = {
@@ -45,6 +46,24 @@ export const bili = {
 
     [BILI_NEW] (state) {
       state.hasNew = true;
-    }
+    },
+
+    /**
+     * 添加一个 bili 视频.
+     * @param state
+     * @param resource
+     */
+    [BILI_ADD] (state, {resource}) {
+
+      let idx = state.history.indexOf(resource);
+      if (idx >= 0) {
+        return;
+      }
+      state.history.push(resource);
+      if (state.history >= 30) {
+        state.history.pop();
+      }
+      state.hasNew = true;
+    },
   },
 };

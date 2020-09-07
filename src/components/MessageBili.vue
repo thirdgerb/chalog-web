@@ -23,7 +23,7 @@
 </template>
 
 <script>
-  import {BILI_PLAY} from '../constants';
+  import {BILI_PLAY, BILI_ADD} from '../constants';
   import {BiliMessage} from "../socketio/Message";
 
   export default {
@@ -37,6 +37,9 @@
       if ($this.session !== $this.$route.params.session) {
         return;
       }
+
+      let resource = $this.message.resource;
+      $this.$store.commit(BILI_ADD, {resource});
 
       if ($this.$store.state.bili.hasNew && $this.$store.state.bili.autoPlay) {
         $this.play();
