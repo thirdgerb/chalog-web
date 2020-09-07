@@ -86,8 +86,9 @@
         height:150px;
         position: fixed;
         top: 90px;
-        right: 60px;
-        opacity: 0.45;
+        left:50%;
+        margin-left: -12.5%;
+        opacity: 0.3;
     }
     .maze-cell {
         text-align: center;
