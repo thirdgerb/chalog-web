@@ -28,7 +28,6 @@ import {
   BATCH_MODE_BOT,
   BATCH_MODE_SELF,
   BATCH_MODE_SYSTEM,
-  BATCH_MODE_USER,
   MessageBatch
 } from "../socketio/MessageBatch";
 
