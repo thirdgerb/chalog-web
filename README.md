@@ -1,5 +1,22 @@
 # Commune Chatlog [Web]
 
+Demo 介绍视频已经可以查看： https://www.bilibili.com/video/BV1tK4y1a75B
+
+
+核心功能:
+
+1. 基于配置的多轮对话逻辑, 可以无限扩充对话节点.
+2. 可以在对话中增加逻辑节点, 用对话给机器人编程, 用对话来生成新的对话
+3. 实现了 Ghost in Shells 架构, 机器人可以异构到多个平台, 同时运行
+
+相关项目：
+
+- 核心项目: https://github.com/thirdgerb/chatbot
+- studio: https://github.com/thirdgerb/studio-hyperf
+- nlu单元: https://github.com/thirdgerb/spacy-nlu
+
+
+
 这个项目是作者 (thirdgerb@gmail.com) 为自己的对话机器人项目 [CommuneChatbot](https://github.com/thirdgerb/chatbot) 开发的前端界面.
 
 简单来说, 我打算实现名为 __Chatlog__ 的一种产品. 它类似于 Weblog (博客), Videolog (播客), micro weblog (微博), 是一种个人化的知识管理与呈现的工具.
@@ -23,10 +40,6 @@ Chatlog 应该作为一个完整的对话机器人平台, 具备各种对话机�
 
 由于作者并非专业的前端工程师, 所以本项目目前主要是在验证各种思路.
 更多开发思路见 [开发记录](/docs/thoughts.md)
-
-
-这是我第一次创造一个市面上还未曾见到过的项目. 希望各路好汉给予意见建议, 也欢迎把我打醒 :p
-
 
 
 ## Project setup
