@@ -21,15 +21,13 @@
       single-line
       append-icon="mdi-send"
       :prepend-inner-icon="prependIcon"
-      clearable
       dense
       filled
       no-resize
       background-color="white"
-      @click:append="buttonSendMessage"
+      @click:append="sendMessage"
       @click:prepend-inner="changeToBot"
-      @click:clear="clearMessage"
-      v-on:keyup.shift.enter.prevent.stop="sendMessage"
+      v-on:keyup.enter.prevent.stop="sendMessage"
       v-on:keyup.up="prevHistory"
       v-on:keyup.down="nextHistory"
       v-on:blur="clearError"
