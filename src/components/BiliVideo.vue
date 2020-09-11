@@ -1,7 +1,7 @@
 <template>
     <v-dialog v-model="play" width="600" max-width="80%" dark>
         <v-card >
-            <div class="bili-video">
+            <div class="bili-video" v-if="play">
                 <iframe
                     :src="src"
                     ref="bili"
@@ -41,6 +41,7 @@
       selected: false,
       suggestions: {},
       played: 0,
+      contextId: '',
     }),
     computed : {
       play: {
@@ -79,8 +80,10 @@
       commits() {
         let $this = this;
         let chat = $this.$store.state.chat.connected[$this.alive];
+
         if (!chat) {
           $this.suggestions = {};
+          $this.play = false;
           return;
         }
 
